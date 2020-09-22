@@ -21,7 +21,7 @@ namespace AppDAL.DBRepository
         }
         public async Task<Appuser> GetUserByUserID(string UserID)
         {
-            var oUser = await _DBContext.Appuser.Where(x => x.UserName.Equals(UserID)).FirstOrDefaultAsync();
+            var oUser = await _DBContext.Appuser.Where(x => x.UserId.Equals(UserID)).FirstOrDefaultAsync();
 
             return oUser;            
         }

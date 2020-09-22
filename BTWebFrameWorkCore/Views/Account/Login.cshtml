@@ -1,0 +1,143 @@
+﻿@model LoginVM
+@{
+    ViewData["PageTitle"] = "Login";
+    Layout = "~/Views/Shared/_LayoutAuth.cshtml";
+}
+
+<div class="hold-transition login-page">
+    <div class="login-box">
+        <div class="login-logo">
+            <!-- /.info-box -->
+            <div class="info-box mb-3 bg-info">
+                @*<span class="info-box-icon"><i class="far fa-comment"></i></span>*@
+
+                <div class="info-box-content">                    
+                    <span class="info-box-number">@Model.ProjectName</span>
+                    <span class="info-box-text" style="font-size:large">( Beyoncetech Solutions )</span>
+                </div>
+                <!-- /.info-box-content -->
+            </div>
+            @*<a href="beyoncetechsolutions.com"><b>Beyoncetech</b>Solutions</a>*@
+        </div>
+        <!-- /.login-logo -->
+        <div class="card">
+            <div class="card-body login-card-body">
+                <p class="login-box-msg">Sign in</p>
+
+                <form id="frmLogin" asp-area="" asp-action="Login" asp-controller="Account" data-ajax="true" data-ajax-method="post" data-ajax-success="onSuccess">
+                    <div style="padding-bottom:15px;">
+                        <div class="input-group mb-3" style="height:20px;">
+                            <input type="text" name="UserName" asp-for="UserName" class="form-control" placeholder="User ID" />
+                            <div class="input-group-append">
+                                <div class="input-group-text">
+                                    <span class="fas fa-envelope"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <span asp-validation-for="UserName" class="text-danger" style="font-size:small"></span>
+                    </div>
+                    <div style="padding-bottom:15px;">
+                        <div class="input-group mb-3" style="height:20px;">
+                            <input type="password" name="Password" asp-for="Password" class="form-control" placeholder="Password" />
+                            <div class="input-group-append">
+                                <div class="input-group-text">
+                                    <span class="fas fa-lock"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <span asp-validation-for="Password" class="text-danger" style="font-size:small"></span>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-8">
+                            <div class="input-group">
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" name="RememberMe" asp-for="RememberMe" class="custom-control-input" id="remember_Me">
+                                    <label class="custom-control-label" for="remember_Me">Remember Me</label>
+                                </div>
+                            </div>
+                            @*<div class="icheck-primary">
+                    <input type="checkbox" name="rememberMe" asp-for="RememberMe" />
+                    <label>
+                        Remember Me
+                    </label>
+                </div>*@
+                        </div>
+                        <!-- /.col -->
+                        <div class="col-4">
+                            @*<button type="submit" class="btn btn-primary btn-block">Sign In</button>*@
+                            <button type="button" class="btn btn-primary btn-block" onclick="AjaxSubmit('frmLogin', onBeforeSubmit, onSuccess)">Sign In</button>
+                        </div>
+                        <!-- /.col -->
+                    </div>
+                </form>
+
+                <p class="mb-1">
+                    <a href="forgot-password.html">I forgot my password</a>
+                </p>
+            </div>
+            <!-- /.login-card-body -->
+        </div>
+    </div>
+    <!-- /.login-box -->
+</div>
+@section Scripts {
+    <script src="~/lib/jquery-ajax-unobtrusive/jquery.unobtrusive-ajax.js"></script>
+    <script type="text/javascript">
+        $(function () {            
+            //$('#frmLogin').validate({
+            //    rules: {
+            //        UserName: {
+            //            required: true                        
+            //        },
+            //        Password: {
+            //            required: true,
+            //            minlength: 3
+            //        },
+            //        RememberMe: {
+            //            required: false
+            //        }
+            //    },
+            //    messages: {
+            //        UserName: {
+            //            required: "Please enter a Login id"
+            //        },
+            //        Password: {
+            //            required: "Please provide a password",
+            //            minlength: "Your password must be at least 3 characters long"
+            //        },
+            //        RememberMe: {
+            //            required: "Please check remember me"
+            //        }
+            //    },
+            //    errorElement: 'span',
+            //    errorPlacement: function (error, element) {
+            //        error.addClass('invalid-feedback');
+            //        element.closest('.input-group-append').append(error);
+            //    },
+            //    highlight: function (element, errorClass, validClass) {
+            //        $(element).addClass('is-invalid');
+            //    },
+            //    unhighlight: function (element, errorClass, validClass) {
+            //        $(element).removeClass('is-invalid');
+            //    }
+            //});
+        });
+        
+        function onBeforeSubmit() {
+            ShowAppLoader();
+        }
+
+        onSuccess = function (result) {
+            debugger;
+            HideAppLoader();
+            alert("hi")
+        }
+
+        onFail = function (xhr) {
+            debugger;
+            alert(`Hi ${xhr.responseText}!`);
+            HideAppLoader();
+        };
+    </script>
+}
