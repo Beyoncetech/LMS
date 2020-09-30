@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using AppDAL.DBModels;
+﻿using AppDAL.DBModels;
 using AppDAL.DBRepository;
-using AppDAL.DBRepository.Master;
 using AppModel;
 using AutoMapper;
+using System.Threading.Tasks;
 
 namespace AppBAL.Sevices.Master
 {

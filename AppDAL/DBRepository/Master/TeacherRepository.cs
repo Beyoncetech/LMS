@@ -4,14 +4,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace AppDAL.DBRepository.Master
+namespace AppDAL.DBRepository
 {
     public interface ITeacherRepository
     {
         Task<List<Tblmteacher>> GetAllTeachers();
         Task<Tblmteacher> GetTeacherByTeacherId(int TeacherID);        
         Task<Tblmteacher> GetTeacherByEmailID(string EmailID);
-
     }
     public class TeacherRepository:ITeacherRepository
     {
