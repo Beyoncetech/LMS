@@ -11,7 +11,7 @@
             <div class="info-box mb-3 bg-info">
                 @*<span class="info-box-icon"><i class="far fa-comment"></i></span>*@
 
-                <div class="info-box-content">                    
+                <div class="info-box-content">
                     <span class="info-box-number">@Model.ProjectName</span>
                     <span class="info-box-text" style="font-size:large">( Beyoncetech Solutions )</span>
                 </div>
@@ -24,7 +24,7 @@
             <div class="card-body login-card-body">
                 <p class="login-box-msg">Sign in</p>
 
-                <form id="frmLogin" asp-area="" asp-action="Login" asp-controller="Account" data-ajax="true" data-ajax-method="post" data-ajax-success="onSuccess">
+                <form id="frmLogin" asp-area="" asp-action="Login" asp-controller="Account" data-ajax="true" data-ajax-method="post" data-ajax-begin="onBeforeSubmit" data-ajax-success="onSuccess">
                     <div style="padding-bottom:15px;">
                         <div class="input-group mb-3" style="height:20px;">
                             <input type="text" name="UserName" asp-for="UserName" class="form-control" placeholder="User ID" />
@@ -47,7 +47,7 @@
                         </div>
                         <span asp-validation-for="Password" class="text-danger" style="font-size:small"></span>
                     </div>
-                    
+
                     <div class="row">
                         <div class="col-8">
                             <div class="input-group">
@@ -57,16 +57,17 @@
                                 </div>
                             </div>
                             @*<div class="icheck-primary">
-                    <input type="checkbox" name="rememberMe" asp-for="RememberMe" />
-                    <label>
-                        Remember Me
-                    </label>
-                </div>*@
+                                    <input type="checkbox" name="rememberMe" asp-for="RememberMe" />
+                                    <label>
+                                        Remember Me
+                                    </label>
+                                </div>*@
                         </div>
                         <!-- /.col -->
                         <div class="col-4">
+                            <input type="submit" class="btn btn-primary btn-block" value="Sign In" />
                             @*<button type="submit" class="btn btn-primary btn-block">Sign In</button>*@
-                            <button type="button" class="btn btn-primary btn-block" onclick="AjaxSubmit('frmLogin', onBeforeSubmit, onSuccess)">Sign In</button>
+                            @*<button type="button" class="btn btn-primary btn-block" onclick="AjaxSubmit('frmLogin', onBeforeSubmit, onSuccess, null, '#loginErrMsg')">Sign In</button>*@
                         </div>
                         <!-- /.col -->
                     </div>
@@ -74,6 +75,9 @@
 
                 <p class="mb-1">
                     <a href="forgot-password.html">I forgot my password</a>
+                </p>
+                <p class="login-box-msg">
+                    <span id="loginErrMsg" class="badge badge-danger"></span>
                 </p>
             </div>
             <!-- /.login-card-body -->
@@ -83,12 +87,12 @@
 </div>
 @section Scripts {
     <script src="~/lib/jquery-ajax-unobtrusive/jquery.unobtrusive-ajax.js"></script>
-    <script type="text/javascript">
-        $(function () {            
+    <script type="text/javascript">        
+        $(function () {
             //$('#frmLogin').validate({
             //    rules: {
             //        UserName: {
-            //            required: true                        
+            //            required: true
             //        },
             //        Password: {
             //            required: true,
@@ -122,16 +126,24 @@
             //        $(element).removeClass('is-invalid');
             //    }
             //});
-        });
-        
+        });              
+
         function onBeforeSubmit() {
+            debugger;
             ShowAppLoader();
+            $('#loginErrMsg').text('')
         }
 
-        onSuccess = function (result) {
+        function onSuccess (result, textStatus, jqXHR) {
             debugger;
             HideAppLoader();
-            alert("hi")
+            //alert(result.msg)
+            if (result.stat) {               
+                location.href = result.rtnUrl
+            } else {               
+                $('#loginErrMsg').text(result.msg)                
+            }
+
         }
 
         onFail = function (xhr) {

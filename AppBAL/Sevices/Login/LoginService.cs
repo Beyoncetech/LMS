@@ -13,7 +13,7 @@ namespace AppBAL.Sevices.Login
 {
     public interface ILoginService
     {
-        Task<CommonResponce> ValidateUser(string UserName, string Password);
+        Task<CommonResponce> ValidateUser(string UserID, string Password);
     }
     public class LoginService : ILoginService
     {         
@@ -24,11 +24,11 @@ namespace AppBAL.Sevices.Login
             _DBUserRepository = DBUserRepository;
             _mapper = mapper;
         }
-        public async Task<CommonResponce> ValidateUser(string UserName, string Password)
+        public async Task<CommonResponce> ValidateUser(string UserID, string Password)
         {
             bool isValid = false;
             LoginUser UserInfo = null;
-            var oUser = await _DBUserRepository.GetUserByUserID(UserName).ConfigureAwait(false);
+            var oUser = await _DBUserRepository.GetUserByUserID(UserID).ConfigureAwait(false);
 
             if (oUser != null)
             {

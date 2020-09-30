@@ -14,12 +14,15 @@ namespace AppModel
     public class SiteMapInfo
     {
         public string ID { get; set; }
-        public string ParentID { get; set; }
+        public string Group { get; set; }
+        public string Parent { get; set; }
+        public string Name { get; set; }
+        public string MenuType { get; set; }
         public string AccessType { get; set; }
-        public string MenuItemInfo { get; set; }
         public string ActionUrl { get; set; }
         public string ActionPerm { get; set; }
-        public string Name { get; set; }
+        public int MenuOrder { get; set; }
+
         public string IconLeft { get; set; }
         public string IconRight { get; set; }
     }
@@ -58,5 +61,11 @@ namespace AppModel
             }
 
         }
+    }
+
+    public class AppKeyValueInfo
+    {
+        public string Key { get; set; }
+        public string Value { get; set; }
     }
 }

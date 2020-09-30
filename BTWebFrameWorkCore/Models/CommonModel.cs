@@ -6,9 +6,11 @@ using System.Threading.Tasks;
 namespace BTWebAppFrameWorkCore.Models
 {
     public class LoginUserInfo
-    {        
-        public string UserName { get; set; }        
-        public string UserImgPath { get; set; }              
+    {
+        public string UserID { get; set; }
+        public string UserName { get; set; }              
+        public string UserType { get; set; }
+        public string UserPerm { get; set; }
     }
 
     public class UserMessageInfo

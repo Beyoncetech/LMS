@@ -50,8 +50,7 @@ function ConfirmPopupForSubmit(formId, ConfirmMsg, beforeSubmit, onSuccess, onEr
     }
 }
 
-function AjaxSubmit(formId, beforeSubmit, onSuccess, onError) {
-    debugger;
+function AjaxSubmit(formId, beforeSubmit, onSuccess, onError) {      
     var frmID = "#" + formId;
     var isFormValid = $(frmID).valid();
     if (isFormValid) {

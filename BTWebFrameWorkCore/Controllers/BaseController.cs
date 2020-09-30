@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using AppModel;
 using BTWebAppFrameWorkCore.Models;
@@ -21,11 +22,14 @@ namespace BTWebAppFrameWorkCore.Controllers
                 ProjectName = "BT Project",
                 PageTitle = "Home",
                 BUserName = "Unknown",
+                BUserType = "A",
                 BUserImgPath = "~/assets/img/AppUser/BlankUser.jpg",
                 BreadCrumbItems = new List<AppBreadCrumb>()
             };
             if (AppConfigSingletonRepository.AppConfig != null)
                 _BaseViewModel.ProjectName = AppConfigSingletonRepository.AppConfig.ProjectName;
+                       
+
             GetUserMessage(); // get the unread message and notification from db
         }
 
@@ -41,8 +45,50 @@ namespace BTWebAppFrameWorkCore.Controllers
         public BaseViewModel GetViewModel<T>()
         {
             BaseViewModel TempBaseViewModel = (BaseViewModel)Activator.CreateInstance(typeof(T));
+            var tempLoginUser = GetLoginUserInfo();
+            if (tempLoginUser != null)
+            {
+                _BaseViewModel.BUserName = tempLoginUser.UserName;
+                _BaseViewModel.BUserType = tempLoginUser.UserType;
+            }
             TempBaseViewModel.CopyToBase(_BaseViewModel);
             return TempBaseViewModel;
+        }
+
+        public LoginUserInfo GetLoginUserInfo()
+        {
+            LoginUserInfo result = null;            
+            if (Request.HttpContext.User.Identity.IsAuthenticated)
+            {
+                var claimsIdentity = Request.HttpContext.User.Identity as ClaimsIdentity;
+
+                result = new LoginUserInfo();
+                foreach (var claim in claimsIdentity.Claims)
+                {
+                    switch (claim.Type)
+                    {
+                        case "UserID":
+                            result.UserID = claim.Value;
+                            break;
+                        case "UserName":
+                            result.UserName = claim.Value;
+                            break;
+                        case "UserType":
+                            result.UserType = claim.Value;
+                            break;
+                        case "UserPerm":
+                            result.UserPerm = claim.Value;
+                            break;
+                        default:
+                            break;
+                    }
+                    //System.Console.WriteLine(claim.Type + ":" + claim.Value);
+                }
+
+                return result;
+            }
+            else
+                return result;            
         }
 
         private void GetUserMessage()

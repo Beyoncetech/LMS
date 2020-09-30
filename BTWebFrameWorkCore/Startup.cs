@@ -1,17 +1,21 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using AppBAL.Sevices.Authentication;
 using AppBAL.Sevices.Login;
 using AppDAL.DBModels;
 using AppDAL.DBRepository;
 using AppModel;
+using AppUtility.AppEncription;
 using AppUtility.AppModels;
 using AutoMapper;
+using BTWebAppFrameWorkCore.AppSecurity;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.EntityFrameworkCore;
@@ -21,6 +25,7 @@ using Microsoft.Extensions.Hosting;
 using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
 using Pomelo.EntityFrameworkCore.MySql.Storage;
 using GroupChat.SignalrHub;
+
 namespace BTWebAppFrameWorkCore
 {
     public class Startup
@@ -34,7 +39,7 @@ namespace BTWebAppFrameWorkCore
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
-        {            
+        {
             RegisterAppModel(services);
             RegisterAppServices(services);
 
@@ -50,13 +55,23 @@ namespace BTWebAppFrameWorkCore
                     mysqlOptions =>
                         mysqlOptions.ServerVersion(new ServerVersion(new Version(10, 4, 13), ServerType.MariaDb))));
 
-            // Enable cookie authentication
-            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-                    .AddCookie(options =>
-                    {
-                        options.LoginPath = "/Account/Unauthorized/";
-                        options.AccessDeniedPath = "/Account/Forbidden/";                        
-                    });
+            
+            services.AddAuthentication(options =>
+            {
+                // the scheme name has to match the value we're going to use in AuthenticationBuilder.AddScheme(...)
+                options.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+            })
+            .AddCookie(options =>
+            {
+                options.Cookie.Name = "LMSAuthCookies";
+                options.LoginPath = "/Account/Login/";
+                options.AccessDeniedPath = "/Account/Forbidden/";
+                options.ExpireTimeSpan = TimeSpan.FromMinutes(30);
+            })
+            //.AddCustomCookieAuth(o => { })
+            .AddCustomJWTAuth(o => { });
+
 
             services.AddControllersWithViews();
             // register the automapper
@@ -92,6 +107,16 @@ namespace BTWebAppFrameWorkCore
 
             app.UseAuthorization();
 
+            //app.UseAppRedirectMiddleware();
+            //app.UseStatusCodePages(context =>
+            //{
+            //    if (context.HttpContext.Response.StatusCode == (int)HttpStatusCode.Unauthorized)
+            //    {                    
+            //        context.HttpContext.Response.Redirect("/Account/Login");
+            //    }
+            //    return Task.CompletedTask;
+            //});
+
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllerRoute(
@@ -99,6 +124,7 @@ namespace BTWebAppFrameWorkCore
                     pattern: "{controller=Account}/{action=Login}/{id?}");
                 endpoints.MapHub<ChatHub>("/chathub");
             });
+
         }
 
         private void RegisterAppServices(IServiceCollection services)
@@ -106,14 +132,17 @@ namespace BTWebAppFrameWorkCore
             services.AddScoped<IEmailSender, EmailSender>();
             services.AddScoped<ILoginService, LoginService>();
             services.AddScoped<ISiteMapService, SiteMapService>();
+            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+            services.AddScoped<IAppCookiesAuthService, AppCookiesAuthService>();
+            services.AddScoped<IEncriptionService, EncriptionService>();
             #region Master
-            
+
             #endregion
             //*****register DB repository*********
             services.AddScoped(typeof(ICommonRepository<>), typeof(CommonRepository<>));
             services.AddScoped<IAppUserRepository, AppUserRepository>();
             #region Master
-            
+
 
             #endregion
             //************************************

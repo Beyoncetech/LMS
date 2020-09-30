@@ -16,6 +16,7 @@ namespace BTWebAppFrameWorkCore.Models
         public string ProjectName { get; set; }
         public string PageTitle { get; set; }
         public string BUserName { get; set; }
+        public string BUserType { get; set; }
         public string BUserImgPath { get; set; }
         public List<AppBreadCrumb> BreadCrumbItems { get; set; }
         public List<UserMessageInfo> UserMsgItems { get; set; }
@@ -26,6 +27,7 @@ namespace BTWebAppFrameWorkCore.Models
             ProjectName = BaseObj.ProjectName;
             PageTitle = BaseObj.PageTitle;
             BUserName = BaseObj.BUserName;
+            BUserType = BaseObj.BUserType;
             BUserImgPath = BaseObj.BUserImgPath;
             BreadCrumbItems = BaseObj.BreadCrumbItems;
             UserMsgItems = BaseObj.UserMsgItems;
@@ -41,6 +43,11 @@ namespace BTWebAppFrameWorkCore.Models
         [MinLength(3, ErrorMessage = "Password cannot be less than 3 char")]
         public string Password { get; set; }
         public Boolean RememberMe { get; set; }
+    }
+
+    public class DashboardVM : BaseViewModel
+    {
+        public Dictionary<string, string> DashboardData { get; set; }        
     }
 
     public class UserContactInfo : BaseViewModel
