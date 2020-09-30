@@ -55,6 +55,7 @@ namespace BTWebAppFrameWorkCore.Controllers
                                     new { Name = "Form 1", ActionUrl = "#" } });
             return View(_BaseViewModel);
         }
+       
 
         public IActionResult Modals()
         {
@@ -166,6 +167,10 @@ namespace BTWebAppFrameWorkCore.Controllers
         public IActionResult Error()
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+        }
+        public IActionResult Chat()
+        {
+            return View(_BaseViewModel);
         }
     }
 }

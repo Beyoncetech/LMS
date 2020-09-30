@@ -20,7 +20,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
 using Pomelo.EntityFrameworkCore.MySql.Storage;
-
+using GroupChat.SignalrHub;
 namespace BTWebAppFrameWorkCore
 {
     public class Startup
@@ -61,7 +61,7 @@ namespace BTWebAppFrameWorkCore
             services.AddControllersWithViews();
             // register the automapper
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
-
+            services.AddSignalR();
             //services.AddMvc()
             //.AddJsonOptions(options =>
             //{
@@ -97,6 +97,7 @@ namespace BTWebAppFrameWorkCore
                 endpoints.MapControllerRoute(
                     name: "default",
                     pattern: "{controller=Account}/{action=Login}/{id?}");
+                endpoints.MapHub<ChatHub>("/chathub");
             });
         }
 
