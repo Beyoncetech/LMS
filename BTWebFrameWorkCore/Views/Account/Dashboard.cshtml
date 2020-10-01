@@ -13,12 +13,12 @@
         break;
     case "S":
         <div>
-            @await Html.PartialAsync("_PartialAdminDashboard", Model);
+            @await Html.PartialAsync("_PartialSuperAdminDashboard", Model);
         </div>
         break;
     case "U":
         <div>
-            @await Html.PartialAsync("_PartialAdminDashboard", Model);
+            @await Html.PartialAsync("_PartialUserDashboard", Model);
         </div>
         break;
     default:

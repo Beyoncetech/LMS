@@ -25,6 +25,7 @@ using Microsoft.Extensions.Hosting;
 using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
 using Pomelo.EntityFrameworkCore.MySql.Storage;
 using GroupChat.SignalrHub;
+using Microsoft.AspNetCore.Authorization;
 
 namespace BTWebAppFrameWorkCore
 {
@@ -71,6 +72,14 @@ namespace BTWebAppFrameWorkCore
             })
             //.AddCustomCookieAuth(o => { })
             .AddCustomJWTAuth(o => { });
+
+            services.AddAuthorization(options =>
+            {
+                options.AddPolicy(
+                    "AllowAuthUsers", policy =>
+                    policy.Requirements.Add(
+                          new ManageUserPermissionRequirement()));
+            });
 
 
             services.AddControllersWithViews();
@@ -129,19 +138,27 @@ namespace BTWebAppFrameWorkCore
 
         private void RegisterAppServices(IServiceCollection services)
         {
-            services.AddScoped<IEmailSender, EmailSender>();
-            services.AddScoped<ILoginService, LoginService>();
+
+            #region Core Injection
             services.AddScoped<ISiteMapService, SiteMapService>();
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddScoped<IAppCookiesAuthService, AppCookiesAuthService>();
             services.AddScoped<IEncriptionService, EncriptionService>();
-            #region Master
-
+            services.AddScoped<IAuthorizationHandler, CanAllowOnlyAuthUsersHandler>();
             #endregion
-            //*****register DB repository*********
+
+            #region Register services
+            services.AddScoped<IEmailSender, EmailSender>();
+            services.AddScoped<ILoginService, LoginService>();
+            #endregion
+
+
+            #region register DB repository
             services.AddScoped(typeof(ICommonRepository<>), typeof(CommonRepository<>));
             services.AddScoped<IAppUserRepository, AppUserRepository>();
-            #region Master
+            #endregion
+            
+            #region Other Services
 
 
             #endregion

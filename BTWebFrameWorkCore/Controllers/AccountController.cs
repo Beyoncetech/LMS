@@ -16,7 +16,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace BTWebAppFrameWorkCore.Controllers
 {
-    [Authorize]
+    [Authorize(Policy = "AllowAuthUsers")]
     public class AccountController : BaseController
     {
         private readonly IEmailSender _EmailSender;
