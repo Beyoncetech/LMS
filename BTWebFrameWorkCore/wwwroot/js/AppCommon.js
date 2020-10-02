@@ -21,7 +21,7 @@ function ConfirmPopupForSubmit(formId, ConfirmMsg, beforeSubmit, onSuccess, onEr
                 }
                 debugger;
                 //$("#" + formId).submit();   
-                var frmUrl = $(frmID).attr('action'); 
+                var frmUrl = $(frmID).attr('action');
                 var frmMethod = $(frmID).attr('method');
                 var frmModel = $(frmID).serialize();
                 $.ajax({
@@ -50,7 +50,7 @@ function ConfirmPopupForSubmit(formId, ConfirmMsg, beforeSubmit, onSuccess, onEr
     }
 }
 
-function AjaxSubmit(formId, beforeSubmit, onSuccess, onError) {      
+function AjaxSubmit(formId, beforeSubmit, onSuccess, onError) {
     var frmID = "#" + formId;
     var isFormValid = $(frmID).valid();
     if (isFormValid) {
@@ -84,4 +84,25 @@ function AjaxSubmit(formId, beforeSubmit, onSuccess, onError) {
     else {
         return false;
     }
+}
+
+function AppCommonAjaxPost(actionUrl, dataModel, onSuccess, onError) {
+    
+    $.ajax({
+        url: actionUrl,
+        type: 'POST',        
+        dataType: 'json',
+        contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
+        data: dataModel,
+        success: function (result) {
+            if (onSuccess !== undefined) {
+                onSuccess(result);
+            }
+        },
+        error: function (result) {
+            if (onError !== undefined) {
+                onError(result);
+            }
+        }
+    });
 }

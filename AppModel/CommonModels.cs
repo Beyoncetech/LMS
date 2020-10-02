@@ -17,7 +17,7 @@ namespace AppModel
         public string Group { get; set; }
         public string Parent { get; set; }
         public string Name { get; set; }
-        public string MenuType { get; set; }
+        public string Type { get; set; }
         public string AccessType { get; set; }
         public string ActionUrl { get; set; }
         public string ActionPerm { get; set; }

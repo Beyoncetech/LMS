@@ -113,7 +113,7 @@
                             <i class="fas fa-file mr-2"></i> Settings
                         </a>
                         <div class="dropdown-divider"></div>
-                        <a href="#" class="dropdown-item">
+                        <a href="#" onclick="AppCommonAjaxPost('/Account/Logout', null, onLogoutSuccess, onLogoutFail)" class="dropdown-item">
                             <i class="fas fa-file mr-2"></i> Log Out
                         </a>
                     </div>
@@ -818,6 +818,17 @@
     <script src="~/js/AppCommon.js"></script>
     <!-- PAGE SCRIPTS -->
     @RenderSection("Scripts", required: false)
-
+    <script type="text/javascript">
+        function onLogoutSuccess(result) {
+            if (result.stat) {               
+                location.href = '/Account/Login'
+            } else {               
+                toastr.error('Something wrong while logout.')                
+            }
+        }
+        function onLogoutFail(result) {
+            toastr.error('Something wrong while logout.')
+        }
+    </script>
 </body>
 </html>

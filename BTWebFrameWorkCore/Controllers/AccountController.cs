@@ -48,19 +48,7 @@ namespace BTWebAppFrameWorkCore.Controllers
                 if (result.Stat)
                 {
                     LoginUser UserInfo = (LoginUser)result.StatusObj;
-
-                    //var TokenHandler = new AppTokenHandler();
-                    //var Payload = new Dictionary<string, string>();
-                    //Payload.Add("UserID", model.UserName);
-                    //Payload.Add("UserType", UserInfo.UserType);
-                    //Payload.Add("UserPerm", string.IsNullOrEmpty(UserInfo.UserPerm) ? "" : UserInfo.UserPerm);
-
-                    //var TempClaims = new List<AppKeyValueInfo>
-                    //{
-                    //    new AppKeyValueInfo { Key = "UserID", Value = model.UserName },                        
-                    //    new AppKeyValueInfo { Key = "JWTToken", Value = TokenHandler.CreateJWTToken(Payload) }
-                    //};
-
+                                        
                     var TempClaims = new List<Claim>
                     {
                         new Claim ("UserID", UserInfo.UserId),
@@ -71,9 +59,7 @@ namespace BTWebAppFrameWorkCore.Controllers
 
 
                     var claimsIdentity = new ClaimsIdentity(TempClaims, CookieAuthenticationDefaults.AuthenticationScheme);
-                    //string resultClaim = CommonEncription.ConvertObjectToBase64String(TempClaims);
-
-                    //await _AppCookiesAuth.SignInAsync("LMSAuthCookies", TempClaims, false);
+                   
                     await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme,
                         new ClaimsPrincipal(claimsIdentity),
                         new AuthenticationProperties
@@ -93,6 +79,13 @@ namespace BTWebAppFrameWorkCore.Controllers
                 return Json(new { stat = false, msg = "Invalid UserId and Password" });
             }
 
+        }
+        [HttpPost]
+        public async Task<JsonResult> LogOut()
+        {
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+
+            return Json(new { stat = true, msg = "Successfully Signed out"});
         }
         #endregion
 
