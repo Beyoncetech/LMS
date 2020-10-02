@@ -21,6 +21,7 @@ namespace BTWebAppFrameWorkCore.Controllers
             {
                 ProjectName = "BT Project",
                 PageTitle = "Home",
+                BUserID = "",
                 BUserName = "Unknown",
                 BUserType = "A",
                 BUserImgPath = "~/assets/img/AppUser/BlankUser.jpg",
@@ -48,6 +49,7 @@ namespace BTWebAppFrameWorkCore.Controllers
             var tempLoginUser = GetLoginUserInfo();
             if (tempLoginUser != null)
             {
+                _BaseViewModel.BUserID = tempLoginUser.UserID;
                 _BaseViewModel.BUserName = tempLoginUser.UserName;
                 _BaseViewModel.BUserType = tempLoginUser.UserType;
             }

@@ -15,6 +15,7 @@ namespace BTWebAppFrameWorkCore.Models
     {
         public string ProjectName { get; set; }
         public string PageTitle { get; set; }
+        public string BUserID { get; set; }
         public string BUserName { get; set; }
         public string BUserType { get; set; }
         public string BUserImgPath { get; set; }
