@@ -100,5 +100,57 @@ namespace BTWebAppFrameWorkCore.Controllers
         }
 
         #endregion
+
+        #region User Profile        
+        public IActionResult UserProfile()
+        {
+            CreateBreadCrumb(new[] {new { Name = "Home", ActionUrl = "#" },
+                                    new { Name = "User Profile", ActionUrl = "/Account/UserProfile" } });
+            var VModel = GetViewModel<LoginVM>();
+            return View(VModel);
+        }
+        [HttpPost]
+        [ValidateAntiForgeryToken]        
+        public async Task<JsonResult> UserProfile(LoginVM model)
+        {
+            if (ModelState.IsValid)
+            {
+                var result = await _LoginService.ValidateUser(model.UserName, model.Password);
+                if (result.Stat)
+                {
+                    LoginUser UserInfo = (LoginUser)result.StatusObj;
+
+                    var TempClaims = new List<Claim>
+                    {
+                        new Claim ("UserID", UserInfo.UserId),
+                        new Claim ("UserName", UserInfo.Name),
+                        new Claim ("UserType", UserInfo.UserType),
+                        new Claim ("UserPerm", string.IsNullOrEmpty(UserInfo.UserPerm) ? "" : UserInfo.UserPerm)
+                    };
+
+
+                    var claimsIdentity = new ClaimsIdentity(TempClaims, CookieAuthenticationDefaults.AuthenticationScheme);
+
+                    await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme,
+                        new ClaimsPrincipal(claimsIdentity),
+                        new AuthenticationProperties
+                        {
+                            ExpiresUtc = DateTime.UtcNow.AddMinutes(30)
+                        });
+
+
+                    //return RedirectToAction("Index", "Home");
+                    return Json(new { stat = true, msg = "Valid User", rtnUrl = "/Account/Dashboard" });
+                }
+                else
+                    return Json(new { stat = false, msg = "Invalid UserId and Password" });
+            }
+            else
+            {
+                return Json(new { stat = false, msg = "Invalid UserId and Password" });
+            }
+
+        }        
+        #endregion
     }
 }

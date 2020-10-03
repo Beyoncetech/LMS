@@ -1,0 +1,134 @@
+﻿@model LoginVM
+@{
+    ViewData["PageTitle"] = "User Profile";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row">
+    <!-- left column -->
+    <div class="col-md-8">
+        <!-- jquery validation -->
+        <div class="card card-primary">
+            <!-- /.card-header -->
+            <!-- form start -->
+            <form id="frmUserProfile" asp-area="" asp-action="UserProfile" asp-controller="Account" data-ajax="true" data-ajax-method="post" data-ajax-begin="onBeforeSubmit" data-ajax-success="onSuccess">
+                <div class="card-body">
+                    <div class="form-group">
+                        <label>User Name</label>
+                        <input type="text" name="UserName" asp-for="UserName" class="form-control" placeholder="User ID" />
+                        <span asp-validation-for="UserName" class="text-danger" style="font-size:small"></span>
+                    </div>
+                    <div class="form-group">
+                        <label for="exampleInputPassword1">Password</label>
+                        <input type="password" name="password" class="form-control" id="exampleInputPassword1" placeholder="Password">
+                    </div>
+                    <div class="form-group mb-0">
+                        <div class="custom-control custom-checkbox">
+                            <input type="checkbox" name="terms" class="custom-control-input" id="exampleCheck11">
+                            <label class="custom-control-label" for="exampleCheck11">I agree to the <a href="#">terms of service</a>.</label>
+                        </div>
+                    </div>
+                </div>
+                <!-- /.card-body -->
+                <div class="card-footer">
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                </div>
+            </form>
+        </div>
+        <!-- /.card -->
+    </div>
+    <!--/.col (left) -->
+    <!-- right column -->
+    <div class="col-md-4">
+        <!-- jquery validation -->
+        <div class="card card-primary">
+            <!-- /.card-header -->
+            <!-- contain start -->
+            <div class="card-body">
+                <div class="form-group">
+                    <table>
+                        <tr>
+                            <td>
+                                @*@Html.HiddenFor(model => model.UserImgPath)*@
+                                <img id="EmpImg" alt="No Image Found" src="~/img/avatar5.png" style="border:groove;" width="150" height="150" />
+                            </td>
+                            <td style="padding-left:10px;">
+                                <div style="position:relative;">
+                                    <a class='btn btn-primary' href='javascript:;'>
+                                        Browse ...
+                                        <input type="file" name="UpldUserImg" style='position:absolute;z-index:2;top:0;left:0;filter: alpha(opacity=0);-ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";opacity:0;background-color:transparent;color:transparent;' size="40" onchange='OnImageSelect(this);'>
+                                    </a>
+                                    &nbsp;
+                                    <span class='label label-success' id="upload-file-info"></span>
+                                </div>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <!-- /.card -->
+    </div>
+    <!--/.col (right) -->
+</div>
+
+@section Scripts {
+    <script src="~/lib/jquery-ajax-unobtrusive/jquery.unobtrusive-ajax.js"></script>
+    <script type="text/javascript">
+
+        $(function () {
+
+        });
+
+        function onBeforeSubmit() {
+            debugger;
+            ShowAppLoader();
+            $('#loginErrMsg').text('')
+        }
+
+        function onSuccess(result, textStatus, jqXHR) {
+            debugger;
+            HideAppLoader();
+            //alert(result.msg)
+            if (result.stat) {
+                location.href = result.rtnUrl
+            } else {
+                $('#loginErrMsg').text(result.msg)
+            }
+
+        }
+
+        onFail = function (xhr) {
+            debugger;
+            alert(`Hi ${xhr.responseText}!`);
+            HideAppLoader();
+        };
+
+        function OnImageSelect(input) {
+        if (input.files && input.files[0]) {
+            if (input.files[0].size > 1048576) {
+                ezBSAlert({
+                    messageText: "The selected User image is lerger than 1MB. Please select Image less than 1MB.",
+                    alertType: "danger",
+                    topMargin: '300px'
+                });
+                //ShowCustomMsgEx('Warning', 'The selected User image is lerger than 1MB. Please select Image less than 1MB.');
+                input.value = '';
+                return;
+            }
+            $("#AttachUserImage_FileName").val(input.files[0].name);
+            $("#AttachUserImage_FileSize").val(input.files[0].size);
+            $("#AttachUserImage_FileType").val(input.files[0].type || "application/octet-stream");
+
+            $("#upload-file-info").html(input.value);
+            var reader = new FileReader();
+
+            reader.onload = function (e) {
+                $('#EmpImg').attr('src', e.target.result);
+                $("#AttachUserImage_FileContentsBase64").val(e.target.result);
+            }
+
+            reader.readAsDataURL(input.files[0]);
+        }
+    </script>
+}
