@@ -57,6 +57,11 @@ namespace AppDAL.DBModels
                     .HasCharSet("latin1")
                     .HasCollation("latin1_swedish_ci");
 
+                entity.Property(e => e.Gender)
+                    .HasColumnType("varchar(1)")
+                    .HasCharSet("latin1")
+                    .HasCollation("latin1_swedish_ci");
+
                 entity.Property(e => e.IsActive)
                     .HasColumnType("bit(1)")
                     .HasDefaultValueSql("b'0'");

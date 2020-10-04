@@ -54,6 +54,7 @@ namespace BTWebAppFrameWorkCore.Controllers
                         new Claim ("UserID", UserInfo.UserId),
                         new Claim ("UserName", UserInfo.Name),
                         new Claim ("UserType", UserInfo.UserType),
+                        new Claim ("UserGender", string.IsNullOrEmpty(UserInfo.Gender) ? "M" : UserInfo.Gender),
                         new Claim ("UserPerm", string.IsNullOrEmpty(UserInfo.UserPerm) ? "" : UserInfo.UserPerm)
                     };
 
@@ -106,7 +107,7 @@ namespace BTWebAppFrameWorkCore.Controllers
         {
             CreateBreadCrumb(new[] {new { Name = "Home", ActionUrl = "#" },
                                     new { Name = "User Profile", ActionUrl = "/Account/UserProfile" } });
-            var VModel = GetViewModel<LoginVM>();
+            var VModel = GetViewModel<UserProfileVM>();
             return View(VModel);
         }
         [HttpPost]

@@ -18,6 +18,7 @@ namespace BTWebAppFrameWorkCore.Models
         public string BUserID { get; set; }
         public string BUserName { get; set; }
         public string BUserType { get; set; }
+        public string BUserGender { get; set; }
         public string BUserImgPath { get; set; }
         public List<AppBreadCrumb> BreadCrumbItems { get; set; }
         public List<UserMessageInfo> UserMsgItems { get; set; }
@@ -61,5 +62,19 @@ namespace BTWebAppFrameWorkCore.Models
         public string Subject { get; set; }
         [Required]
         public string Description { get; set; }
+    }
+
+    public class UserProfileVM : BaseViewModel
+    {
+        public long Id { get; set; }
+        [Required]
+        public string UserName { get; set; }        
+        public string UserID { get; set; }
+        public string Email { get; set; }
+        [RegularExpression("([0-9]+)", ErrorMessage = "Please enter valid mobile Number")]
+        [MaxLength(10, ErrorMessage = "Mobile Number cannot be greater than 10 digit")]
+        [MinLength(10, ErrorMessage = "Mobile Number cannot be less than 10 digit")]
+        public string Mobile { get; set; }        
+        public DateTime? Dob { get; set; }        
     }
 }

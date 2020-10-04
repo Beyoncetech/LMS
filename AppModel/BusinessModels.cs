@@ -13,6 +13,7 @@ namespace AppModel
         public string Email { get; set; }        
         public string UserPerm { get; set; }        
         public ulong IsActive { get; set; }
-        public DateTime? Dob { get; set; }        
+        public DateTime? Dob { get; set; }
+        public string Gender { get; set; }
     }
 }

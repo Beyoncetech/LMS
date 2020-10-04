@@ -24,6 +24,7 @@ namespace BTWebAppFrameWorkCore.Controllers
                 BUserID = "",
                 BUserName = "Unknown",
                 BUserType = "A",
+                BUserGender = "M",
                 BUserImgPath = "~/assets/img/AppUser/BlankUser.jpg",
                 BreadCrumbItems = new List<AppBreadCrumb>()
             };
@@ -52,6 +53,7 @@ namespace BTWebAppFrameWorkCore.Controllers
                 _BaseViewModel.BUserID = tempLoginUser.UserID;
                 _BaseViewModel.BUserName = tempLoginUser.UserName;
                 _BaseViewModel.BUserType = tempLoginUser.UserType;
+                _BaseViewModel.BUserGender = tempLoginUser.UserGender;
             }
             TempBaseViewModel.CopyToBase(_BaseViewModel);
             return TempBaseViewModel;
@@ -80,6 +82,9 @@ namespace BTWebAppFrameWorkCore.Controllers
                             break;
                         case "UserPerm":
                             result.UserPerm = claim.Value;
+                            break;
+                        case "UserGender":
+                            result.UserGender = claim.Value;
                             break;
                         default:
                             break;

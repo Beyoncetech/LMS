@@ -19,5 +19,6 @@ namespace AppDAL.DBModels
         public ulong IsActive { get; set; }
         public DateTime? Dob { get; set; }
         public string CustomData { get; set; }
+        public string Gender { get; set; }
     }
 }

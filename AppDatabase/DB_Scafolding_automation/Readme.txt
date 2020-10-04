@@ -5,6 +5,7 @@ dotnet tool install --global dotnet-ef
 
 Step 2
 ******
+dotnet ef dbcontext scaffold "server=localhost;port=3306;user=root;password=Mdb123;database=lmsdb" Pomelo.EntityFrameworkCore.MySql -c AppDBContext -o DBModels -f --project AppDAL
 dotnet ef dbcontext scaffold "server=localhost;port=3306;user=root;password=Mdb123;database=btcoreframeworkdb" Pomelo.EntityFrameworkCore.MySql -c AppDBContext -o DBModels -f --project AppDAL
 
 
