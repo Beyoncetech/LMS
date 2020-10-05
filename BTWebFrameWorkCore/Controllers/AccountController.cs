@@ -1,10 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using AppBAL.Sevices.Login;
+using AppBAL.Sevices.Master;
 using AppModel;
+using AppModel.ViewModel;
 using AppUtility.AppEncription;
 using AppUtility.AppModels;
 using BTWebAppFrameWorkCore.AppSecurity;
@@ -12,6 +15,7 @@ using BTWebAppFrameWorkCore.Models;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BTWebAppFrameWorkCore.Controllers
@@ -21,19 +25,24 @@ namespace BTWebAppFrameWorkCore.Controllers
     {
         private readonly IEmailSender _EmailSender;
         private readonly ILoginService _LoginService;
+        private readonly IAppUserService _AppUserService;
         private readonly IAppCookiesAuthService _AppCookiesAuth;
+        private IWebHostEnvironment _HostingEnvironment;
 
-        public AccountController(ILoginService LoginService, IEmailSender EmailSender, AppSettingsConfiguration AppSettingsConfig, IAppCookiesAuthService AppCookiesAuth)
+        public AccountController(ILoginService LoginService, IEmailSender EmailSender, AppSettingsConfiguration AppSettingsConfig,
+            IAppCookiesAuthService AppCookiesAuth, IAppUserService AppUserService, IWebHostEnvironment HostingEnvironment)
         {
             _LoginService = LoginService;
             _EmailSender = EmailSender;
             _AppSettingsConfig = AppSettingsConfig;
+            _AppUserService = AppUserService;
             _AppCookiesAuth = AppCookiesAuth;
+            _HostingEnvironment = HostingEnvironment;
         }
         #region App login
         [AllowAnonymous]
         public IActionResult Login()
-        {            
+        {
             var VModel = GetViewModel<LoginVM>();
             return View(VModel);
         }
@@ -48,7 +57,7 @@ namespace BTWebAppFrameWorkCore.Controllers
                 if (result.Stat)
                 {
                     LoginUser UserInfo = (LoginUser)result.StatusObj;
-                                        
+
                     var TempClaims = new List<Claim>
                     {
                         new Claim ("UserID", UserInfo.UserId),
@@ -60,7 +69,7 @@ namespace BTWebAppFrameWorkCore.Controllers
 
 
                     var claimsIdentity = new ClaimsIdentity(TempClaims, CookieAuthenticationDefaults.AuthenticationScheme);
-                   
+
                     await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme,
                         new ClaimsPrincipal(claimsIdentity),
                         new AuthenticationProperties
@@ -86,7 +95,7 @@ namespace BTWebAppFrameWorkCore.Controllers
         {
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
 
-            return Json(new { stat = true, msg = "Successfully Signed out"});
+            return Json(new { stat = true, msg = "Successfully Signed out" });
         }
         #endregion
 
@@ -103,15 +112,64 @@ namespace BTWebAppFrameWorkCore.Controllers
         #endregion
 
         #region User Profile        
-        public IActionResult UserProfile()
+        public async Task<IActionResult> UserProfile()
         {
             CreateBreadCrumb(new[] {new { Name = "Home", ActionUrl = "#" },
                                     new { Name = "User Profile", ActionUrl = "/Account/UserProfile" } });
-            var VModel = GetViewModel<UserProfileVM>();
+
+            BaseViewModel VModel = null;
+            var CurrentUserInfo = GetLoginUserInfo();
+            //*****get user avtar************
+            string UsrImgPath = string.Format("{0}\\{1}.{2}", Path.Combine(_HostingEnvironment.WebRootPath, "AppFileRepo\\UserAvatar\\"), CurrentUserInfo.UserID, "jpg");
+            if (System.IO.File.Exists(UsrImgPath))
+            {
+                UsrImgPath = string.Format("~/AppFileRepo/UserAvatar/{0}.{1}", CurrentUserInfo.UserID, "jpg");
+            }
+            else
+            {
+                if (CurrentUserInfo.UserGender.Equals("M"))
+                    UsrImgPath = "~/img/avatar5.png";
+                else
+                    UsrImgPath = "~/img/avatar3.png";
+            }
+
+            //*******************************
+
+            var result = await _AppUserService.GetUserProfile(CurrentUserInfo.UserID);
+            if (result.Stat)
+            {
+                UserProfile UserInfo = (UserProfile)result.StatusObj;
+
+                var TempVModel = new UserProfileVM
+                {
+                    Id = UserInfo.Id,
+                    UserID = UserInfo.UserId,
+                    UserName = UserInfo.Name,
+                    Email = UserInfo.Email,
+                    Mobile = UserInfo.Mobile,
+                    Dob = UserInfo.Dob,
+                    UserImgPath = UsrImgPath
+                };
+
+                VModel = GetViewModel(TempVModel);
+            }
+            else
+            {
+                var TempVModel = new UserProfileVM
+                {
+                    Id = 0,
+                    UserID = CurrentUserInfo.UserID,                    
+                    UserImgPath = UsrImgPath
+                };
+
+                VModel = GetViewModel(TempVModel);
+            }
+
+
             return View(VModel);
         }
         [HttpPost]
-        [ValidateAntiForgeryToken]        
+        [ValidateAntiForgeryToken]
         public async Task<JsonResult> UserProfile(LoginVM model)
         {
             if (ModelState.IsValid)
@@ -151,7 +209,7 @@ namespace BTWebAppFrameWorkCore.Controllers
                 return Json(new { stat = false, msg = "Invalid UserId and Password" });
             }
 
-        }        
+        }
         #endregion
     }
 }

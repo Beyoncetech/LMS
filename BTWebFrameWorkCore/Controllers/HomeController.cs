@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using BTWebAppFrameWorkCore.Models;
 using AppUtility.AppModels;
+using AppModel.ViewModel;
 
 namespace BTWebAppFrameWorkCore.Controllers
 {

@@ -5,6 +5,7 @@ using System.Runtime.CompilerServices;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using AppModel;
+using AppModel.ViewModel;
 using BTWebAppFrameWorkCore.Models;
 using Microsoft.AspNetCore.Mvc;
 
@@ -57,6 +58,20 @@ namespace BTWebAppFrameWorkCore.Controllers
             }
             TempBaseViewModel.CopyToBase(_BaseViewModel);
             return TempBaseViewModel;
+        }
+
+        public BaseViewModel GetViewModel(BaseViewModel objBaseViewModel)
+        {            
+            var tempLoginUser = GetLoginUserInfo();
+            if (tempLoginUser != null)
+            {
+                _BaseViewModel.BUserID = tempLoginUser.UserID;
+                _BaseViewModel.BUserName = tempLoginUser.UserName;
+                _BaseViewModel.BUserType = tempLoginUser.UserType;
+                _BaseViewModel.BUserGender = tempLoginUser.UserGender;
+            }
+            objBaseViewModel.CopyToBase(_BaseViewModel);
+            return objBaseViewModel;
         }
 
         public LoginUserInfo GetLoginUserInfo()

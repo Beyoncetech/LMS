@@ -68,4 +68,21 @@ namespace AppModel
         public string Key { get; set; }
         public string Value { get; set; }
     }
+
+    public class FileUploadInfo
+    {
+        public string FileName { get; set; }
+        public long FileSize { get; set; }
+        public string FileType { get; set; }
+        public string FileContentsBase64 { get; set; }
+    }
+
+    public class LoginUserInfo
+    {
+        public string UserID { get; set; }
+        public string UserName { get; set; }
+        public string UserType { get; set; }
+        public string UserPerm { get; set; }
+        public string UserGender { get; set; }
+    }
 }

@@ -1,4 +1,5 @@
-﻿@model UserProfileVM
+﻿@using AppModel.ViewModel
+@model UserProfileVM
 @{
     ViewData["PageTitle"] = "User Profile";
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -12,6 +13,11 @@
             <!-- /.card-header -->
             <!-- form start -->
             <form id="frmUserProfile" asp-area="" asp-action="UserProfile" asp-controller="Account" data-ajax="true" data-ajax-method="post" data-ajax-begin="onBeforeSubmit" data-ajax-success="onSuccess">
+                @Html.HiddenFor(model => model.AttachUserImage.FileName)
+                @Html.HiddenFor(model => model.AttachUserImage.FileSize)
+                @Html.HiddenFor(model => model.AttachUserImage.FileType)
+                @Html.HiddenFor(model => model.AttachUserImage.FileContentsBase64)
+                @Html.HiddenFor(model => model.Id)
                 <div class="card-body">
                     <div class="form-group">
                         <label>User Name</label>
@@ -59,7 +65,7 @@
                         <tr>
                             <td>
                                 @*@Html.HiddenFor(model => model.UserImgPath)*@
-                                <img id="EmpImg" alt="No Image Found" src="~/img/avatar5.png" style="border:groove;" width="150" height="150" />
+                                <img id="EmpImg" alt="No Image Found" src="@Url.Content(Model.UserImgPath)" style="border:groove;" width="150" height="150" />
                             </td>
                             <td style="padding-left:10px;">
                                 <div style="position:relative;">

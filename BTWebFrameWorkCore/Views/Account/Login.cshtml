@@ -1,4 +1,5 @@
-﻿@model LoginVM
+﻿@using AppModel.ViewModel
+@model LoginVM
 @{
     ViewData["PageTitle"] = "Login";
     Layout = "~/Views/Shared/_LayoutAuth.cshtml";
@@ -87,7 +88,7 @@
 </div>
 @section Scripts {
     <script src="~/lib/jquery-ajax-unobtrusive/jquery.unobtrusive-ajax.js"></script>
-    <script type="text/javascript">        
+    <script type="text/javascript">
         $(function () {
             //$('#frmLogin').validate({
             //    rules: {
@@ -126,7 +127,7 @@
             //        $(element).removeClass('is-invalid');
             //    }
             //});
-        });              
+        });
 
         function onBeforeSubmit() {
             debugger;
@@ -134,14 +135,14 @@
             $('#loginErrMsg').text('')
         }
 
-        function onSuccess (result, textStatus, jqXHR) {
+        function onSuccess(result, textStatus, jqXHR) {
             debugger;
             HideAppLoader();
             //alert(result.msg)
-            if (result.stat) {               
+            if (result.stat) {
                 location.href = result.rtnUrl
-            } else {               
-                $('#loginErrMsg').text(result.msg)                
+            } else {
+                $('#loginErrMsg').text(result.msg)
             }
 
         }

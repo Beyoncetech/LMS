@@ -26,6 +26,7 @@ using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
 using Pomelo.EntityFrameworkCore.MySql.Storage;
 using GroupChat.SignalrHub;
 using Microsoft.AspNetCore.Authorization;
+using AppBAL.Sevices.Master;
 
 namespace BTWebAppFrameWorkCore
 {
@@ -150,6 +151,7 @@ namespace BTWebAppFrameWorkCore
             #region Register services
             services.AddScoped<IEmailSender, EmailSender>();
             services.AddScoped<ILoginService, LoginService>();
+            services.AddScoped<IAppUserService, AppUserService>();            
             #endregion
 
 

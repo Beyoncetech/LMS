@@ -1,4 +1,5 @@
-﻿@model BaseViewModel
+﻿@using AppModel.ViewModel
+@model BaseViewModel
 @{
     var PTitle = ViewData["PageTitle"];
     Model.PageTitle = PTitle != null ? PTitle.ToString() : string.Empty;
