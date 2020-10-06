@@ -8,10 +8,11 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace AppBAL.Sevices.Master
-{    
+{
     public interface IAppUserService
     {
         Task<CommonResponce> GetUserProfile(string UserID);
+        Task<CommonResponce> UpdateAppUserProfileAsync(UserProfileVM oModel);
     }
     public class AppUserService : IAppUserService
     {
@@ -24,14 +25,14 @@ namespace AppBAL.Sevices.Master
         }
         public async Task<CommonResponce> GetUserProfile(string UserID)
         {
-            bool isValid = false;            
+            bool isValid = false;
             UserProfile UserInfo = null;
             var oUser = await _DBUserRepository.GetUserByUserID(UserID).ConfigureAwait(false);
 
             if (oUser != null)
-            { 
-                
+            {
                 UserInfo = _mapper.Map<UserProfile>(oUser);
+                isValid = true;
             }
             CommonResponce result = new CommonResponce
             {
@@ -45,32 +46,22 @@ namespace AppBAL.Sevices.Master
         public async Task<CommonResponce> UpdateAppUserProfileAsync(UserProfileVM oModel)
         {
             CommonResponce result = new CommonResponce { Stat = false, StatusMsg = "" };
-            try
+            var oUser = await _DBUserRepository.GetUserByID(oModel.Id).ConfigureAwait(false);
+            if (oUser != null)
             {
-                //MUser oDBUser = await GetEntityAsync<MUser>(x => x.ID.Equals(oModel.ID)).ConfigureAwait(false);
-                //if (oDBUser == null)
-                //    throw new Exception("Invalid User.");
+                oUser.Name = oModel.UserName;
+                oUser.Email = oModel.Email;
+                oUser.Mobile = oModel.Mobile;
+                oUser.Dob = oModel.Dob;
 
-                //oDBUser.FirstName = oModel.Name;
-                //oDBUser.Email = oModel.Email;
-                //oDBUser.MobNo = oModel.MobNo;
-                //oDBUser.DOB = oModel.DOB;
-                //oDBUser.HintQuestion = oModel.HintQuestion;
-                //oDBUser.HintAnswer = oModel.HintAnswer;
-
-                //Update(oDBUser);
-
-                //Insert(AppActivityResolver.GetUpdateActivity(CurrentUser.UserID, "Profile update", string.Format("Profile {0} has updated", oModel.UserID)));
-
-                //result.Stat = true;
-                //result.Msg = "Successfully updated application User";
+                await _DBUserRepository.Update(oUser).ConfigureAwait(false);
+                result.Stat = true;
+                result.StatusMsg = "Successfully updated application User";
             }
-            catch (Exception ex)
+            else
             {
-                //Insert(AppErrorLogResolver.GetExceptionErrorLog(CurrentUser.UserID, RepositoryName, ex.Message));
-                result.Stat = false;
-                result.StatusMsg = ex.Message;
-            }
+                result.StatusMsg = "Not a valid User";
+            }            
 
             return result;
         }

@@ -11,19 +11,37 @@ namespace AppDAL.DBRepository
     public interface IAppUserRepository
     {
         Task<Appuser> GetUserByUserID(string UserID);
+        Task<Appuser> GetUserByID(long ID);
+        Task Update(Appuser entity);
     }
     public class AppUserRepository : IAppUserRepository
     {
-        private readonly AppDBContext _DBContext;        
+        private readonly AppDBContext _DBContext;
+        private DbSet<Appuser> entities;
         public AppUserRepository(AppDBContext DBContext)
         {
-            _DBContext = DBContext;            
+            _DBContext = DBContext;
+            entities = _DBContext.Set<Appuser>();
         }
         public async Task<Appuser> GetUserByUserID(string UserID)
         {
             var oUser = await _DBContext.Appuser.Where(x => x.UserId.Equals(UserID)).FirstOrDefaultAsync();
 
             return oUser;            
+        }
+        public async Task<Appuser> GetUserByID(long ID)
+        {
+            var oUser = await _DBContext.Appuser.Where(x => x.Id.Equals(ID)).FirstOrDefaultAsync();
+
+            return oUser;
+        }
+        public async Task Update(Appuser entity)
+        {
+            if (entity == null) throw new ArgumentNullException("entity");
+
+            entities.Attach(entity);
+            _DBContext.Entry(entity).State = EntityState.Modified;
+            await _DBContext.SaveChangesAsync();
         }
     }
 }

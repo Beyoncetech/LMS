@@ -148,7 +148,8 @@ namespace BTWebAppFrameWorkCore.Controllers
                     Email = UserInfo.Email,
                     Mobile = UserInfo.Mobile,
                     Dob = UserInfo.Dob,
-                    UserImgPath = UsrImgPath
+                    UserImgPath = UsrImgPath,
+                    AttachUserImage = new FileUploadInfo()
                 };
 
                 VModel = GetViewModel(TempVModel);
@@ -159,7 +160,8 @@ namespace BTWebAppFrameWorkCore.Controllers
                 {
                     Id = 0,
                     UserID = CurrentUserInfo.UserID,                    
-                    UserImgPath = UsrImgPath
+                    UserImgPath = UsrImgPath,
+                    AttachUserImage = new FileUploadInfo()
                 };
 
                 VModel = GetViewModel(TempVModel);
@@ -170,45 +172,42 @@ namespace BTWebAppFrameWorkCore.Controllers
         }
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<JsonResult> UserProfile(LoginVM model)
+        public async Task<JsonResult> UserProfile(UserProfileVM model)
         {
             if (ModelState.IsValid)
             {
-                var result = await _LoginService.ValidateUser(model.UserName, model.Password);
+                var result = await _AppUserService.UpdateAppUserProfileAsync(model).ConfigureAwait(false);                
                 if (result.Stat)
                 {
-                    LoginUser UserInfo = (LoginUser)result.StatusObj;
-
-                    var TempClaims = new List<Claim>
-                    {
-                        new Claim ("UserID", UserInfo.UserId),
-                        new Claim ("UserName", UserInfo.Name),
-                        new Claim ("UserType", UserInfo.UserType),
-                        new Claim ("UserPerm", string.IsNullOrEmpty(UserInfo.UserPerm) ? "" : UserInfo.UserPerm)
-                    };
-
-
-                    var claimsIdentity = new ClaimsIdentity(TempClaims, CookieAuthenticationDefaults.AuthenticationScheme);
-
-                    await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme,
-                        new ClaimsPrincipal(claimsIdentity),
-                        new AuthenticationProperties
-                        {
-                            ExpiresUtc = DateTime.UtcNow.AddMinutes(30)
-                        });
-
-
-                    //return RedirectToAction("Index", "Home");
-                    return Json(new { stat = true, msg = "Valid User", rtnUrl = "/Account/Dashboard" });
+                    //save the user picture
+                    //if (model.AttachUserImage.FileSize > 0)
+                    //{
+                    //    try
+                    //    {
+                    //        string UsrImgPath = AppPathResolver.GetTenantUserImageDirectoryPath(Server.MapPath("~\\images\\"), oTenantUser.TenantID);
+                    //        if (!Directory.Exists(UsrImgPath))
+                    //            Directory.CreateDirectory(UsrImgPath);
+                    //        UsrImgPath = string.Format("{0}\\{1}.{2}", UsrImgPath, oTenantUser.UserID, "jpg");
+                    //        string FileContentBase64 = Regex.Replace(model.AttachUserImage.FileContentsBase64, "^data:image/[a-zA-Z]+;base64,", string.Empty);
+                    //        Byte[] bytes = Convert.FromBase64String(FileContentBase64);
+                    //        System.IO.File.WriteAllBytes(UsrImgPath, bytes);
+                    //        model.UserImgPath = string.Format("~/images/AppUser/{0}/{1}.{2}?r={3}", AppPathResolver.GetTenantFolderName(oTenantUser.TenantID), oTenantUser.UserID, "jpg", DateTime.Now.Ticks.ToString());
+                    //    }
+                    //    catch (Exception ex)
+                    //    {
+                    //        result.Stat = false;
+                    //        result.Msg = ex.Message;
+                    //    }
+                    //}
+                    return Json(new { stat = true, msg = "Successfully updated user profile" });
                 }
                 else
-                    return Json(new { stat = false, msg = "Invalid UserId and Password" });
+                    return Json(new { stat = false, msg = result.StatusMsg });
             }
             else
             {
-                return Json(new { stat = false, msg = "Invalid UserId and Password" });
+                return Json(new { stat = false, msg = "Invalid User Profile data" });
             }
-
         }
         #endregion
     }
