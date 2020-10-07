@@ -4,10 +4,7 @@ using System.Text;
 using System.Text.Json;
 
 namespace AppUtility.AppEncription
-{
-    class AppEncriptionService
-    {
-    }
+{    
     public interface IEncriptionService
     {
         string ConvertObjectToBase64String<T>(T obj);

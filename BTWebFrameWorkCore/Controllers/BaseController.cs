@@ -7,12 +7,15 @@ using System.Threading.Tasks;
 using AppModel;
 using AppModel.ViewModel;
 using BTWebAppFrameWorkCore.Models;
+using BTWebAppFrameWorkCore.Services;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BTWebAppFrameWorkCore.Controllers
 {
     public abstract class BaseController : Controller
-    {
+    {        
+        private IBaseControllerService _BaseService;
         public AppSettingsConfiguration _AppSettingsConfig;
         public BaseViewModel _BaseViewModel;
 
@@ -29,9 +32,8 @@ namespace BTWebAppFrameWorkCore.Controllers
                 BUserImgPath = "~/assets/img/AppUser/BlankUser.jpg",
                 BreadCrumbItems = new List<AppBreadCrumb>()
             };
-            if (AppConfigSingletonRepository.AppConfig != null)
-                _BaseViewModel.ProjectName = AppConfigSingletonRepository.AppConfig.ProjectName;
-                       
+            //if (AppConfigSingletonRepository.AppConfig != null)
+            //    _BaseViewModel.ProjectName = AppConfigSingletonRepository.AppConfig.ProjectName;                       
 
             GetUserMessage(); // get the unread message and notification from db
         }
@@ -56,6 +58,7 @@ namespace BTWebAppFrameWorkCore.Controllers
                 _BaseViewModel.BUserType = tempLoginUser.UserType;
                 _BaseViewModel.BUserGender = tempLoginUser.UserGender;
             }
+            UpdateBaseModelConfig();
             TempBaseViewModel.CopyToBase(_BaseViewModel);
             return TempBaseViewModel;
         }
@@ -70,8 +73,15 @@ namespace BTWebAppFrameWorkCore.Controllers
                 _BaseViewModel.BUserType = tempLoginUser.UserType;
                 _BaseViewModel.BUserGender = tempLoginUser.UserGender;
             }
+            UpdateBaseModelConfig();
             objBaseViewModel.CopyToBase(_BaseViewModel);
             return objBaseViewModel;
+        }
+
+        public void UpdateBaseModelConfig()
+        {            
+            _BaseViewModel.ProjectName = GetBaseService().AppSettingConfigaration.ProjectName;
+            _BaseViewModel.BUserImgPath = GetBaseService().GetUserAvatarPath(string.Format("{0}.{1}", _BaseViewModel.BUserID, "jpg"));
         }
 
         public LoginUserInfo GetLoginUserInfo()
@@ -111,6 +121,14 @@ namespace BTWebAppFrameWorkCore.Controllers
             }
             else
                 return result;            
+        }
+
+        public IBaseControllerService GetBaseService()
+        {
+            if(_BaseService == null)
+                _BaseService = (IBaseControllerService) HttpContext.RequestServices.GetService(typeof(IBaseControllerService));
+
+            return _BaseService;
         }
 
         private void GetUserMessage()
@@ -165,6 +183,7 @@ namespace BTWebAppFrameWorkCore.Controllers
                 TimeRef = "2 days"
             });
         }
+               
 
     }
 }

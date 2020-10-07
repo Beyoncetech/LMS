@@ -3,12 +3,14 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Security.Claims;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using AppBAL.Sevices.Login;
 using AppBAL.Sevices.Master;
 using AppModel;
 using AppModel.ViewModel;
 using AppUtility.AppEncription;
+using AppUtility.AppIO;
 using AppUtility.AppModels;
 using BTWebAppFrameWorkCore.AppSecurity;
 using BTWebAppFrameWorkCore.Models;
@@ -26,18 +28,16 @@ namespace BTWebAppFrameWorkCore.Controllers
         private readonly IEmailSender _EmailSender;
         private readonly ILoginService _LoginService;
         private readonly IAppUserService _AppUserService;
-        private readonly IAppCookiesAuthService _AppCookiesAuth;
-        private IWebHostEnvironment _HostingEnvironment;
+        private readonly IAppCookiesAuthService _AppCookiesAuth;        
 
         public AccountController(ILoginService LoginService, IEmailSender EmailSender, AppSettingsConfiguration AppSettingsConfig,
-            IAppCookiesAuthService AppCookiesAuth, IAppUserService AppUserService, IWebHostEnvironment HostingEnvironment)
+            IAppCookiesAuthService AppCookiesAuth, IAppUserService AppUserService)
         {
             _LoginService = LoginService;
             _EmailSender = EmailSender;
             _AppSettingsConfig = AppSettingsConfig;
             _AppUserService = AppUserService;
-            _AppCookiesAuth = AppCookiesAuth;
-            _HostingEnvironment = HostingEnvironment;
+            _AppCookiesAuth = AppCookiesAuth;                        
         }
         #region App login
         [AllowAnonymous]
@@ -120,7 +120,7 @@ namespace BTWebAppFrameWorkCore.Controllers
             BaseViewModel VModel = null;
             var CurrentUserInfo = GetLoginUserInfo();
             //*****get user avtar************
-            string UsrImgPath = string.Format("{0}\\{1}.{2}", Path.Combine(_HostingEnvironment.WebRootPath, "AppFileRepo\\UserAvatar\\"), CurrentUserInfo.UserID, "jpg");
+            string UsrImgPath = string.Format("{0}\\{1}.{2}", Path.Combine(GetBaseService().GetAppRootPath(), "AppFileRepo\\UserAvatar"), CurrentUserInfo.UserID, "jpg");
             if (System.IO.File.Exists(UsrImgPath))
             {
                 UsrImgPath = string.Format("~/AppFileRepo/UserAvatar/{0}.{1}", CurrentUserInfo.UserID, "jpg");
@@ -159,7 +159,7 @@ namespace BTWebAppFrameWorkCore.Controllers
                 var TempVModel = new UserProfileVM
                 {
                     Id = 0,
-                    UserID = CurrentUserInfo.UserID,                    
+                    UserID = CurrentUserInfo.UserID,
                     UserImgPath = UsrImgPath,
                     AttachUserImage = new FileUploadInfo()
                 };
@@ -176,29 +176,23 @@ namespace BTWebAppFrameWorkCore.Controllers
         {
             if (ModelState.IsValid)
             {
-                var result = await _AppUserService.UpdateAppUserProfileAsync(model).ConfigureAwait(false);                
+                var result = await _AppUserService.UpdateAppUserProfileAsync(model).ConfigureAwait(false);
                 if (result.Stat)
                 {
                     //save the user picture
-                    //if (model.AttachUserImage.FileSize > 0)
-                    //{
-                    //    try
-                    //    {
-                    //        string UsrImgPath = AppPathResolver.GetTenantUserImageDirectoryPath(Server.MapPath("~\\images\\"), oTenantUser.TenantID);
-                    //        if (!Directory.Exists(UsrImgPath))
-                    //            Directory.CreateDirectory(UsrImgPath);
-                    //        UsrImgPath = string.Format("{0}\\{1}.{2}", UsrImgPath, oTenantUser.UserID, "jpg");
-                    //        string FileContentBase64 = Regex.Replace(model.AttachUserImage.FileContentsBase64, "^data:image/[a-zA-Z]+;base64,", string.Empty);
-                    //        Byte[] bytes = Convert.FromBase64String(FileContentBase64);
-                    //        System.IO.File.WriteAllBytes(UsrImgPath, bytes);
-                    //        model.UserImgPath = string.Format("~/images/AppUser/{0}/{1}.{2}?r={3}", AppPathResolver.GetTenantFolderName(oTenantUser.TenantID), oTenantUser.UserID, "jpg", DateTime.Now.Ticks.ToString());
-                    //    }
-                    //    catch (Exception ex)
-                    //    {
-                    //        result.Stat = false;
-                    //        result.Msg = ex.Message;
-                    //    }
-                    //}
+                    if (model.AttachUserImage.FileSize > 0)
+                    {
+                        string UsrImgPath = Path.Combine(GetBaseService().GetAppRootPath(), "AppFileRepo\\UserAvatar");
+                        if (GetBaseService().DirectoryFileService.CreateDirectoryIfNotExist(UsrImgPath))
+                        {
+                            UsrImgPath = string.Format("{0}\\{1}.{2}", UsrImgPath, model.UserID, "jpg");
+                            if (GetBaseService().DirectoryFileService.CreateFileFromBase64String(model.AttachUserImage.FileContentsBase64, UsrImgPath))
+                            {
+                                model.UserImgPath = string.Format("~/AppFileRepo/UserAvatar/{0}.{1}?r={2}", model.UserID, "jpg", DateTime.Now.Ticks.ToString());
+                            }
+                        }
+
+                    }
                     return Json(new { stat = true, msg = "Successfully updated user profile" });
                 }
                 else

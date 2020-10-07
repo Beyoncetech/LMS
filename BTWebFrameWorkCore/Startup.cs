@@ -27,6 +27,8 @@ using Pomelo.EntityFrameworkCore.MySql.Storage;
 using GroupChat.SignalrHub;
 using Microsoft.AspNetCore.Authorization;
 using AppBAL.Sevices.Master;
+using AppUtility.AppIO;
+using BTWebAppFrameWorkCore.Services;
 
 namespace BTWebAppFrameWorkCore
 {
@@ -146,6 +148,7 @@ namespace BTWebAppFrameWorkCore
             services.AddScoped<IAppCookiesAuthService, AppCookiesAuthService>();
             services.AddScoped<IEncriptionService, EncriptionService>();
             services.AddScoped<IAuthorizationHandler, CanAllowOnlyAuthUsersHandler>();
+            services.AddScoped<IBaseControllerService, BaseControllerService>();
             #endregion
 
             #region Register services
@@ -159,10 +162,10 @@ namespace BTWebAppFrameWorkCore
             services.AddScoped(typeof(ICommonRepository<>), typeof(CommonRepository<>));
             services.AddScoped<IAppUserRepository, AppUserRepository>();
             #endregion
-            
+
             #region Other Services
-
-
+            services.AddScoped<IDirectoryFileService, DirectoryFileService>();
+            
             #endregion
             //************************************
         }
@@ -179,7 +182,7 @@ namespace BTWebAppFrameWorkCore
             .Get<AppSettingsConfiguration>();
             services.AddSingleton(appSettingConfig);
 
-            AppConfigSingletonRepository.UpdateConfiguration(appSettingConfig);
+            //AppConfigSingletonRepository.UpdateConfiguration(appSettingConfig);
         }
     }
 }
