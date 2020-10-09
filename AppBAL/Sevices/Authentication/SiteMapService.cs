@@ -36,6 +36,7 @@ namespace AppBAL.Sevices.Authentication
 
             _AppSiteMap.Add(new SiteMapInfo { ID = "100", MenuOrder = 100, Group = "", Parent = "", Name = "", Type = "ChildAction", AccessType = "GA", ActionUrl = "/Account/Logout", ActionPerm = "000", IconLeft = "nav-icon fas fa-tachometer-alt", IconRight = "" });
             _AppSiteMap.Add(new SiteMapInfo { ID = "101", MenuOrder = 101, Group = "", Parent = "", Name = "", Type = "TopRightMenu", AccessType = "GA", ActionUrl = "/Account/UserProfile", ActionPerm = "000", IconLeft = "nav-icon fas fa-tachometer-alt", IconRight = "" });
+            _AppSiteMap.Add(new SiteMapInfo { ID = "102", MenuOrder = 102, Group = "", Parent = "", Name = "", Type = "ChildAction", AccessType = "GA", ActionUrl = "/Account/MarkActivityAsRead", ActionPerm = "000", IconLeft = "nav-icon fas fa-tachometer-alt", IconRight = "" });
             return;
         }
 

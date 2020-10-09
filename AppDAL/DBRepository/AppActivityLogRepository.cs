@@ -12,6 +12,7 @@ namespace AppDAL.DBRepository
     public interface IAppActivityLogRepository
     {
         Task<List<Activitylog>> GetAllUnRead();
+        Task<bool> MarkAllActivityAsRead();
         Task InsertActivity(ActivitylogBM entity);
     }
     public class AppActivityLogRepository : IAppActivityLogRepository
@@ -30,6 +31,17 @@ namespace AppDAL.DBRepository
                 .ToListAsync();
 
             return oActivity;
+        }
+
+        public async Task<bool> MarkAllActivityAsRead()
+        {           
+            var Result = await _DBContext.Database.ExecuteSqlRawAsync("Update Activitylog set IsRead = '1' where IsRead = '0';");
+
+            if (Result > 0)
+                return true;
+            else
+                return false;
+
         }
 
         public async Task InsertActivity(ActivitylogBM entity)

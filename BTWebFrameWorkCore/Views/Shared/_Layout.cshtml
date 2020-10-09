@@ -89,7 +89,7 @@
                 <!-- Messages Dropdown Menu -->
                 @if (Model.BUserType.Equals("A"))
                 {
-                    <li id="UserMsgLstSec" class="nav-item dropdown">
+                    <li id="UserActivityMsgLstSec" class="nav-item dropdown">
                         @await Html.PartialAsync("_UserMessage.cshtml", Model.UserActivityMsg)
                     </li>
                 }
@@ -833,6 +833,12 @@
         function onLogoutFail(result) {
             toastr.error('Something wrong while logout.')
         }
+        function onActivityLogSuccess(result) {           
+            $('#UserActivityMsgLstSec').html(result);
+        }
+        function onActivityLogFail(result) {
+            toastr.error('Something wrong while mark read activity.')
+        }        
     </script>
 </body>
 </html>

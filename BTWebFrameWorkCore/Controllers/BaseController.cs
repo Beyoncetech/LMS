@@ -136,32 +136,7 @@ namespace BTWebAppFrameWorkCore.Controllers
             {
                 // get top 5 unread activity from db
                 _BaseViewModel.UserActivityMsg = await GetBaseService().GetUnreadUserActivity(5);
-                //_BaseViewModel.UserMsgItems = new List<UserMessageInfo>();
-                //_BaseViewModel.UserMsgItems.Add(new UserMessageInfo
-                //{
-                //    ID = "A001",
-                //    Name = "Brad Diesel",
-                //    Message = "Call me whenever you can...",
-                //    TimeRef = "4 Hours Ago",
-                //    UserAvatar = "/img/user1-128x128.jpg"
-                //});
-                //_BaseViewModel.UserMsgItems.Add(new UserMessageInfo
-                //{
-                //    ID = "A002",
-                //    Name = "John Pierce",
-                //    Message = "I got your message bro",
-                //    TimeRef = "6 Hours Ago",
-                //    UserAvatar = "/img/user3-128x128.jpg"
-                //});
-                //_BaseViewModel.UserMsgItems.Add(new UserMessageInfo
-                //{
-                //    ID = "A003",
-                //    Name = "Nora Silvester",
-                //    Message = "The subject goes here",
-                //    TimeRef = "9 Hours Ago",
-                //    UserAvatar = "/img/user8-128x128.jpg"
-                //});
-
+                
                 // get top unread notification from db
                 _BaseViewModel.UserNotification = new UserNotificationInfo();
                 _BaseViewModel.UserNotification.TotalNotification = "15";

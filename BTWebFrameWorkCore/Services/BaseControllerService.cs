@@ -20,6 +20,7 @@ namespace BTWebAppFrameWorkCore.Services
         Task AddActivity(ActivityType ActvType, string UserID, string UserName, string Origin, string Description);
         AppSettingsConfiguration AppSettingConfigaration { get; }
         IDirectoryFileService DirectoryFileService { get; }
+        Task<bool> MarkAllUnreadActivityAsRead();
     }
 
     public class BaseControllerService : IBaseControllerService
@@ -90,6 +91,11 @@ namespace BTWebAppFrameWorkCore.Services
 
             }
             return ActivityInfo;
+        }
+
+        public async Task<bool> MarkAllUnreadActivityAsRead()
+        {
+            return await _AppActivityLogRepository.MarkAllActivityAsRead().ConfigureAwait(false);
         }
 
         public async Task AddActivity(ActivityType ActvType, string UserID, string UserName, string Origin, string Description)

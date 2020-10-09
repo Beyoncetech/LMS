@@ -99,6 +99,28 @@ namespace BTWebAppFrameWorkCore.Controllers
         }
         #endregion
 
+        #region App Message update
+        [HttpPost]
+        public async Task<IActionResult> MarkActivityAsRead()
+        {
+            UserActivityInfo TempActivity;
+            var Result = await GetBaseService().MarkAllUnreadActivityAsRead().ConfigureAwait(false);
+            if(Result)
+            {
+                TempActivity = new UserActivityInfo();
+                TempActivity.TotalActivity = "0";
+                TempActivity.MsgItems = new List<UserMessageInfo>();
+            }
+            else
+            {
+                TempActivity = await GetBaseService().GetUnreadUserActivity(5);
+            }
+
+            return PartialView("_UserMessage", TempActivity);
+            
+        }
+        #endregion
+
         #region Dashboard
 
         public async Task<IActionResult> Dashboard()
