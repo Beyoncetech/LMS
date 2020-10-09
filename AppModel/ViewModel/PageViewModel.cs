@@ -20,6 +20,11 @@ namespace AppModel.ViewModel
         public Dictionary<string, string> DashboardData { get; set; }
     }
 
+    public class CommonVM : BaseViewModel
+    {
+        public Dictionary<string, string> CommonData { get; set; }
+    }
+
     public class UserProfileVM : BaseViewModel
     {
         public long Id { get; set; }

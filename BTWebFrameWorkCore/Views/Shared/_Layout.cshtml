@@ -87,9 +87,12 @@
             <!-- Right navbar links -->
             <ul class="navbar-nav ml-auto">
                 <!-- Messages Dropdown Menu -->
-                <li id="UserMsgLstSec" class="nav-item dropdown">
-                    @await Html.PartialAsync("_UserMessage.cshtml", Model.UserMsgItems)
-                </li>
+                @if (Model.BUserType.Equals("A"))
+                {
+                    <li id="UserMsgLstSec" class="nav-item dropdown">
+                        @await Html.PartialAsync("_UserMessage.cshtml", Model.UserActivityMsg)
+                    </li>
+                }
                 <!-- Notifications Dropdown Menu -->
                 <li id="UserNotificationLstSec" class="nav-item dropdown">
                     @await Html.PartialAsync("_UserNotification.cshtml", Model.UserNotification)

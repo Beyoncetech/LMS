@@ -18,6 +18,12 @@ namespace AppModel.ViewModel
         public string UserAvatar { get; set; }
     }
 
+    public class UserActivityInfo
+    {
+        public string TotalActivity { get; set; }
+        public List<UserMessageInfo> MsgItems { get; set; }
+    }
+
     public class UserNotificationItem
     {
         public string NotifyType { get; set; }
@@ -39,7 +45,7 @@ namespace AppModel.ViewModel
         public string BUserGender { get; set; }
         public string BUserImgPath { get; set; }
         public List<AppBreadCrumb> BreadCrumbItems { get; set; }
-        public List<UserMessageInfo> UserMsgItems { get; set; }
+        public UserActivityInfo UserActivityMsg { get; set; }
         public UserNotificationInfo UserNotification { get; set; }
 
         public void CopyToBase(BaseViewModel BaseObj)
@@ -52,7 +58,7 @@ namespace AppModel.ViewModel
             BUserGender = BaseObj.BUserGender;
             BUserImgPath = BaseObj.BUserImgPath;
             BreadCrumbItems = BaseObj.BreadCrumbItems;
-            UserMsgItems = BaseObj.UserMsgItems;
+            UserActivityMsg = BaseObj.UserActivityMsg;
             UserNotification = BaseObj.UserNotification;
         }
     }

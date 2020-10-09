@@ -13,7 +13,7 @@ namespace AppBAL.BusinessConfig
         public AutoMapperProfile()
         {
             CreateMap<Appuser, LoginUser>();
-            CreateMap<Appuser, UserProfile>();
+            CreateMap<Appuser, UserProfile>();            
         }
     }
 }

@@ -15,6 +15,7 @@ namespace AppDAL.DBModels
         {
         }
 
+        public virtual DbSet<Activitylog> Activitylog { get; set; }
         public virtual DbSet<Appuser> Appuser { get; set; }
         public virtual DbSet<Tblmclassroom> Tblmclassroom { get; set; }
         public virtual DbSet<Tblmstandard> Tblmstandard { get; set; }
@@ -35,6 +36,46 @@ namespace AppDAL.DBModels
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<Activitylog>(entity =>
+            {
+                entity.ToTable("activitylog");
+
+                entity.Property(e => e.Id)
+                    .HasColumnName("ID")
+                    .HasColumnType("bigint(20)");
+
+                entity.Property(e => e.ActivityTime).HasColumnType("datetime");
+
+                entity.Property(e => e.ActivityType).HasColumnType("tinyint(4)");
+
+                entity.Property(e => e.Description)
+                    .HasColumnType("varchar(255)")
+                    .HasCharSet("latin1")
+                    .HasCollation("latin1_swedish_ci");
+
+                entity.Property(e => e.Origin)
+                    .IsRequired()
+                    .HasColumnType("varchar(255)")
+                    .HasDefaultValueSql("''")
+                    .HasCharSet("latin1")
+                    .HasCollation("latin1_swedish_ci");
+
+                entity.Property(e => e.UserId)
+                    .IsRequired()
+                    .HasColumnName("UserID")
+                    .HasColumnType("varchar(100)")
+                    .HasDefaultValueSql("''")
+                    .HasCharSet("latin1")
+                    .HasCollation("latin1_swedish_ci");
+
+                entity.Property(e => e.UserName)
+                    .IsRequired()
+                    .HasColumnType("varchar(255)")
+                    .HasDefaultValueSql("''")
+                    .HasCharSet("latin1")
+                    .HasCollation("latin1_swedish_ci");
+            });
+
             modelBuilder.Entity<Appuser>(entity =>
             {
                 entity.ToTable("appuser");

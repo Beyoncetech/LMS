@@ -148,7 +148,7 @@ namespace BTWebAppFrameWorkCore
             services.AddScoped<IAppCookiesAuthService, AppCookiesAuthService>();
             services.AddScoped<IEncriptionService, EncriptionService>();
             services.AddScoped<IAuthorizationHandler, CanAllowOnlyAuthUsersHandler>();
-            services.AddScoped<IBaseControllerService, BaseControllerService>();
+            services.AddScoped<IBaseControllerService, BaseControllerService>();            
             #endregion
 
             #region Register services
@@ -161,6 +161,7 @@ namespace BTWebAppFrameWorkCore
             #region register DB repository
             services.AddScoped(typeof(ICommonRepository<>), typeof(CommonRepository<>));
             services.AddScoped<IAppUserRepository, AppUserRepository>();
+            services.AddScoped<IAppActivityLogRepository, AppActivityLogRepository>();
             #endregion
 
             #region Other Services

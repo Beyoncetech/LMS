@@ -41,9 +41,9 @@ namespace BTWebAppFrameWorkCore.Controllers
         }
         #region App login
         [AllowAnonymous]
-        public IActionResult Login()
+        public async Task<IActionResult> Login()
         {
-            var VModel = GetViewModel<LoginVM>();
+            var VModel = await GetViewModel<LoginVM>();
             return View(VModel);
         }
         [HttpPost]
@@ -101,11 +101,11 @@ namespace BTWebAppFrameWorkCore.Controllers
 
         #region Dashboard
 
-        public IActionResult Dashboard()
+        public async Task<IActionResult> Dashboard()
         {
             CreateBreadCrumb(new[] {new { Name = "Home", ActionUrl = "#" },
                                     new { Name = "Dashboard", ActionUrl = "/Account/Dashboard" } });
-            var VModel = GetViewModel<DashboardVM>();
+            var VModel = await GetViewModel<DashboardVM>();
             return View(VModel);
         }
 
@@ -151,8 +151,8 @@ namespace BTWebAppFrameWorkCore.Controllers
                     UserImgPath = UsrImgPath,
                     AttachUserImage = new FileUploadInfo()
                 };
-
-                VModel = GetViewModel(TempVModel);
+                
+                VModel = await GetViewModel(TempVModel);
             }
             else
             {
@@ -164,7 +164,7 @@ namespace BTWebAppFrameWorkCore.Controllers
                     AttachUserImage = new FileUploadInfo()
                 };
 
-                VModel = GetViewModel(TempVModel);
+                VModel = await GetViewModel(TempVModel);
             }
 
 
@@ -189,10 +189,12 @@ namespace BTWebAppFrameWorkCore.Controllers
                             if (GetBaseService().DirectoryFileService.CreateFileFromBase64String(model.AttachUserImage.FileContentsBase64, UsrImgPath))
                             {
                                 model.UserImgPath = string.Format("~/AppFileRepo/UserAvatar/{0}.{1}?r={2}", model.UserID, "jpg", DateTime.Now.Ticks.ToString());
+                                model.BUserImgPath = model.UserImgPath; // update the user avatar
                             }
                         }
 
                     }
+                    await GetBaseService().AddActivity(ActivityType.Update, model.UserID, model.UserName, "User Profile", "Updated user profile");
                     return Json(new { stat = true, msg = "Successfully updated user profile" });
                 }
                 else

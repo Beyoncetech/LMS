@@ -22,54 +22,61 @@ namespace BTWebAppFrameWorkCore.Controllers
             _EmailSender = EmailSender;            
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
             CreateBreadCrumb(new[] {new { Name = "Home", ActionUrl = "#" } , 
                                     new { Name = "Dashboard", ActionUrl = "#" } });
-            return View(_BaseViewModel);
+            var VModel = await GetViewModel<CommonVM>();
+            return View(VModel);
         }
 
-        public IActionResult Index2()
+        public async Task<IActionResult> Index2()
         {
             CreateBreadCrumb(new[] {new { Name = "Home", ActionUrl = "#" } ,
                                     new { Name = "Dashboard 2", ActionUrl = "#" } });
-            return View(_BaseViewModel);
+            var VModel = await GetViewModel<CommonVM>();
+            return View(VModel);
         }
 
-        public IActionResult Index3()
+        public async Task<IActionResult> Index3()
         {
             CreateBreadCrumb(new[] {new { Name = "Home", ActionUrl = "#" } ,
                                     new { Name = "Dashboard 3", ActionUrl = "#" } });
-            return View(_BaseViewModel);
+            var VModel = await GetViewModel<CommonVM>();
+            return View(VModel);
         }
 
-        public IActionResult Widgets()
+        public async Task<IActionResult> Widgets()
         {
             CreateBreadCrumb(new[] {new { Name = "Home", ActionUrl = "#" } ,
                                     new { Name = "Widgets", ActionUrl = "#" } });
-            return View(_BaseViewModel);
+            var VModel = await GetViewModel<CommonVM>();
+            return View(VModel);
         }
 
-        public IActionResult Form1()
+        public async Task<IActionResult> Form1()
         {
             CreateBreadCrumb(new[] {new { Name = "Home", ActionUrl = "#" } ,
                                     new { Name = "Form 1", ActionUrl = "#" } });
-            return View(_BaseViewModel);
+            var VModel = await GetViewModel<CommonVM>();
+            return View(VModel);
         }
        
 
-        public IActionResult Modals()
+        public async Task<IActionResult> Modals()
         {
             CreateBreadCrumb(new[] {new { Name = "Home", ActionUrl = "#" } ,
                                     new { Name = "Modals", ActionUrl = "#" } });
-            return View(_BaseViewModel);
+            var VModel = await GetViewModel<CommonVM>();
+            return View(VModel);
         }
 
-        public IActionResult Tables()
+        public async Task<IActionResult> Tables()
         {
             CreateBreadCrumb(new[] {new { Name = "Home", ActionUrl = "#" } ,
                                     new { Name = "Tables", ActionUrl = "#" } });
-            return View(_BaseViewModel);
+            var VModel = await GetViewModel<CommonVM>();
+            return View(VModel);
         }
 
         public IActionResult OurServices()
