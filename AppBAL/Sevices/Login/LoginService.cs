@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using AppDAL.DBRepository;
 using AppDAL.DBModels;
 using AutoMapper;
+using AppUtility.AppEncription;
 
 namespace AppBAL.Sevices.Login
 {
@@ -19,10 +20,12 @@ namespace AppBAL.Sevices.Login
     {         
         private readonly IAppUserRepository _DBUserRepository;
         private readonly IMapper _mapper;
-        public LoginService(IAppUserRepository DBUserRepository, IMapper mapper)
+        private readonly IEncriptionService _AppEncription;
+        public LoginService(IAppUserRepository DBUserRepository, IMapper mapper, IEncriptionService AppEncription)
         {
             _DBUserRepository = DBUserRepository;
             _mapper = mapper;
+            _AppEncription = AppEncription;
         }
         public async Task<CommonResponce> ValidateUser(string UserID, string Password)
         {
@@ -32,7 +35,7 @@ namespace AppBAL.Sevices.Login
 
             if (oUser != null)
             {
-                if (oUser.Password.Equals(Password) && oUser.IsActive.Equals(1))
+                if (oUser.Password.Equals(_AppEncription.EncriptWithPrivateKey(Password)) && oUser.IsActive.Equals(1))
                     isValid = true;
 
                 UserInfo = _mapper.Map<LoginUser>(oUser);

@@ -41,4 +41,23 @@ namespace AppModel.ViewModel
         public string UserImgPath { get; set; }
         public FileUploadInfo AttachUserImage { get; set; }
     }
+
+    public class ChangeProfilePasswordVM : BaseViewModel
+    {
+        public long Id { get; set; }        
+        public string UserID { get; set; }
+        [Required(ErrorMessage = "Old Password is required")]
+        public string OldPassword { get; set; }
+        [Required(ErrorMessage = "New Password is required")]
+        [StringLength(16, ErrorMessage = "Password be between 3 and 16 characters", MinimumLength = 3)]
+        public string NewPassword { get; set; }
+        [Required(ErrorMessage = "Confirm New Password is required")]
+        [Compare("NewPassword", ErrorMessage = "Confirm New Password does not matched")]
+        public string ConfirmNewPassword { get; set; }
+    }
+
+    public class ActivityLogVM : BaseViewModel
+    {
+        public AppGridModel<ActivitylogBM> ActivityLogInfo { get; set; }        
+    }
 }

@@ -33,10 +33,13 @@ namespace AppBAL.Sevices.Authentication
             _AppSiteMap.Add(new SiteMapInfo { ID = "4.1", MenuOrder = 5, Group = "Report", Parent = "Master", Name = "User List Report", Type = "LeftMenu", AccessType = "R", ActionUrl = "/home/index", ActionPerm = "000", IconLeft = "nav-icon fas fa-th", IconRight = "" });
             _AppSiteMap.Add(new SiteMapInfo { ID = "4.2", MenuOrder = 6, Group = "Report", Parent = "Class", Name = "Class List Report", Type = "LeftMenu", AccessType = "R", ActionUrl = "/home/index", ActionPerm = "000", IconLeft = "nav-icon fas fa-th", IconRight = "" });
             _AppSiteMap.Add(new SiteMapInfo { ID = "4.2", MenuOrder = 6, Group = "Report", Parent = "Class", Name = "Student List Report", Type = "LeftMenu", AccessType = "R", ActionUrl = "/home/index", ActionPerm = "000", IconLeft = "nav-icon fas fa-th", IconRight = "" });
+            
+            _AppSiteMap.Add(new SiteMapInfo { ID = "50.1", MenuOrder = 50, Group = "App Logs", Parent = "", Name = "Activity Log", Type = "LeftMenu", AccessType = "R", ActionUrl = "/AppLog/ActivityLog", ActionPerm = "000", IconLeft = "nav-icon fas fa-th", IconRight = "" });
 
             _AppSiteMap.Add(new SiteMapInfo { ID = "100", MenuOrder = 100, Group = "", Parent = "", Name = "", Type = "ChildAction", AccessType = "GA", ActionUrl = "/Account/Logout", ActionPerm = "000", IconLeft = "nav-icon fas fa-tachometer-alt", IconRight = "" });
-            _AppSiteMap.Add(new SiteMapInfo { ID = "101", MenuOrder = 101, Group = "", Parent = "", Name = "", Type = "TopRightMenu", AccessType = "GA", ActionUrl = "/Account/UserProfile", ActionPerm = "000", IconLeft = "nav-icon fas fa-tachometer-alt", IconRight = "" });
+            _AppSiteMap.Add(new SiteMapInfo { ID = "101", MenuOrder = 101, Group = "", Parent = "", Name = "UserProfile", Type = "TopRightMenu", AccessType = "GA", ActionUrl = "/Account/UserProfile", ActionPerm = "000", IconLeft = "nav-icon fas fa-tachometer-alt", IconRight = "" });
             _AppSiteMap.Add(new SiteMapInfo { ID = "102", MenuOrder = 102, Group = "", Parent = "", Name = "", Type = "ChildAction", AccessType = "GA", ActionUrl = "/Account/MarkActivityAsRead", ActionPerm = "000", IconLeft = "nav-icon fas fa-tachometer-alt", IconRight = "" });
+            _AppSiteMap.Add(new SiteMapInfo { ID = "103", MenuOrder = 103, Group = "", Parent = "", Name = "ChangePassword", Type = "TopRightMenu", AccessType = "GA", ActionUrl = "/Account/ChangeProfilePassword", ActionPerm = "000", IconLeft = "nav-icon fas fa-tachometer-alt", IconRight = "" });
             return;
         }
 

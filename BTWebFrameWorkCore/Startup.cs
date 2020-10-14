@@ -29,6 +29,7 @@ using Microsoft.AspNetCore.Authorization;
 using AppBAL.Sevices.Master;
 using AppUtility.AppIO;
 using BTWebAppFrameWorkCore.Services;
+using AppBAL.Sevices.AppCore;
 
 namespace BTWebAppFrameWorkCore
 {
@@ -154,7 +155,8 @@ namespace BTWebAppFrameWorkCore
             #region Register services
             services.AddScoped<IEmailSender, EmailSender>();
             services.AddScoped<ILoginService, LoginService>();
-            services.AddScoped<IAppUserService, AppUserService>();            
+            services.AddScoped<IAppUserService, AppUserService>();
+            services.AddScoped<IAppLogService, AppLogService>();
             #endregion
 
 

@@ -1,0 +1,198 @@
+﻿@using System.Linq
+@using AppModel
+@using AppModel.ViewModel
+@using System.Reflection
+@model dynamic
+
+@{
+    List<AppGridModelInfo> TempGridMetaInfo = new List<AppGridModelInfo>();
+    foreach (System.Reflection.PropertyInfo item in Model.GetMyType.GetProperties())
+    {
+        var CusAttrib = item.GetCustomAttribute<AppModel.CustomAttributes.GridColumnAttribute>();
+        if (CusAttrib != null)
+        {
+            if (string.IsNullOrEmpty(CusAttrib.HeaderText))
+                CusAttrib.HeaderText = item.Name;
+
+            TempGridMetaInfo.Add(new AppGridModelInfo
+            {
+                PropertyName = item.Name,
+                HeaderText = CusAttrib.HeaderText,
+                ColumnOrder = CusAttrib.ColumnOrder,
+                ColumnWidth = CusAttrib.ColumnWidth,
+                ColumnFormat = CusAttrib.ColumnFormat,
+                IsInlineEdit = CusAttrib.IsInlineEdit,
+                IsVisible = CusAttrib.IsVisible,
+                Type = CusAttrib.Type
+            });
+
+        }
+    }
+}
+
+<table id="@Model.TableID" class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            @foreach (var item in TempGridMetaInfo.OrderBy(o => o.ColumnOrder).ToList())
+            {
+                string TempWidth = item.ColumnWidth == 0 ? "auto" : string.Format("{0}{1}", item.ColumnWidth.ToString(), "px;");
+                {
+                    if (item.Type == GridColumnType.CheckBox && item.IsInlineEdit)
+                    {
+                        <th style="width:@TempWidth"><input type="checkbox" id="appGridCheckAll">&nbsp;@item.HeaderText</th>
+                    }
+                    else
+                    {
+                        <th style="width:@TempWidth">@item.HeaderText</th>
+                    }
+
+                }
+            }
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var DataItem in Model.Rows)
+        {
+            <tr>
+                @foreach (var Propitem in TempGridMetaInfo.OrderBy(o => o.ColumnOrder).ToList())
+                {
+                    if (Propitem.IsVisible)
+                    {
+                        var propertyValue = DataItem.GetType().GetProperty(Propitem.PropertyName).GetValue(DataItem);
+
+                        switch (Propitem.Type)
+                        {
+                            case GridColumnType.Default:
+                                if (Propitem.IsInlineEdit)
+                                {
+                                    <td><input type="text" value="@propertyValue" /></td>
+                                }
+                                else
+                                {
+                                    <td>@propertyValue</td>
+                                }
+                                break;
+                            case GridColumnType.Date:
+                                <td>@FormarDateTime(propertyValue, Propitem.ColumnFormat)</td>
+                                break;
+                            case GridColumnType.CheckBox:
+                                <td>
+                                    @if (Propitem.IsInlineEdit)
+                                    {
+                                        <input type="checkbox" value="@propertyValue" />
+                                    }
+                                    else
+                                    {
+                                        <input type="checkbox" checked="@propertyValue" disabled="disabled" />
+                                    }
+                                </td>
+                                break;
+                            case GridColumnType.Icon:
+                                <td>
+                                    @foreach (var itemIcon in Propitem.ColumnFormat.Split(';'))
+                                    {
+                                        string[] IconInfo = itemIcon.Split(':');
+                                        if (propertyValue.ToString().Equals(IconInfo[0]))
+                                        {
+                                            <i style="padding-right:10px;" class="@IconInfo[1]"></i>
+                                        }
+                                    }
+                                </td>
+                                break;
+                            case GridColumnType.Image:
+                                <td>
+                                    @if (!string.IsNullOrEmpty(Propitem.ColumnFormat))
+                                    {
+                                        <img src="@Url.Content(propertyValue)" style="@Propitem.ColumnFormat" alt="Grid Image">
+                                    }
+                                    else
+                                    {
+                                        <img src="@Url.Content(propertyValue)" style="height:25px;width:25px;" alt="Grid Image">
+                                    }
+                                </td>
+                                break;
+                            case GridColumnType.Action:
+                                <td>
+                                    @{int Idx = 0; }
+                                    @foreach (var itemAction in Propitem.ColumnFormat.Split(';'))
+                                    {
+                                        string[] ItemActionDetails = itemAction.Split('=');
+                                        string ActionType = string.Empty;
+                                        string JavascriptMethod = "Action" + (Idx + 1) + "Click(this);";
+                                        switch (ItemActionDetails[0])
+                                        {
+                                            case "Icon":
+                                                ActionType = ItemActionDetails[1].Split(':')[1];
+                                                <span>
+                                                    <a href="#" onclick="@JavascriptMethod" title="@ItemActionDetails[1].Split(':')[0]" style="padding-right:10px;"><i class="fa fa-fw @ActionType fa-lg"></i></a>
+                                                </span>
+                                                break;
+                                            case "Button":
+                                                ActionType = ItemActionDetails[1].Split(':')[1];
+                                                <span>
+                                                    <a class="btn @ActionType btn-xs" href="#" onclick="@JavascriptMethod" title="@ItemActionDetails[1].Split(':')[0]" style="padding-right:10px;">@ItemActionDetails[1].Split(':')[0]</a>
+                                                </span>
+                                                break;
+                                        }
+                                        Idx++;
+                                    }
+                                </td>
+                                break;
+                            default:
+                                <td>@propertyValue</td>
+                                break;
+                        }
+
+                    }
+                }
+            </tr>
+        }
+
+    </tbody>
+    <tfoot>
+        @if (Model.ShowHeaderOnFooter)
+        {
+            <tr>
+                @foreach (var item in TempGridMetaInfo.OrderBy(o => o.ColumnOrder).ToList())
+                {
+                    if (item.IsVisible)
+                    {
+                        if (item.Type == GridColumnType.CheckBox && item.IsInlineEdit)
+                        {
+                            <th><input type="checkbox" id="appGridCheckAll">&nbsp;@item.HeaderText</th>
+                        }
+                        else
+                        {
+                            <th>@item.HeaderText</th>
+                        }
+                    }
+                }
+            </tr>
+        }
+    </tfoot>
+</table>
+
+@functions
+{
+    public string FormarDateTime(dynamic Dt, string format)
+    {
+        DateTime TempDt = (DateTime)Dt;
+        if (!string.IsNullOrEmpty(format))
+        {
+            return TempDt.ToString(format);
+        }
+        else
+        {
+            return TempDt.ToString();
+        }
+    }
+}
+
+@section Scripts {    
+    <script type="text/javascript">
+        $(function () {
+            
+        });
+
+    </script>
+}

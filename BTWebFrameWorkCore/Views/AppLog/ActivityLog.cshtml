@@ -1,0 +1,34 @@
+﻿@using AppModel.ViewModel
+@model ActivityLogVM
+@{
+    ViewData["PageTitle"] = "Activity Log";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+<div class="row">    
+    <div class="col-md-12">        
+        <div class="card card-primary" style="padding:10px;">
+            <!-- /.card-header -->
+            <!-- form start -->
+            @await Html.PartialAsync("_HTMLTable", Model.ActivityLogInfo)
+        </div>
+        <!-- /.card -->
+    </div>    
+</div>
+
+@section Scripts {
+    @*<script src="~/lib/jquery-ajax-unobtrusive/jquery.unobtrusive-ajax.js"></script>*@
+    <script type="text/javascript">
+
+        $(function () {
+            $("#appHtmlGrid1").DataTable({
+                "responsive": true,
+                "autoWidth": false,
+            });
+        });
+
+    </script>
+}
+
+

@@ -1,6 +1,7 @@
 ﻿using AppDAL.DBRepository;
 using AppModel;
 using AppModel.ViewModel;
+using AppUtility.AppEncription;
 using AutoMapper;
 using System;
 using System.Collections.Generic;
@@ -13,15 +14,18 @@ namespace AppBAL.Sevices.Master
     {
         Task<CommonResponce> GetUserProfile(string UserID);
         Task<CommonResponce> UpdateAppUserProfileAsync(UserProfileVM oModel);
+        Task<CommonResponce> ChangeProfilePasswordAsync(ChangeProfilePasswordVM oModel);
     }
     public class AppUserService : IAppUserService
     {
         private readonly IAppUserRepository _DBUserRepository;
         private readonly IMapper _mapper;
-        public AppUserService(IAppUserRepository DBUserRepository, IMapper mapper)
+        private readonly IEncriptionService _AppEncription;
+        public AppUserService(IAppUserRepository DBUserRepository, IMapper mapper, IEncriptionService AppEncription)
         {
             _DBUserRepository = DBUserRepository;
             _mapper = mapper;
+            _AppEncription = AppEncription;
         }
         public async Task<CommonResponce> GetUserProfile(string UserID)
         {
@@ -62,6 +66,33 @@ namespace AppBAL.Sevices.Master
             {
                 result.StatusMsg = "Not a valid User";
             }            
+
+            return result;
+        }
+
+        public async Task<CommonResponce> ChangeProfilePasswordAsync(ChangeProfilePasswordVM oModel)
+        {
+            CommonResponce result = new CommonResponce { Stat = false, StatusMsg = "" };
+            var oUser = await _DBUserRepository.GetUserByID(oModel.Id).ConfigureAwait(false);
+            if (oUser != null)
+            {
+                if (oUser.Password.Equals(_AppEncription.EncriptWithPrivateKey(oModel.OldPassword)))
+                {
+                    oUser.Password = _AppEncription.EncriptWithPrivateKey(oModel.NewPassword);
+
+                    await _DBUserRepository.Update(oUser).ConfigureAwait(false);
+                    result.Stat = true;
+                    result.StatusMsg = "Successfully changed User password";
+                }
+                else
+                {
+                    result.StatusMsg = "Old Password not Matched";
+                }
+            }
+            else
+            {
+                result.StatusMsg = "Not a valid User";
+            }
 
             return result;
         }

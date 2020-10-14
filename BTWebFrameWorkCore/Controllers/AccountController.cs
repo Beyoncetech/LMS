@@ -28,7 +28,7 @@ namespace BTWebAppFrameWorkCore.Controllers
         private readonly IEmailSender _EmailSender;
         private readonly ILoginService _LoginService;
         private readonly IAppUserService _AppUserService;
-        private readonly IAppCookiesAuthService _AppCookiesAuth;        
+        private readonly IAppCookiesAuthService _AppCookiesAuth;
 
         public AccountController(ILoginService LoginService, IEmailSender EmailSender, AppSettingsConfiguration AppSettingsConfig,
             IAppCookiesAuthService AppCookiesAuth, IAppUserService AppUserService)
@@ -37,7 +37,7 @@ namespace BTWebAppFrameWorkCore.Controllers
             _EmailSender = EmailSender;
             _AppSettingsConfig = AppSettingsConfig;
             _AppUserService = AppUserService;
-            _AppCookiesAuth = AppCookiesAuth;                        
+            _AppCookiesAuth = AppCookiesAuth;
         }
         #region App login
         [AllowAnonymous]
@@ -105,7 +105,7 @@ namespace BTWebAppFrameWorkCore.Controllers
         {
             UserActivityInfo TempActivity;
             var Result = await GetBaseService().MarkAllUnreadActivityAsRead().ConfigureAwait(false);
-            if(Result)
+            if (Result)
             {
                 TempActivity = new UserActivityInfo();
                 TempActivity.TotalActivity = "0";
@@ -117,7 +117,7 @@ namespace BTWebAppFrameWorkCore.Controllers
             }
 
             return PartialView("_UserMessage", TempActivity);
-            
+
         }
         #endregion
 
@@ -173,7 +173,7 @@ namespace BTWebAppFrameWorkCore.Controllers
                     UserImgPath = UsrImgPath,
                     AttachUserImage = new FileUploadInfo()
                 };
-                
+
                 VModel = await GetViewModel(TempVModel);
             }
             else
@@ -225,6 +225,67 @@ namespace BTWebAppFrameWorkCore.Controllers
             else
             {
                 return Json(new { stat = false, msg = "Invalid User Profile data" });
+            }
+        }
+        #endregion
+
+        #region Change Password        
+        public async Task<IActionResult> ChangeProfilePassword()
+        {
+            CreateBreadCrumb(new[] {new { Name = "Home", ActionUrl = "#" },
+                                    new { Name = "Change Password", ActionUrl = "/Account/ChangeProfilePassword" } });
+
+            BaseViewModel VModel = null;
+            var CurrentUserInfo = GetLoginUserInfo();
+
+            var result = await _AppUserService.GetUserProfile(CurrentUserInfo.UserID);
+            if (result.Stat)
+            {
+                UserProfile UserInfo = (UserProfile)result.StatusObj;
+
+                var TempVModel = new ChangeProfilePasswordVM
+                {
+                    Id = UserInfo.Id,
+                    UserID = UserInfo.UserId,
+                    OldPassword = "",
+                    NewPassword = "",
+                    ConfirmNewPassword = ""
+                };
+                VModel = await GetViewModel(TempVModel);
+            }
+            else
+            {
+                var TempVModel = new ChangeProfilePasswordVM
+                {
+                    Id = 0,
+                    UserID = CurrentUserInfo.UserID,
+                    OldPassword = "",
+                    NewPassword = "",
+                    ConfirmNewPassword = ""
+                };
+                VModel = await GetViewModel(TempVModel);
+            }
+            
+            return View(VModel);
+        }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<JsonResult> ChangeProfilePassword(ChangeProfilePasswordVM model)
+        {
+            if (ModelState.IsValid)
+            {
+                var result = await _AppUserService.ChangeProfilePasswordAsync(model).ConfigureAwait(false);
+                if (result.Stat)
+                {                    
+                    await GetBaseService().AddActivity(ActivityType.Update, model.UserID, model.BUserName, "Change Password", "Changed user password");
+                    return Json(new { stat = true, msg = "Successfully Changed user password" });
+                }
+                else
+                    return Json(new { stat = false, msg = result.StatusMsg });
+            }
+            else
+            {
+                return Json(new { stat = false, msg = "Invalid User change password data" });
             }
         }
         #endregion

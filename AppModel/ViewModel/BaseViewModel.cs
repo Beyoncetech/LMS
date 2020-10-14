@@ -62,4 +62,37 @@ namespace AppModel.ViewModel
             UserNotification = BaseObj.UserNotification;
         }
     }
+    public class AppGridModel<T> where T : class
+    {
+        public string TableID { get; set; }
+        public List<T> Rows { get; set; }
+        public string PageSizeOption { get; set; }
+        public bool ShowHeaderOnFooter { get; set; }
+        public Type GetMyType
+        {
+            get
+            {
+                return typeof(T);
+            }
+        }
+
+        public AppGridModel()
+        {
+            TableID = "appHtmlGrid1";
+            Rows = new List<T>();
+            PageSizeOption = "10;25;50;100";
+            ShowHeaderOnFooter = false;
+        }
+    }
+    public class AppGridModelInfo
+    {
+        public Boolean IsInlineEdit { get; set; }
+        public Boolean IsVisible { get; set; }
+        public string HeaderText { get; set; }
+        public string PropertyName { get; set; }
+        public GridColumnType Type { get; set; }
+        public int ColumnOrder { get; set; }
+        public int ColumnWidth { get; set; }
+        public string ColumnFormat { get; set; }
+    }
 }

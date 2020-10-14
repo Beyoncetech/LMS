@@ -1,6 +1,5 @@
 ﻿using AppDAL.DBModels;
 using AppModel;
-
 using AutoMapper;
 using System;
 using System.Collections.Generic;
@@ -13,7 +12,8 @@ namespace AppBAL.BusinessConfig
         public AutoMapperProfile()
         {
             CreateMap<Appuser, LoginUser>();
-            CreateMap<Appuser, UserProfile>();            
+            CreateMap<Appuser, UserProfile>();
+            CreateMap<Activitylog, ActivitylogBM>();
         }
     }
 }

@@ -12,6 +12,7 @@ namespace AppDAL.DBRepository
     public interface IAppActivityLogRepository
     {
         Task<List<Activitylog>> GetAllUnRead();
+        Task<List<Activitylog>> GetAll(int RowCount);
         Task<bool> MarkAllActivityAsRead();
         Task InsertActivity(ActivitylogBM entity);
     }
@@ -32,7 +33,15 @@ namespace AppDAL.DBRepository
 
             return oActivity;
         }
+        public async Task<List<Activitylog>> GetAll(int RowCount)
+        {
+            var oActivity = await _DBContext.Activitylog
+                .OrderByDescending(o => o.ActivityTime)
+                .Take(RowCount)
+                .ToListAsync();
 
+            return oActivity;
+        }
         public async Task<bool> MarkAllActivityAsRead()
         {           
             var Result = await _DBContext.Database.ExecuteSqlRawAsync("Update Activitylog set IsRead = '1' where IsRead = '0';");
