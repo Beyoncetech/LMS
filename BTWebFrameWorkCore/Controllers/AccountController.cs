@@ -5,6 +5,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using AppBAL.Sevices.AppCore;
 using AppBAL.Sevices.Login;
 using AppBAL.Sevices.Master;
 using AppModel;
@@ -29,15 +30,17 @@ namespace BTWebAppFrameWorkCore.Controllers
         private readonly ILoginService _LoginService;
         private readonly IAppUserService _AppUserService;
         private readonly IAppCookiesAuthService _AppCookiesAuth;
+        private readonly IAppSettingService _AppSettingService;
 
         public AccountController(ILoginService LoginService, IEmailSender EmailSender, AppSettingsConfiguration AppSettingsConfig,
-            IAppCookiesAuthService AppCookiesAuth, IAppUserService AppUserService)
+            IAppCookiesAuthService AppCookiesAuth, IAppUserService AppUserService, IAppSettingService ObjAppSettingService)
         {
             _LoginService = LoginService;
             _EmailSender = EmailSender;
             _AppSettingsConfig = AppSettingsConfig;
             _AppUserService = AppUserService;
             _AppCookiesAuth = AppCookiesAuth;
+            _AppSettingService = ObjAppSettingService;
         }
         #region App login
         [AllowAnonymous]
@@ -286,6 +289,63 @@ namespace BTWebAppFrameWorkCore.Controllers
             else
             {
                 return Json(new { stat = false, msg = "Invalid User change password data" });
+            }
+        }
+        #endregion
+
+        #region App Settings        
+        public async Task<IActionResult> AppSettings()
+        {
+            CreateBreadCrumb(new[] {new { Name = "Home", ActionUrl = "#" },
+                                    new { Name = "Settings", ActionUrl = "/Account/AppSettings" } });
+
+            BaseViewModel VModel = null;
+
+            var TempVModel = new SettingsVM
+            {
+                MailSettings = new MailSettingBM(),
+                AppGeneralSettings = new GeneralSettingBM()
+            };
+
+            var oMailSetup = await _AppSettingService.GetMailSetting().ConfigureAwait(false);
+            TempVModel.MailSettings = oMailSetup;
+
+            var oGeneralSetup = await _AppSettingService.GetAppGeneralSetting().ConfigureAwait(false);
+            TempVModel.AppGeneralSettings = oGeneralSetup;
+            
+            VModel = await GetViewModel(TempVModel);
+            return View(VModel);
+        }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<JsonResult> AppSettings(SettingsVM model)
+        {
+            if (ModelState.IsValid)
+            {
+                CommonResponce result = null;
+                string ActivityMsg = "";
+                if(model.Flag.Equals("GENERALSetting"))
+                {
+                    result = await _AppSettingService.SaveGeneralSetting(model.AppGeneralSettings).ConfigureAwait(false);
+                    ActivityMsg = "Changed App Settings";
+                }
+                else
+                {
+                    result = await _AppSettingService.SaveMailSetting(model.MailSettings).ConfigureAwait(false);
+                    ActivityMsg = "Changed Email Settings";
+                }
+                
+                if (result.Stat)
+                {
+                    await GetBaseService().AddActivity(ActivityType.Update, model.BUserID, model.BUserName, "Settings", ActivityMsg);
+                    return Json(new { stat = true, msg = "Successfully Changed settings" });
+                }
+                else
+                    return Json(new { stat = false, msg = result.StatusMsg });
+            }
+            else
+            {
+                return Json(new { stat = false, msg = "Invalid application settings" });
             }
         }
         #endregion

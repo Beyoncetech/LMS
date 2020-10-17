@@ -16,6 +16,7 @@ namespace AppDAL.DBModels
         }
 
         public virtual DbSet<Activitylog> Activitylog { get; set; }
+        public virtual DbSet<Appsetting> Appsetting { get; set; }
         public virtual DbSet<Appuser> Appuser { get; set; }
         public virtual DbSet<Tblmclassroom> Tblmclassroom { get; set; }
         public virtual DbSet<Tblmstandard> Tblmstandard { get; set; }
@@ -71,6 +72,29 @@ namespace AppDAL.DBModels
                 entity.Property(e => e.UserName)
                     .IsRequired()
                     .HasColumnType("varchar(255)")
+                    .HasDefaultValueSql("''")
+                    .HasCharSet("latin1")
+                    .HasCollation("latin1_swedish_ci");
+            });
+
+            modelBuilder.Entity<Appsetting>(entity =>
+            {
+                entity.ToTable("appsetting");
+
+                entity.Property(e => e.Id)
+                    .HasColumnName("ID")
+                    .HasColumnType("int(11)");
+
+                entity.Property(e => e.AppKey)
+                    .IsRequired()
+                    .HasColumnType("varchar(255)")
+                    .HasDefaultValueSql("''")
+                    .HasCharSet("latin1")
+                    .HasCollation("latin1_swedish_ci");
+
+                entity.Property(e => e.AppVal)
+                    .IsRequired()
+                    .HasColumnType("varchar(5000)")
                     .HasDefaultValueSql("''")
                     .HasCharSet("latin1")
                     .HasCollation("latin1_swedish_ci");

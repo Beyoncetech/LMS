@@ -1,0 +1,159 @@
+﻿@using AppModel.ViewModel
+@model SettingsVM
+@{
+    ViewData["PageTitle"] = "Settings";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+<div class="row">
+    <!-- left column -->
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header p-2">
+                <ul class="nav nav-pills">
+                    <li class="nav-item"><a class="nav-link active" href="#appSettings" data-toggle="tab">App Settings</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#mailSettings" data-toggle="tab">Mail Setup</a></li>                    
+                </ul>
+            </div><!-- /.card-header -->
+            <div class="card-body">
+                <div class="tab-content">
+                    <!-- /.tab-pane -->
+                    <div class="active tab-pane" id="appSettings">
+                        <form id="frmSettingGeneralSetup" asp-area="" asp-action="AppSettings" asp-controller="Account" data-ajax="true" data-ajax-method="post" data-ajax-begin="onBeforeSubmit" data-ajax-success="onSuccess">
+                            @Html.HiddenFor(model => model.BUserID, new { @id = "GeneralBUserID" })
+                            @Html.HiddenFor(model => model.BUserName, new { @id = "GeneralBUserName" })
+                            @Html.HiddenFor(model => model.Flag, new { @id = "SettingGeneralFlag" })
+                            <div class="card-body">
+                                <div class="form-group">
+                                    <label>Class Active Threshold Time (In minute)</label>
+                                    <input type="text" name="AppGeneralSettings.ClassActiveThresholdTime" asp-for="AppGeneralSettings.ClassActiveThresholdTime" class="form-control" placeholder="Class Active Threshold Time" />
+                                    <span asp-validation-for="AppGeneralSettings.ClassActiveThresholdTime" class="text-danger" style="font-size:small"></span>
+                                </div>
+                                <div class="form-group">
+                                    <label>Support Mail ID</label>
+                                    <input type="text" name="AppGeneralSettings.SupportMailID" asp-for="AppGeneralSettings.SupportMailID" class="form-control" placeholder="Support Mail ID" />
+                                    <span asp-validation-for="AppGeneralSettings.SupportMailID" class="text-danger" style="font-size:small"></span>
+                                </div>
+                            </div>
+                            <!-- /.card-body -->
+                            <div class="card-footer">
+                                <input type="submit" class="btn btn-primary" value="Save" id="btnGeneralSetup" />
+                            </div>
+                        </form>
+                    </div>
+                    <!-- /.tab-pane -->
+                    <div class="tab-pane" id="mailSettings">
+                        <form id="frmSettingMailSetup" asp-area="" asp-action="AppSettings" asp-controller="Account" data-ajax="true" data-ajax-method="post" data-ajax-begin="onBeforeSubmit" data-ajax-success="onSuccess">
+                            @Html.HiddenFor(model => model.BUserID, new { @id = "MailSettingBUserID" })
+                            @Html.HiddenFor(model => model.BUserName, new { @id = "MailSettingBUserName" })
+                            @Html.HiddenFor(model => model.Flag, new { @id = "SettingMailFlag" })
+                            @Html.HiddenFor(model => model.MailSettings.MailPassword)
+                            <div class="card-body">
+                                <div class="form-group">
+                                    <label>From Mail ID</label>
+                                    <input type="email" name="MailSettings.FromMailID" asp-for="MailSettings.FromMailID" class="form-control" placeholder="From Mail ID" />
+                                    <span asp-validation-for="MailSettings.FromMailID" class="text-danger" style="font-size:small"></span>
+                                </div>
+                                <div class="form-group">
+                                    <label>Smtp Server</label>
+                                    <input type="text" name="MailSettings.SmtpServer" asp-for="MailSettings.SmtpServer" class="form-control" placeholder="Smtp Server" />
+                                    <span asp-validation-for="MailSettings.SmtpServer" class="text-danger" style="font-size:small"></span>
+                                </div>
+                                <div class="form-group">
+                                    <label>Smtp Server Port</label>
+                                    <input type="text" name="MailSettings.SmtpServerPort" asp-for="MailSettings.SmtpServerPort" class="form-control" placeholder="Smtp Server Port" />
+                                    <span asp-validation-for="MailSettings.SmtpServerPort" class="text-danger" style="font-size:small"></span>
+                                </div>
+                                <div class="form-group">
+                                    <label>Mail UserID</label>
+                                    <input type="text" name="MailSettings.MailUserID" asp-for="MailSettings.MailUserID" class="form-control" placeholder="Mail UserID" />
+                                    <span asp-validation-for="MailSettings.MailUserID" class="text-danger" style="font-size:small"></span>
+                                </div>
+                                <div class="form-group">
+                                    <label>Mail Password</label>
+                                    <input type="text" name="MailSettings.MailPasswordEx" asp-for="MailSettings.MailPasswordEx" class="form-control" placeholder="Mail Password" />
+                                    <span asp-validation-for="MailSettings.MailPasswordEx" class="text-danger" style="font-size:small"></span>
+                                </div>
+                            </div>
+                            <!-- /.card-body -->
+                            <div class="card-footer">
+                                <input type="submit" class="btn btn-primary" value="Save" id="btnEmailSetup" />
+                            </div>
+                        </form>
+                    </div>                    
+                </div>
+                <!-- /.tab-content -->
+            </div><!-- /.card-body -->
+        </div>
+    </div>
+    <!--/.col (left) -->
+</div>
+
+@section Scripts {
+    @*<script src="~/lib/jquery-ajax-unobtrusive/jquery.unobtrusive-ajax.js"></script>*@
+    <script type="text/javascript">
+
+        $(function () {
+            $('#btnEmailSetup').click(function (e) {
+                e.preventDefault();
+                var isFormValid = $('#frmSettingMailSetup').valid();
+                if (isFormValid) {
+                    ezBSAlert({
+                        type: "confirm",
+                        messageText: "Do you want to save email setup ?",
+                        alertType: "info"
+                    }).done(function (flag) {
+                        $('#SettingMailFlag').val('MAILSetting')
+                        if (flag) {
+                            $('#frmSettingMailSetup').submit();
+                        }
+                    });
+                }
+            });
+
+            $('#btnGeneralSetup').click(function (e) {
+                e.preventDefault();
+                var isFormValid = $('#frmSettingGeneralSetup').valid();
+                if (isFormValid) {
+                    ezBSAlert({
+                        type: "confirm",
+                        messageText: "Do you want to save app settings ?",
+                        alertType: "info"
+                    }).done(function (flag) {
+                        $('#SettingGeneralFlag').val('GENERALSetting')
+                        if (flag) {
+                            $('#frmSettingGeneralSetup').submit();
+                        }
+                    });
+                }
+            });
+        });
+
+
+        function onBeforeSubmit() {
+            debugger;
+            ShowAppLoader();
+
+        }
+
+        function onSuccess(result, textStatus, jqXHR) {
+            debugger;
+            HideAppLoader();
+            //alert(result.msg)
+            if (result.stat) {
+                toastr.success(result.msg)
+            } else {
+                toastr.error(result.msg)
+            }
+
+        }
+
+        onFail = function (xhr) {
+            debugger;
+            alert(`Hi ${xhr.responseText}!`);
+            HideAppLoader();
+        };
+
+    </script>
+}

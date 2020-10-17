@@ -157,6 +157,7 @@ namespace BTWebAppFrameWorkCore
             services.AddScoped<ILoginService, LoginService>();
             services.AddScoped<IAppUserService, AppUserService>();
             services.AddScoped<IAppLogService, AppLogService>();
+            services.AddScoped<IAppSettingService, AppSettingService>();
             #endregion
 
 
@@ -164,6 +165,7 @@ namespace BTWebAppFrameWorkCore
             services.AddScoped(typeof(ICommonRepository<>), typeof(CommonRepository<>));
             services.AddScoped<IAppUserRepository, AppUserRepository>();
             services.AddScoped<IAppActivityLogRepository, AppActivityLogRepository>();
+            services.AddScoped<IAppSettingRepository, AppSettingRepository>();
             #endregion
 
             #region Other Services

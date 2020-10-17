@@ -112,10 +112,12 @@
                         <a href="/Account/ChangeProfilePassword" class="dropdown-item">
                             <i class="fas fa-key mr-2"></i> Change Password
                         </a>
-
-                        <a href="#" class="dropdown-item">
-                            <i class="fas fa-cogs mr-2"></i> Settings
-                        </a>
+                        @if (Model.BUserType.Equals("A"))
+                        {
+                            <a href="/Account/AppSettings" class="dropdown-item">
+                                <i class="fas fa-cogs mr-2"></i> Settings
+                            </a>
+                        }
                         <div class="dropdown-divider"></div>
                         <a href="#" onclick="AppCommonAjaxPost('/Account/Logout', null, onLogoutSuccess, onLogoutFail)" class="dropdown-item">
                             <i class="fas fa-power-off mr-2"></i> Log Out
@@ -833,12 +835,12 @@
         function onLogoutFail(result) {
             toastr.error('Something wrong while logout.')
         }
-        function onActivityLogSuccess(result) {           
+        function onActivityLogSuccess(result) {
             $('#UserActivityMsgLstSec').html(result);
         }
         function onActivityLogFail(result) {
             toastr.error('Something wrong while mark read activity.')
-        }        
+        }
     </script>
 </body>
 </html>

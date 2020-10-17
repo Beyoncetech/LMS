@@ -60,4 +60,11 @@ namespace AppModel.ViewModel
     {
         public AppGridModel<ActivitylogBM> ActivityLogInfo { get; set; }        
     }
+
+    public class SettingsVM : BaseViewModel
+    {
+        public string Flag { get; set; }
+        public MailSettingBM MailSettings { get; set; }
+        public GeneralSettingBM AppGeneralSettings { get; set; }
+    }
 }
