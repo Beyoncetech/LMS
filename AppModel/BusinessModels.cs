@@ -36,7 +36,7 @@ namespace AppModel
         public long Id { get; set; }
         [GridColumn(ColumnOrder = 1, ColumnWidth = 110, HeaderText = "Activity Type", Type = GridColumnType.Icon, ColumnFormat = "1:fas fa-plus;2:fas fa-edit;3:fas fa-trash")]
         public sbyte ActivityType { get; set; }
-        [GridColumn(ColumnOrder = 5, HeaderText = "Activity Time", ColumnFormat = "dd-MMM-yyyy HH:mm:ss")]
+        [GridColumn(ColumnOrder = 5, HeaderText = "Activity Time", Type = GridColumnType.Date, ColumnFormat = "dd-MMM-yyyy HH:mm:ss")]
         public DateTime ActivityTime { get; set; }
         public string UserId { get; set; }
         [GridColumn(ColumnOrder = 3, HeaderText = "User Name")]
@@ -89,5 +89,33 @@ namespace AppModel
         [Range(0, 720, ErrorMessage = "Please enter valid minute between 0 to 720")]
         public string ClassActiveThresholdTime { get; set; }
         public string SupportMailID { get; set; }
+    }
+
+    public class AppUserBM
+    {        
+        public long Id { get; set; }
+        [GridColumn(ColumnOrder = 1, HeaderText = "Avatar", Type = GridColumnType.Image)]
+        public string UserAvatar { get; set; }
+        [GridColumn(ColumnOrder = 1, HeaderText = "Name")]
+        public string Name { get; set; }
+        [GridColumn(ColumnOrder = 2, HeaderText = "User ID")]
+        public string UserId { get; set; }
+        [GridColumn(ColumnOrder = 3, HeaderText = "User Type")]
+        public string UserType { get; set; }
+        [GridColumn(ColumnOrder = 4, HeaderText = "Gender")]
+        public string Gender { get; set; }
+        [GridColumn(ColumnOrder = 5, HeaderText = "Email")]
+        public string Email { get; set; }
+        [GridColumn(ColumnOrder = 6, HeaderText = "Is Active", Type = GridColumnType.CheckBox)]
+        public ulong IsActive { get; set; }
+        [GridColumn(ColumnOrder = 7, HeaderText = "Action", Type = GridColumnType.Action, ColumnFormat = "Icon=Edit:fa fa-fw fa-address-card;Icon=Delete:fa fa-fw fa-user-times;Icon=Reset Password:fa fa-fw fa-retweet")]
+        public string Action { get; set; }        
+        public string Mobile { get; set; }        
+        public string UserPerm { get; set; }
+        public ulong IsPassReset { get; set; }
+        public DateTime? ResetPassValidity { get; set; }
+        public string ResetPassContext { get; set; }        
+        public DateTime? Dob { get; set; }
+        public string CustomData { get; set; }        
     }
 }

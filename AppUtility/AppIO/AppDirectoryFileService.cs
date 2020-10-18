@@ -10,6 +10,7 @@ namespace AppUtility.AppIO
     {
         bool CreateDirectoryIfNotExist(string DirectoryPath);
         bool CreateFileFromBase64String(string FileContentsBase64, string FilePath);
+        string GetAppUserAvatarPath(string AppRootPath, string UserID, string UserGender);
     }
 
     public class DirectoryFileService : IDirectoryFileService
@@ -48,6 +49,24 @@ namespace AppUtility.AppIO
             {
                 return false;
             }
+        }
+
+        public string GetAppUserAvatarPath(string AppRootPath, string UserID, string UserGender)
+        {
+            string UsrImgPath = string.Format("{0}\\{1}.{2}", Path.Combine(AppRootPath, "AppFileRepo\\UserAvatar"), UserID, "jpg");
+            if (System.IO.File.Exists(UsrImgPath))
+            {
+                UsrImgPath = string.Format("~/AppFileRepo/UserAvatar/{0}.{1}", UserID, "jpg");
+            }
+            else
+            {
+                if (UserGender.Equals("M"))
+                    UsrImgPath = "~/img/avatar5.png";
+                else
+                    UsrImgPath = "~/img/avatar3.png";
+            }
+
+            return UsrImgPath;
         }
     }
 }

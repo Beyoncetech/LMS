@@ -67,4 +67,9 @@ namespace AppModel.ViewModel
         public MailSettingBM MailSettings { get; set; }
         public GeneralSettingBM AppGeneralSettings { get; set; }
     }
+
+    public class AppUsersVM : BaseViewModel
+    {
+        public AppGridModel<AppUserBM> AppUsersInfo { get; set; }
+    }
 }

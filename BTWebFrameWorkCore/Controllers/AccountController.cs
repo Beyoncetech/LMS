@@ -349,5 +349,26 @@ namespace BTWebAppFrameWorkCore.Controllers
             }
         }
         #endregion
+
+        #region App Users        
+        public async Task<IActionResult> AppUsers()
+        {
+            CreateBreadCrumb(new[] {new { Name = "Home", ActionUrl = "#" },
+                                    new { Name = "App Users", ActionUrl = "/Account/AppUsers" } });
+
+            BaseViewModel VModel = null;
+            
+            var result = await _AppUserService.GetAllAppUsers(500, GetBaseService().GetAppRootPath());
+
+            var TempVModel = new AppUsersVM();
+            TempVModel.AppUsersInfo = new AppGridModel<AppUserBM>();
+            TempVModel.AppUsersInfo.Rows = result;
+
+            VModel = await GetViewModel(TempVModel);
+           
+            return View(VModel);
+        }
+        
+        #endregion
     }
 }

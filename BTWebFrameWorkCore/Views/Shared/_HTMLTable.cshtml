@@ -116,21 +116,20 @@
                                     @{int Idx = 0; }
                                     @foreach (var itemAction in Propitem.ColumnFormat.Split(';'))
                                     {
+                                        string ActionID = string.Format("Action{0}ID_{1}", (Idx + 1).ToString(), propertyValue.ToString());
                                         string[] ItemActionDetails = itemAction.Split('=');
-                                        string ActionType = string.Empty;
-                                        string JavascriptMethod = "Action" + (Idx + 1) + "Click(this);";
+                                        string[] ItemActionStyle = ItemActionDetails[1].Split(':');
+                                        string JavascriptMethod = string.Format("Action{0}Click({1});", (Idx + 1).ToString(), propertyValue.ToString());
                                         switch (ItemActionDetails[0])
                                         {
                                             case "Icon":
-                                                ActionType = ItemActionDetails[1].Split(':')[1];
                                                 <span>
-                                                    <a href="#" onclick="@JavascriptMethod" title="@ItemActionDetails[1].Split(':')[0]" style="padding-right:10px;"><i class="fa fa-fw @ActionType fa-lg"></i></a>
+                                                    <a href="#" id="@ActionID" onclick="@JavascriptMethod" title="@ItemActionStyle[0]" style="padding-right:10px;"><i class="@ItemActionStyle[1]"></i></a>
                                                 </span>
                                                 break;
                                             case "Button":
-                                                ActionType = ItemActionDetails[1].Split(':')[1];
                                                 <span>
-                                                    <a class="btn @ActionType btn-xs" href="#" onclick="@JavascriptMethod" title="@ItemActionDetails[1].Split(':')[0]" style="padding-right:10px;">@ItemActionDetails[1].Split(':')[0]</a>
+                                                    <a href="#" id="@ActionID" onclick="@JavascriptMethod" title="@ItemActionStyle[0]" class="@ItemActionStyle[1]" style="padding-right:10px;">@ItemActionStyle[0]</a>
                                                 </span>
                                                 break;
                                         }
@@ -188,10 +187,10 @@
     }
 }
 
-@section Scripts {    
+@section Scripts {
     <script type="text/javascript">
         $(function () {
-            
+
         });
 
     </script>

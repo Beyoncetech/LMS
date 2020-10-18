@@ -71,7 +71,7 @@ namespace BTWebAppFrameWorkCore
             {
                 options.Cookie.Name = "LMSAuthCookies";
                 options.LoginPath = "/Account/Login/";
-                options.AccessDeniedPath = "/Account/Forbidden/";
+                options.AccessDeniedPath = "/AppError/UnAuthorised401/";
                 options.ExpireTimeSpan = TimeSpan.FromMinutes(30);
             })
             //.AddCustomCookieAuth(o => { })

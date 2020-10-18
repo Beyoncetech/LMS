@@ -2,6 +2,7 @@
 using AppModel;
 using AppModel.ViewModel;
 using AppUtility.AppEncription;
+using AppUtility.AppIO;
 using AutoMapper;
 using System;
 using System.Collections.Generic;
@@ -15,17 +16,20 @@ namespace AppBAL.Sevices.Master
         Task<CommonResponce> GetUserProfile(string UserID);
         Task<CommonResponce> UpdateAppUserProfileAsync(UserProfileVM oModel);
         Task<CommonResponce> ChangeProfilePasswordAsync(ChangeProfilePasswordVM oModel);
+        Task<List<AppUserBM>> GetAllAppUsers(int RowCount, String AppRootPath);
     }
     public class AppUserService : IAppUserService
     {
         private readonly IAppUserRepository _DBUserRepository;
         private readonly IMapper _mapper;
         private readonly IEncriptionService _AppEncription;
-        public AppUserService(IAppUserRepository DBUserRepository, IMapper mapper, IEncriptionService AppEncription)
+        private readonly IDirectoryFileService _AppDirectoryFileService;
+        public AppUserService(IAppUserRepository DBUserRepository, IMapper mapper, IEncriptionService AppEncription, IDirectoryFileService AppDirectoryFileService)
         {
             _DBUserRepository = DBUserRepository;
             _mapper = mapper;
             _AppEncription = AppEncription;
+            _AppDirectoryFileService = AppDirectoryFileService;
         }
         public async Task<CommonResponce> GetUserProfile(string UserID)
         {
@@ -65,7 +69,7 @@ namespace AppBAL.Sevices.Master
             else
             {
                 result.StatusMsg = "Not a valid User";
-            }            
+            }
 
             return result;
         }
@@ -94,6 +98,32 @@ namespace AppBAL.Sevices.Master
                 result.StatusMsg = "Not a valid User";
             }
 
+            return result;
+        }
+
+        public async Task<List<AppUserBM>> GetAllAppUsers(int RowCount, String AppRootPath)
+        {
+            List<AppUserBM> result = new List<AppUserBM>();
+            var oUsers = await _DBUserRepository.GetAllUser(RowCount).ConfigureAwait(false);
+
+            if (oUsers != null && oUsers.Count > 0)
+            {
+                foreach (var item in oUsers)
+                {
+                    result.Add(new AppUserBM
+                    {
+                        Id = item.Id,
+                        UserAvatar = _AppDirectoryFileService.GetAppUserAvatarPath(AppRootPath, item.UserId, item.Gender == null ? "M" : item.Gender),
+                        Name = item.Name,
+                        UserId = item.UserId,
+                        UserType = item.UserType,
+                        Gender = item.Gender,
+                        Email = item.Email,
+                        IsActive = item.IsActive,
+                        Action = item.Id.ToString()
+                    });
+                };                
+            }
             return result;
         }
     }

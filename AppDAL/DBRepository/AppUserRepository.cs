@@ -13,6 +13,7 @@ namespace AppDAL.DBRepository
         Task<Appuser> GetUserByUserID(string UserID);
         Task<Appuser> GetUserByID(long ID);
         Task Update(Appuser entity);
+        Task<List<Appuser>> GetAllUser(int RowCount);
     }
     public class AppUserRepository : IAppUserRepository
     {
@@ -42,6 +43,15 @@ namespace AppDAL.DBRepository
             entities.Attach(entity);
             _DBContext.Entry(entity).State = EntityState.Modified;
             await _DBContext.SaveChangesAsync();
+        }
+        public async Task<List<Appuser>> GetAllUser(int RowCount)
+        {
+            var oActivity = await _DBContext.Appuser
+                .OrderByDescending(o => o.Name)
+                .Take(RowCount)
+                .ToListAsync();
+
+            return oActivity;
         }
     }
 }

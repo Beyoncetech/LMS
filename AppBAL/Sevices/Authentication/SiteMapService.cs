@@ -27,7 +27,7 @@ namespace AppBAL.Sevices.Authentication
 
             _AppSiteMap.Add(new SiteMapInfo { ID = "2.1", MenuOrder = 2, Group = "", Parent = "Account", Name = "User", Type = "LeftMenu", AccessType = "R", ActionUrl = "/home/index", ActionPerm = "000", IconLeft = "nav-icon fas fa-th", IconRight = "" });
 
-            _AppSiteMap.Add(new SiteMapInfo { ID = "3.1", MenuOrder = 3, Group = "", Parent = "Master", Name = "Create user", Type = "LeftMenu", AccessType = "R", ActionUrl = "/home/index", ActionPerm = "000", IconLeft = "nav-icon fas fa-th", IconRight = "" });
+            _AppSiteMap.Add(new SiteMapInfo { ID = "3.1", MenuOrder = 3, Group = "Account", Parent = "", Name = "App Users", Type = "LeftMenu", AccessType = "R", ActionUrl = "/Account/AppUsers", ActionPerm = "000", IconLeft = "nav-icon fas fa-th", IconRight = "" });
             _AppSiteMap.Add(new SiteMapInfo { ID = "3.2", MenuOrder = 4, Group = "", Parent = "Master", Name = "Delete user", Type = "LeftMenu", AccessType = "R", ActionUrl = "/home/index", ActionPerm = "000", IconLeft = "nav-icon fas fa-th", IconRight = "" });
 
             _AppSiteMap.Add(new SiteMapInfo { ID = "4.1", MenuOrder = 5, Group = "Report", Parent = "Master", Name = "User List Report", Type = "LeftMenu", AccessType = "R", ActionUrl = "/home/index", ActionPerm = "000", IconLeft = "nav-icon fas fa-th", IconRight = "" });
