@@ -1,14 +1,18 @@
 ﻿using AppDAL.DBModels;
 using AppDAL.DBRepository;
 using AppModel;
+using AppModel.BusinessModel.Master;
+using AppUtility.AppIO;
 using AutoMapper;
+using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace AppBAL.Sevices.Master
 {
     public interface IStudentService
     {
-        Task<CommonResponce> GetAllStudents();
+        Task<List<StudentBM>> GetAllStudents(int RowCount, string AppRootPath);        
         Task<CommonResponce> GetStudentByStudentId(int StudentID);
         Task<CommonResponce> GetStudentByRegNo(int RegNo);
         Task<CommonResponce> GetStudentByEmailID(string EmailID);
@@ -21,19 +25,43 @@ namespace AppBAL.Sevices.Master
         private readonly IStudentRepository _DBStudentRepository;
         private readonly IMapper _mapper;
         private readonly ICommonRepository<Tblmstudent> _commonRepository;
-        public StudentService(IStudentRepository DBStudentRepository, IMapper mapper,ICommonRepository<Tblmstudent> CommonRepository)
+        private readonly IDirectoryFileService _AppDirectoryFileService;
+        public StudentService(IStudentRepository DBStudentRepository, IMapper mapper,ICommonRepository<Tblmstudent> CommonRepository, IDirectoryFileService AppDirectoryFileService)
         {
             _DBStudentRepository = DBStudentRepository;
             _mapper = mapper;
             _commonRepository = CommonRepository;
+            _AppDirectoryFileService = AppDirectoryFileService;
         }
 
-        public async Task<CommonResponce> GetAllStudents()
+        public async Task<List<StudentBM>> GetAllStudents(int RowCount, String AppRootPath)
         {
-            var AllStudents = await _DBStudentRepository.GetAllStudents();
-            CommonResponce result = new CommonResponce { Stat = true, StatusMsg = "", StatusObj = AllStudents };
+            List<StudentBM> result = new List<StudentBM>();
+            var oStudents = await _DBStudentRepository.GetAllStudents(RowCount).ConfigureAwait(false);
+
+            if (oStudents != null && oStudents.Count > 0)
+            {
+                foreach (var item in oStudents)
+                {
+                    result.Add(new StudentBM
+                    {
+                        Id = item.Id,
+                        UserAvatar = _AppDirectoryFileService.GetAppUserAvatarPath(AppRootPath, item.RegNo.ToString(), "M"),
+                        Name = item.Name,
+                        RegNo = item.RegNo,
+                        Address = item.Address,
+                        ContactNo = item.ContactNo,
+                        Email = item.Email,
+                        StandardId = item.StandardId,
+                        Action = item.Id.ToString(),
+                        CreatedOn = item.CreatedOn,
+                        CreatedBy = item.CreatedBy
+                    });
+                };
+            }
             return result;
         }
+        
         public async Task<CommonResponce> GetStudentByStudentId(int StudentID)
         {
             bool isValid = true;

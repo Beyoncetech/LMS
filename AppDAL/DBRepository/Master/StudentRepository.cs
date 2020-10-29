@@ -10,21 +10,21 @@ namespace AppDAL.DBRepository
 {
     public interface IStudentRepository 
     {
-        Task<List<Tblmstudent>> GetAllStudents();
+        Task<List<Tblmstudent>> GetAllStudents(int RowCount);
         Task<Tblmstudent> GetStudentByStudentId(int StudentID);
         Task<Tblmstudent> GetStudentByRegNo(int RegNo);
         Task<Tblmstudent> GetStudentByEmailID(string EmailID);
     }
-    public class StudentRepository
+    public class StudentRepository:IStudentRepository
     {
         private readonly AppDBContext _DBContext;
         public StudentRepository(AppDBContext DBContext)
         {
             _DBContext = DBContext;
         }
-        public async Task<List<Tblmstudent>> GetAllStudents()
+        public async Task<List<Tblmstudent>> GetAllStudents(int RowCount)
         {
-            var result = await _DBContext.Tblmstudent.ToListAsync();
+            var result = await _DBContext.Tblmstudent.OrderBy(o =>o.Name).Take(RowCount).ToListAsync();
             return result;
         }
         public async Task<Tblmstudent> GetStudentByStudentId(int StudentID)
