@@ -30,6 +30,8 @@ using AppBAL.Sevices.Master;
 using AppUtility.AppIO;
 using BTWebAppFrameWorkCore.Services;
 using AppBAL.Sevices.AppCore;
+using AppUtility.AppMessage;
+using AppUtility.AppSchedular;
 
 namespace BTWebAppFrameWorkCore
 {
@@ -38,6 +40,11 @@ namespace BTWebAppFrameWorkCore
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
+
+            //****use this code if required schedule jobs. otherwise comment the code*****
+            JobManager ojobM = new JobManager();
+            ojobM.ExecuteAllJobs();
+            //************************************************
         }
 
         public IConfiguration Configuration { get; }
@@ -149,7 +156,9 @@ namespace BTWebAppFrameWorkCore
             services.AddScoped<IAppCookiesAuthService, AppCookiesAuthService>();
             services.AddScoped<IEncriptionService, EncriptionService>();
             services.AddScoped<IAuthorizationHandler, CanAllowOnlyAuthUsersHandler>();
-            services.AddScoped<IBaseControllerService, BaseControllerService>();            
+            services.AddScoped<IBaseControllerService, BaseControllerService>();
+            services.AddScoped<IEmailService, EmailService>();
+            services.AddScoped<IAppJobService, AppJobService>();
             #endregion
 
             #region Register services
@@ -168,6 +177,7 @@ namespace BTWebAppFrameWorkCore
             services.AddScoped<IAppActivityLogRepository, AppActivityLogRepository>();
             services.AddScoped<IAppSettingRepository, AppSettingRepository>();
             services.AddScoped<IStudentRepository, StudentRepository>();
+            services.AddScoped<IAppJobRepository, AppJobRepository>();
             #endregion
 
             #region Other Services

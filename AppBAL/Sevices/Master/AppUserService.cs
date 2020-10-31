@@ -1,4 +1,5 @@
-﻿using AppDAL.DBRepository;
+﻿using AppDAL.DBModels;
+using AppDAL.DBRepository;
 using AppModel;
 using AppModel.ViewModel;
 using AppUtility.AppEncription;
@@ -17,6 +18,9 @@ namespace AppBAL.Sevices.Master
         Task<CommonResponce> UpdateAppUserProfileAsync(UserProfileVM oModel);
         Task<CommonResponce> ChangeProfilePasswordAsync(ChangeProfilePasswordVM oModel);
         Task<List<AppUserBM>> GetAllAppUsers(int RowCount, String AppRootPath);
+        Task<AppUserVM> GetAppUserByID(int Id);
+        Task<CommonResponce> SaveAppUserAsync(AppUserVM oModel, string ResetContext, DateTime PasswordValidity);
+        Task<CommonResponce> DeleteAppUser(long Id);
     }
     public class AppUserService : IAppUserService
     {
@@ -122,8 +126,107 @@ namespace AppBAL.Sevices.Master
                         IsActive = item.IsActive,
                         Action = item.Id.ToString()
                     });
-                };                
+                };
             }
+            return result;
+        }
+
+        public async Task<AppUserVM> GetAppUserByID(int Id)
+        {
+            AppUserVM result;
+            var oUser = await _DBUserRepository.GetUserByID(Id).ConfigureAwait(false);
+
+            if (oUser != null)
+            {
+                result = _mapper.Map<AppUserVM>(oUser);
+            }
+            else
+            {
+                result = null;
+            }
+
+            return result;
+        }
+
+        public async Task<CommonResponce> SaveAppUserAsync(AppUserVM oModel, string ResetContext, DateTime PasswordValidity)
+        {
+            CommonResponce result = new CommonResponce { Stat = false, StatusMsg = "" };
+            Appuser oUser = null;
+            int RowEffect = 0;
+            if (oModel.Id == 0) // for new user
+            {
+                oUser = await _DBUserRepository.GetUserByUserID(oModel.UserId).ConfigureAwait(false);
+                if (oUser != null)
+                    result.StatusMsg = "User ID is already in use.";
+                else
+                {
+                    oUser = new Appuser
+                    {
+                        Id = oModel.Id,
+                        Name = oModel.Name,
+                        UserId = oModel.UserId,
+                        UserType = oModel.UserType,
+                        Gender = oModel.Gender,
+                        IsActive = (ulong)(oModel.IsActive ? 1 : 0),
+                        Mobile = oModel.Mobile,
+                        Dob = oModel.Dob,
+                        UserPerm = oModel.UserPerm,
+                        Email = oModel.Email,
+                        IsPassReset = 1,
+                        ResetPassContext = ResetContext,
+                        ResetPassValidity = PasswordValidity,
+                        Password = "123"
+                    };
+                    RowEffect = await _DBUserRepository.Insert(oUser).ConfigureAwait(false);
+                    if(RowEffect > 0)
+                    {
+                        result.Stat = true;
+                        result.StatusMsg = "Successfully Save User.";
+                    }
+                    else
+                        result.StatusMsg = "Error on saving user.";
+                }
+            } // for existing user
+            else
+            {
+                bool IsSameUserIDFound = await _DBUserRepository.FindOtherSameUserID(oModel.Id, oModel.UserId).ConfigureAwait(false);
+                if (IsSameUserIDFound)
+                    result.StatusMsg = "User ID is already in use.";
+                else
+                {
+                    oUser = await _DBUserRepository.GetUserByID(oModel.Id).ConfigureAwait(false);
+                    if (oUser != null)
+                    {
+                        oUser.Name = oModel.Name;
+                        oUser.UserId = oModel.UserId;
+                        oUser.UserType = oModel.UserType;
+                        oUser.Gender = oModel.Gender;
+                        oUser.IsActive = (ulong)(oModel.IsActive ? 1 : 0);
+                        oUser.Mobile = oModel.Mobile;
+                        oUser.Dob = oModel.Dob;
+                        oUser.UserPerm = oModel.UserPerm;
+                        oUser.Email = oModel.Email;                        
+
+                        await _DBUserRepository.Update(oUser).ConfigureAwait(false);
+                        result.Stat = true;
+                        result.StatusMsg = "Successfully Save User";
+                    }
+                    else
+                    {
+                        result.StatusMsg = "Error on saving user or user not valid";
+                    }
+                }
+            }            
+
+            return result;
+        }
+
+        public async Task<CommonResponce> DeleteAppUser(long Id)
+        {
+            CommonResponce result = new CommonResponce { Stat = false, StatusMsg = "Error on deleting user" };
+            result.Stat = await _DBUserRepository.Delete(Id).ConfigureAwait(false);
+            if (result.Stat)
+                result.StatusMsg = "Successfully deleted the user.";
             return result;
         }
     }

@@ -18,6 +18,7 @@ namespace AppDAL.DBModels
         public virtual DbSet<Activitylog> Activitylog { get; set; }
         public virtual DbSet<Appsetting> Appsetting { get; set; }
         public virtual DbSet<Appuser> Appuser { get; set; }
+        public virtual DbSet<Mjob> Mjob { get; set; }
         public virtual DbSet<Tblmclassroom> Tblmclassroom { get; set; }
         public virtual DbSet<Tblmstandard> Tblmstandard { get; set; }
         public virtual DbSet<Tblmstudent> Tblmstudent { get; set; }
@@ -178,6 +179,64 @@ namespace AppDAL.DBModels
                     .HasDefaultValueSql("''")
                     .HasCharSet("latin1")
                     .HasCollation("latin1_swedish_ci");
+            });
+
+            modelBuilder.Entity<Mjob>(entity =>
+            {
+                entity.HasKey(e => e.JobId)
+                    .HasName("PRIMARY");
+
+                entity.ToTable("mjob");
+
+                entity.Property(e => e.JobId).HasColumnType("bigint(20)");
+
+                entity.Property(e => e.Command)
+                    .IsRequired()
+                    .HasColumnType("varchar(25)")
+                    .HasDefaultValueSql("''")
+                    .HasCharSet("latin1")
+                    .HasCollation("latin1_swedish_ci");
+
+                entity.Property(e => e.CommandData)
+                    .HasColumnType("varchar(5000)")
+                    .HasCharSet("latin1")
+                    .HasCollation("latin1_swedish_ci");
+
+                entity.Property(e => e.CreatedBy).HasColumnType("bigint(20)");
+
+                entity.Property(e => e.CreatedOn).HasColumnType("datetime");
+
+                entity.Property(e => e.ErrorCode)
+                    .HasColumnType("varchar(10)")
+                    .HasCharSet("latin1")
+                    .HasCollation("latin1_swedish_ci");
+
+                entity.Property(e => e.ErrorMsg)
+                    .HasColumnType("varchar(255)")
+                    .HasCharSet("latin1")
+                    .HasCollation("latin1_swedish_ci");
+
+                entity.Property(e => e.FinishedOn).HasColumnType("datetime");
+
+                entity.Property(e => e.Priority)
+                    .IsRequired()
+                    .HasColumnType("varchar(2)")
+                    .HasDefaultValueSql("''")
+                    .HasCharSet("latin1")
+                    .HasCollation("latin1_swedish_ci");
+
+                entity.Property(e => e.RefNo)
+                    .IsRequired()
+                    .HasColumnType("varchar(50)")
+                    .HasDefaultValueSql("''")
+                    .HasCharSet("latin1")
+                    .HasCollation("latin1_swedish_ci");
+
+                entity.Property(e => e.Status).HasColumnType("tinyint(4)");
+
+                entity.Property(e => e.ValidFrom).HasColumnType("datetime");
+
+                entity.Property(e => e.ValidTo).HasColumnType("datetime");
             });
 
             modelBuilder.Entity<Tblmclassroom>(entity =>

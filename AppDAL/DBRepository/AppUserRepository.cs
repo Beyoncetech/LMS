@@ -14,6 +14,9 @@ namespace AppDAL.DBRepository
         Task<Appuser> GetUserByID(long ID);
         Task Update(Appuser entity);
         Task<List<Appuser>> GetAllUser(int RowCount);
+        Task<int> Insert(Appuser entity);
+        Task<bool> FindOtherSameUserID(long ID, string UserID);
+        Task<bool> Delete(long ID);
     }
     public class AppUserRepository : IAppUserRepository
     {
@@ -52,6 +55,34 @@ namespace AppDAL.DBRepository
                 .ToListAsync();
 
             return oActivity;
+        }
+        public async Task<int> Insert(Appuser entity)
+        {
+            if (entity == null) throw new ArgumentNullException("entity");
+                       
+
+            entities.Add(entity);
+            int result = await _DBContext.SaveChangesAsync();
+            return result;
+        }
+        public async Task<bool> FindOtherSameUserID(long ID, string UserID)
+        {
+            var oUser = await _DBContext.Appuser.Where(x => x.Id != ID && x.UserId.Equals(UserID)).FirstOrDefaultAsync();
+
+            if (oUser != null)
+                return true;
+            else
+                return false;           
+        }
+        public async Task<bool> Delete(long ID)
+        {            
+            var Result = await _DBContext.Database.ExecuteSqlRawAsync(string.Format("Delete from Appuser where Id = {0};", ID.ToString()));
+
+            if (Result > 0)
+                return true;
+            else
+                return false;
+
         }
     }
 }

@@ -118,4 +118,18 @@ namespace AppModel
         public DateTime? Dob { get; set; }
         public string CustomData { get; set; }        
     }
+
+    public class AppJobBM
+    {
+        public long JobId { get; set; }
+        public string RefNo { get; set; }
+        public string Command { get; set; }
+        public string CommandData { get; set; }
+        public string Priority { get; set; }
+        public DateTime? CreatedOn { get; set; }
+        public long? CreatedBy { get; set; }        
+        public sbyte? Status { get; set; }
+        public DateTime? ValidFrom { get; set; }
+        public DateTime? ValidTo { get; set; }
+    }
 }

@@ -8,7 +8,7 @@
 
 <div class="row" style="margin-bottom:7px;">
     <div class="col-md-12">
-        <button class="btn btn-primary"><i class="fa fa-user-plus"></i> New User</button>
+        <button onclick="location.href='@Url.Action("AppUser", "Account")'" class="btn btn-primary"><i class="fa fa-user-plus"></i> New User</button>
     </div>    
 </div>
 <div class="row">
@@ -34,10 +34,51 @@
         });
 
         function Action1Click(data) {
-            alert(data)
+            window.location.href = "/Account/AppUser/" + data
+            //alert(data)
         }
-        function Action2Click(data) {
-            alert(data)
+        function Action2Click(data) {            
+            ezBSAlert({
+                        type: "confirm",
+                        messageText: "Do you want to delete the user ?",
+                        alertType: "info"
+                    }).done(function (flag) {                        
+                        if (flag) {
+                            ShowAppLoader();
+                            var postParam = { id: data };
+                            AppCommonAjaxPost('/Account/DeleteAppUser', postParam, onDelSuccess, onDelFail);
+                        }
+                    });            
+            //alert(data)
+        }
+
+        function onDelSuccess(result, textStatus, jqXHR) {           
+            HideAppLoader();
+            //alert(result.msg)
+            if (result.stat) {                
+                toastr.success(result.msg)
+                //refresh the user grid  
+                ShowAppLoader();
+                AppCommonAjaxPostPartial('/Account/ReloadAppUsers', null, onUserLoadSuccess, onUserLoadFail)
+            } else {
+                toastr.error(result.msg)
+            }
+
+        }
+
+        function onDelFail(xhr) { 
+            toastr.error(xhr.responseText)
+            //alert(`Hi ${xhr.responseText}!`);
+            HideAppLoader();
+        };
+
+        function onUserLoadSuccess(result) {
+            $('#appUserList').html(result);
+            HideAppLoader();
+        }
+        function onUserLoadFail(result) {
+            HideAppLoader();
+            toastr.error('Something wrong while deleting user.')
         }
     </script>
 }

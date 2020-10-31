@@ -26,14 +26,16 @@ namespace BTWebAppFrameWorkCore.Controllers
     [Authorize(Policy = "AllowAuthUsers")]
     public class AccountController : BaseController
     {
-        private readonly IEmailSender _EmailSender;
+        private readonly IEmailService _EmailSender;
+        private readonly IAppJobService _AppJobService;
         private readonly ILoginService _LoginService;
         private readonly IAppUserService _AppUserService;
         private readonly IAppCookiesAuthService _AppCookiesAuth;
         private readonly IAppSettingService _AppSettingService;
 
-        public AccountController(ILoginService LoginService, IEmailSender EmailSender, AppSettingsConfiguration AppSettingsConfig,
-            IAppCookiesAuthService AppCookiesAuth, IAppUserService AppUserService, IAppSettingService ObjAppSettingService)
+        public AccountController(ILoginService LoginService, IEmailService EmailSender, AppSettingsConfiguration AppSettingsConfig,
+            IAppCookiesAuthService AppCookiesAuth, IAppUserService AppUserService, IAppSettingService ObjAppSettingService,
+            IAppJobService objAppJobService)
         {
             _LoginService = LoginService;
             _EmailSender = EmailSender;
@@ -41,6 +43,7 @@ namespace BTWebAppFrameWorkCore.Controllers
             _AppUserService = AppUserService;
             _AppCookiesAuth = AppCookiesAuth;
             _AppSettingService = ObjAppSettingService;
+            _AppJobService = objAppJobService;
         }
         #region App login
         [AllowAnonymous]
@@ -268,7 +271,7 @@ namespace BTWebAppFrameWorkCore.Controllers
                 };
                 VModel = await GetViewModel(TempVModel);
             }
-            
+
             return View(VModel);
         }
         [HttpPost]
@@ -279,7 +282,7 @@ namespace BTWebAppFrameWorkCore.Controllers
             {
                 var result = await _AppUserService.ChangeProfilePasswordAsync(model).ConfigureAwait(false);
                 if (result.Stat)
-                {                    
+                {
                     await GetBaseService().AddActivity(ActivityType.Update, model.UserID, model.BUserName, "Change Password", "Changed user password");
                     return Json(new { stat = true, msg = "Successfully Changed user password" });
                 }
@@ -312,7 +315,7 @@ namespace BTWebAppFrameWorkCore.Controllers
 
             var oGeneralSetup = await _AppSettingService.GetAppGeneralSetting().ConfigureAwait(false);
             TempVModel.AppGeneralSettings = oGeneralSetup;
-            
+
             VModel = await GetViewModel(TempVModel);
             return View(VModel);
         }
@@ -324,7 +327,7 @@ namespace BTWebAppFrameWorkCore.Controllers
             {
                 CommonResponce result = null;
                 string ActivityMsg = "";
-                if(model.Flag.Equals("GENERALSetting"))
+                if (model.Flag.Equals("GENERALSetting"))
                 {
                     result = await _AppSettingService.SaveGeneralSetting(model.AppGeneralSettings).ConfigureAwait(false);
                     ActivityMsg = "Changed App Settings";
@@ -334,7 +337,7 @@ namespace BTWebAppFrameWorkCore.Controllers
                     result = await _AppSettingService.SaveMailSetting(model.MailSettings).ConfigureAwait(false);
                     ActivityMsg = "Changed Email Settings";
                 }
-                
+
                 if (result.Stat)
                 {
                     await GetBaseService().AddActivity(ActivityType.Update, model.BUserID, model.BUserName, "Settings", ActivityMsg);
@@ -357,7 +360,7 @@ namespace BTWebAppFrameWorkCore.Controllers
                                     new { Name = "App Users", ActionUrl = "/Account/AppUsers" } });
 
             BaseViewModel VModel = null;
-            
+
             var result = await _AppUserService.GetAllAppUsers(500, GetBaseService().GetAppRootPath());
 
             var TempVModel = new AppUsersVM();
@@ -365,10 +368,120 @@ namespace BTWebAppFrameWorkCore.Controllers
             TempVModel.AppUsersInfo.Rows = result;
 
             VModel = await GetViewModel(TempVModel);
-           
+
             return View(VModel);
         }
-        
+
+        public async Task<IActionResult> AppUser(int id = 0)
+        {
+            CreateBreadCrumb(new[] {new { Name = "Home", ActionUrl = "#" },
+                                    new { Name = "App Users", ActionUrl = "/Account/AppUsers" },
+                                    new { Name = "User Profile", ActionUrl = "/Account/AppUser" } });
+
+            BaseViewModel VModel = null;
+            AppUserVM TempVModel = null;
+            if (id != 0)
+            {
+                TempVModel = await _AppUserService.GetAppUserByID(id);
+                if (TempVModel != null)
+                {
+                    TempVModel.UserImgPath = GetBaseService().GetUserAvatarPath(string.Format("{0}.{1}", TempVModel.UserId, "jpg"));
+                    TempVModel.AttachUserImage = new FileUploadInfo();
+                }
+                else
+                {
+                    throw new Exception("Not a valid application User");
+                }
+
+            }
+            else
+            {
+                TempVModel = new AppUserVM();
+                TempVModel.UserImgPath = "~/assets/img/AppUser/BlankUser.jpg";
+                TempVModel.AttachUserImage = new FileUploadInfo();
+            }
+
+            VModel = await GetViewModel(TempVModel);
+
+            return View(VModel);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<JsonResult> AppUser(AppUserVM model)
+        {
+            if (ModelState.IsValid)
+            {
+                string ResetContext = Guid.NewGuid().ToString().Replace("-", "RP");
+                DateTime PassValidity = DateTime.Now.AddDays(1); //validity for 1 day
+                var result = await _AppUserService.SaveAppUserAsync(model, ResetContext, PassValidity).ConfigureAwait(false);
+                if (result.Stat)
+                {
+                    //save the user picture
+                    if (model.AttachUserImage.FileSize > 0)
+                    {
+                        string UsrImgPath = Path.Combine(GetBaseService().GetAppRootPath(), "AppFileRepo\\UserAvatar");
+                        if (GetBaseService().DirectoryFileService.CreateDirectoryIfNotExist(UsrImgPath))
+                        {
+                            UsrImgPath = string.Format("{0}\\{1}.{2}", UsrImgPath, model.UserId, "jpg");
+                            if (GetBaseService().DirectoryFileService.CreateFileFromBase64String(model.AttachUserImage.FileContentsBase64, UsrImgPath))
+                            {
+                                model.UserImgPath = string.Format("~/AppFileRepo/UserAvatar/{0}.{1}?r={2}", model.UserId, "jpg", DateTime.Now.Ticks.ToString());
+                            }
+                        }
+
+                    }
+                    if (model.Id != 0)
+                    {
+                        await GetBaseService().AddActivity(ActivityType.Update, model.BUserID, model.BUserName, "Update User", string.Format("Updated user : {0} info.", model.Name));
+                        return Json(new { stat = true, msg = "Successfully updated user" });
+                    }
+                    else
+                    {
+                        await _EmailSender.Initialize();
+                        await GetBaseService().AddActivity(ActivityType.Create, model.BUserID, model.BUserName, "Save User", string.Format("Save new user : {0} info.", model.Name));
+                        return Json(new { stat = true, msg = "Successfully saved user" });
+                    }
+                }
+                else
+                    return Json(new { stat = false, msg = result.StatusMsg });
+            }
+            else
+            {
+                return Json(new { stat = false, msg = "Invalid User data" });
+            }
+        }
+
+        [HttpPost]
+        public async Task<JsonResult> DeleteAppUser(long id)
+        {
+            var oUser = await _AppUserService.GetAppUserByID((int)id).ConfigureAwait(false);
+            if (oUser != null)
+            {
+                var result = await _AppUserService.DeleteAppUser(id).ConfigureAwait(false);
+
+                if (result.Stat)
+                {
+                    var CurrentUserInfo = GetLoginUserInfo();
+                    await GetBaseService().AddActivity(ActivityType.Create, CurrentUserInfo.UserID, CurrentUserInfo.UserName, "Delete User", string.Format("Deleted user : {0}.", oUser.Name));
+                }
+                return Json(new { stat = result.Stat, msg = result.StatusMsg });
+            }
+            else
+                return Json(new { stat = false, msg = "Not a valid User." });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ReloadAppUsers()
+        {
+            var result = await _AppUserService.GetAllAppUsers(500, GetBaseService().GetAppRootPath());
+
+            var TempModel = new AppGridModel<AppUserBM>();
+            TempModel.Rows = result;
+                       
+            return PartialView("_HTMLTable", TempModel);
+
+        }
         #endregion
     }
 }

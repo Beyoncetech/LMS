@@ -1,0 +1,209 @@
+﻿@using AppModel.ViewModel
+@model AppUserVM
+@{
+    ViewData["PageTitle"] = "App User";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    List<SelectListItem> UserTypes = new List<SelectListItem>
+    {
+        new SelectListItem { Value = "A", Text = "Admin" },
+        new SelectListItem { Value = "S", Text = "Super User" },
+        new SelectListItem { Value = "U", Text = "User"  },
+    };
+    List<SelectListItem> Genders = new List<SelectListItem>
+    {
+        new SelectListItem { Value = "M", Text = "Male" },
+        new SelectListItem { Value = "F", Text = "Female" }
+    };
+}
+
+<div class="row">
+    <!-- left column -->
+    <div class="col-md-8">
+        <!-- jquery validation -->
+        <div class="card card-primary">
+            <!-- /.card-header -->
+            <!-- form start -->
+            <form id="frmAppUser" asp-area="" asp-action="AppUser" asp-controller="Account" data-ajax="true" data-ajax-method="post" data-ajax-begin="onBeforeSubmit" data-ajax-success="onSuccess">
+                @Html.HiddenFor(model => model.AttachUserImage.FileName)
+                @Html.HiddenFor(model => model.AttachUserImage.FileSize)
+                @Html.HiddenFor(model => model.AttachUserImage.FileType)
+                @Html.HiddenFor(model => model.AttachUserImage.FileContentsBase64)
+                @Html.HiddenFor(model => model.Id)
+                @Html.HiddenFor(model => model.BUserID)
+                @Html.HiddenFor(model => model.BUserName)
+                <div class="card-body">
+                    <div class="form-group">
+                        <label>User Name</label>
+                        <input type="text" name="Name" asp-for="Name" class="form-control" placeholder="User Name" />
+                        <span asp-validation-for="Name" class="text-danger" style="font-size:small"></span>
+                    </div>
+                    <div class="form-group">
+                        <label>User ID</label>
+                        <input type="text" name="UserId" asp-for="UserId" class="form-control" placeholder="User ID" />
+                        <span asp-validation-for="UserId" class="text-danger" style="font-size:small"></span>
+                    </div>
+                    <div class="form-group">
+                        <label>User Type</label>
+                        <select name="UserType" asp-for="UserType" asp-items="@UserTypes" class="form-control"></select>
+                        <span asp-validation-for="UserType" class="text-danger" style="font-size:small"></span>
+                    </div>
+                    <div class="form-group">
+                        <label>Gender</label>
+                        <select name="Gender" asp-for="Gender" asp-items="@Genders" class="form-control"></select>
+                        <span asp-validation-for="Gender" class="text-danger" style="font-size:small"></span>
+                    </div>
+                    <div class="form-group">
+                        <label>User Email</label>
+                        <input type="email" name="Email" asp-for="Email" class="form-control" placeholder="User Email" />
+                        <span asp-validation-for="Email" class="text-danger" style="font-size:small"></span>
+                    </div>
+                    <div class="form-group">
+                        <label>User Mobile</label>
+                        <input type="text" name="Mobile" asp-for="Mobile" class="form-control" placeholder="User Mobile" />
+                        <span asp-validation-for="Mobile" class="text-danger" style="font-size:small"></span>
+                    </div>
+                    <div class="form-group">
+                        <label>Date of Birth</label>
+                        <div class="input-group date" id="dobdate" data-target-input="nearest">
+                            <input type="text" name="Dob" asp-for="Dob" class="form-control datetimepicker-input" data-target="#dobdate" />
+                            <div class="input-group-append" data-target="#dobdate" data-toggle="datetimepicker">
+                                <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Active User</label>
+                        <input type="checkbox" name="IsActive" asp-for="IsActive" class="form-control" style="width:5%;" />
+                        <span asp-validation-for="IsActive" class="text-danger" style="font-size:small"></span>
+                    </div>
+                    <div class="form-group">
+                        <label>User Permission</label>
+                        <input type="text" name="UserPerm" asp-for="UserPerm" class="form-control" placeholder="User Permission" />
+                        <span asp-validation-for="UserPerm" class="text-danger" style="font-size:small"></span>
+                    </div>
+                </div>
+                <!-- /.card-body -->
+                <div class="card-footer">
+                    <button onclick="location.href='@Url.Action("AppUsers", "Account")'" class="btn btn-primary"><i class="fa fa-arrow-left"></i> Back</button>
+                    <input type="submit" class="btn btn-success float-right" value="Save" id="btnUserSave" />
+                </div>
+            </form>
+        </div>
+        <!-- /.card -->
+    </div>
+    <!--/.col (left) -->
+    <!-- right column -->
+    <div class="col-md-4">
+        <!-- jquery validation -->
+        <div class="card card-primary">
+            <!-- /.card-header -->
+            <!-- contain start -->
+            <div class="card-body">
+                <div class="form-group">
+                    <table>
+                        <tr>
+                            <td>
+                                @*@Html.HiddenFor(model => model.UserImgPath)*@
+                                <img id="EmpImg" alt="No Image Found" src="@Url.Content(Model.UserImgPath)" style="border:groove;" width="150" height="150" />
+                            </td>
+                            <td style="padding-left:10px;">
+                                <div style="position:relative;">
+                                    <a class='btn btn-primary' href='javascript:;'>
+                                        Browse ...
+                                        <input type="file" name="UpldUserImg" style='position:absolute;z-index:2;top:0;left:0;filter: alpha(opacity=0);-ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";opacity:0;background-color:transparent;color:transparent;' size="40" onchange='OnImageSelect(this);'>
+                                    </a>
+                                    &nbsp;
+                                    <span class='label label-success' id="upload-file-info"></span>
+                                </div>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <!-- /.card -->
+    </div>
+    <!--/.col (right) -->
+</div>
+
+@section Scripts {
+    @*<script src="~/lib/jquery-ajax-unobtrusive/jquery.unobtrusive-ajax.js"></script>*@
+    <script type="text/javascript">
+
+        $(function () {            
+            $('#dobdate').datetimepicker({
+                format: 'DD/MM/YYYY'
+            });
+
+            $('#btnUserSave').click(function (e) {
+                e.preventDefault();
+                var isFormValid = $('#frmAppUser').valid();
+                if (isFormValid) {
+                    ezBSAlert({
+                        type: "confirm",
+                        messageText: "Do you want to save the user ?",
+                        alertType: "info"
+                    }).done(function (flag) {                        
+                        if (flag) {
+                            $('#frmAppUser').submit();
+                        }
+                    });
+                }
+            });
+        });
+
+
+        function onBeforeSubmit() {
+            debugger;
+            ShowAppLoader();
+        }
+
+        function onSuccess(result, textStatus, jqXHR) {
+            debugger;
+            HideAppLoader();
+            //alert(result.msg)
+            if (result.stat) {
+                toastr.success(result.msg)
+                setTimeout(function () { window.location.href = "/Account/AppUsers"; }, 1000);                
+            } else {
+                toastr.error(result.msg)
+            }
+
+        }
+
+        onFail = function (xhr) {
+            debugger;
+            alert(`Hi ${xhr.responseText}!`);
+            HideAppLoader();
+        };
+
+        function OnImageSelect(input) {
+            if (input.files && input.files[0]) {
+                if (input.files[0].size > 1048576) {
+                    toastr.warning('The selected User image is lerger than 1MB. Please select Image less than 1MB.')
+                    //ezBSAlert({
+                    //    messageText: "The selected User image is lerger than 1MB. Please select Image less than 1MB.",
+                    //    alertType: "danger",
+                    //    topMargin: '300px'
+                    //});
+                    input.value = '';
+                    return;
+                }
+                $("#AttachUserImage_FileName").val(input.files[0].name);
+                $("#AttachUserImage_FileSize").val(input.files[0].size);
+                $("#AttachUserImage_FileType").val(input.files[0].type || "application/octet-stream");
+
+                //$("#upload-file-info").html(input.value);
+                var reader = new FileReader();
+
+                reader.onload = function (e) {
+                    $('#EmpImg').attr('src', e.target.result);
+                    $("#AttachUserImage_FileContentsBase64").val(e.target.result);
+                }
+
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+    </script>
+}

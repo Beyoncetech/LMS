@@ -72,4 +72,27 @@ namespace AppModel.ViewModel
     {
         public AppGridModel<AppUserBM> AppUsersInfo { get; set; }
     }
+
+    public class AppUserVM : BaseViewModel
+    {
+        public long Id { get; set; }
+        [Required]
+        public string Name { get; set; }
+        [Required(ErrorMessage = "User Id is required")]
+        public string UserId { get; set; }
+        [Required(ErrorMessage = "User type is required")]
+        public string UserType { get; set; }        
+        public string Gender { get; set; }
+        [Required]
+        public string Email { get; set; }       
+        public bool IsActive { get; set; }
+        [RegularExpression(@"^([0-9]{10})$", ErrorMessage = "Invalid Mobile Number.")]       
+        [MaxLength(10, ErrorMessage = "Mobile Number cannot be greater than 10 digit")]
+        [MinLength(10, ErrorMessage = "Mobile Number cannot be less than 10 digit")]
+        public string Mobile { get; set; }
+        public string UserPerm { get; set; }        
+        public DateTime? Dob { get; set; }
+        public string UserImgPath { get; set; }
+        public FileUploadInfo AttachUserImage { get; set; }
+    }
 }
