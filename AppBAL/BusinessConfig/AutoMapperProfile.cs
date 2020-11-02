@@ -16,6 +16,7 @@ namespace AppBAL.BusinessConfig
             CreateMap<Appuser, UserProfile>();
             CreateMap<Appuser, AppUserVM>();
             CreateMap<Activitylog, ActivitylogBM>();
+            CreateMap<Tblmstudent, Student>();
         }
     }
 }

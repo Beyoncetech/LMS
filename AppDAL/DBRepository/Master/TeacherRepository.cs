@@ -8,7 +8,7 @@ namespace AppDAL.DBRepository
 {
     public interface ITeacherRepository
     {
-        Task<List<Tblmteacher>> GetAllTeachers();
+        Task<List<Tblmteacher>> GetAllTeachers(int RowCount);
         Task<Tblmteacher> GetTeacherByTeacherId(int TeacherID);        
         Task<Tblmteacher> GetTeacherByEmailID(string EmailID);
     }
@@ -19,11 +19,12 @@ namespace AppDAL.DBRepository
         {
             _DBContext = DBContext;
         }
-        public async Task<List<Tblmteacher>> GetAllTeachers()
+        public async Task<List<Tblmteacher>> GetAllTeachers(int RowCount)
         {
-            var result = await _DBContext.Tblmteacher.ToListAsync();
+            var result = await _DBContext.Tblmteacher.OrderBy(o => o.Name).Take(RowCount).ToListAsync();
             return result;
         }
+
         public async Task<Tblmteacher> GetTeacherByTeacherId(int TeacherID)
         {
             var oTeacher = await _DBContext.Tblmteacher.Where(s => s.Id.Equals(TeacherID)).FirstOrDefaultAsync();

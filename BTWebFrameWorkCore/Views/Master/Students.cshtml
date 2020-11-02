@@ -7,7 +7,7 @@
 
 <div class="row" style="margin-bottom:7px;">
     <div class="col-md-12">
-        <button class="btn btn-primary"><i class="fa fa-user-plus"></i> New Student</button>
+        <button class="btn btn-primary" onclick="AddNewPage()"><i class="fa fa-user-plus"></i> New Student</button>
     </div>
 </div>
 <div class="row">
@@ -31,9 +31,17 @@
                 "autoWidth": false,
             });
         });
+        function AddNewPage()
+        {
+            var url = "/Student/StudentProfile";
+            location.href = url;
+        }
 
         function Action1Click(data) {
-            alert(data)
+           
+            var url = "/Student/UpdateStudentProfile?StudentId=" + data;            
+            location.href = url;
+                           
         }
         function Action2Click(data) {
             alert(data)

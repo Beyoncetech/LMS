@@ -13,11 +13,12 @@ namespace AppDAL.DBRepository
         Task<List<Tblmstudent>> GetAllStudents(int RowCount);
         Task<Tblmstudent> GetStudentByStudentId(int StudentID);
         Task<Tblmstudent> GetStudentByRegNo(int RegNo);
-        Task<Tblmstudent> GetStudentByEmailID(string EmailID);
+        Task<Tblmstudent> GetStudentByEmailID(string EmailID);        
     }
     public class StudentRepository:IStudentRepository
     {
         private readonly AppDBContext _DBContext;
+        private DbSet<Tblmstudent> entities;
         public StudentRepository(AppDBContext DBContext)
         {
             _DBContext = DBContext;
@@ -41,7 +42,6 @@ namespace AppDAL.DBRepository
         {
             var oStudent = await _DBContext.Tblmstudent.Where(s => s.Email.Equals(EmailID)).FirstOrDefaultAsync();
             return oStudent;
-        }
-
+        }        
     }
 }

@@ -2,6 +2,7 @@
 using AppDAL.DBRepository;
 using AppModel;
 using AppModel.BusinessModel.Master;
+using AppModel.ViewModel;
 using AppUtility.AppIO;
 using AutoMapper;
 using System;
@@ -16,8 +17,8 @@ namespace AppBAL.Sevices.Master
         Task<CommonResponce> GetStudentByStudentId(int StudentID);
         Task<CommonResponce> GetStudentByRegNo(int RegNo);
         Task<CommonResponce> GetStudentByEmailID(string EmailID);
-        Task<CommonResponce> Insert(Student StudentToInsert);
-        CommonResponce Update(Student StudentToUpdate);
+        Task<CommonResponce> InsertStudentProfile(StudentProfileVM StudentToInsert);
+        Task<CommonResponce> UpdateStudentProfile(StudentProfileVM StudentToUpdate);
         CommonResponce Delete(Student StudentToDelete);
     }
     public class StudentService:IStudentService
@@ -65,11 +66,17 @@ namespace AppBAL.Sevices.Master
         public async Task<CommonResponce> GetStudentByStudentId(int StudentID)
         {
             bool isValid = true;
+            Student StudentProfile = null;
             var oStudent = await _DBStudentRepository.GetStudentByStudentId(StudentID);
-            if (oStudent == null)
+            if (oStudent != null)
+            {
+                StudentProfile = _mapper.Map<Student>(oStudent);
+                isValid = true;
+            }
+            else
                 isValid = false;
-            CommonResponce result = new CommonResponce { Stat = isValid, StatusMsg = (isValid ? "" : "Invalid Student Id"), StatusObj = oStudent };
-            return result;
+            CommonResponce result = new CommonResponce { Stat = isValid, StatusMsg = (isValid ? "" : "Invalid Student Id"), StatusObj = StudentProfile };
+            return result;           
         }
         public async Task<CommonResponce> GetStudentByRegNo(int RegNo)
         {
@@ -91,13 +98,23 @@ namespace AppBAL.Sevices.Master
         }
 
         #region INSERT/ UPDATE/ DELETE 
-        public async Task<CommonResponce> Insert(Student StudentToInsert)
+        public async Task<CommonResponce> InsertStudentProfile(StudentProfileVM StudentToInsert)
         {
-            CommonResponce result = new CommonResponce();
+            CommonResponce result = new CommonResponce { Stat = false, StatusMsg = "" }; 
             bool isValid = false;
             try
             {
-                isValid = await _commonRepository.Insert(_mapper.Map<Tblmstudent>(StudentToInsert));
+                Tblmstudent oStudent = new Tblmstudent
+                {
+                    RegNo = StudentToInsert.RegNo,
+                    Name = StudentToInsert.Name,
+                    Address = StudentToInsert.Address,
+                    Email = StudentToInsert.Email,
+                    ContactNo = StudentToInsert.ContactNo,
+                    StandardId = StudentToInsert.StandardId
+                };
+                //isValid = await _commonRepository.Insert(_mapper.Map<Tblmstudent>(StudentToInsert));
+                isValid = await _commonRepository.Insert(oStudent);
                 result.Stat = isValid;
                 result.StatusMsg = "Student added successfully";
             }
@@ -105,15 +122,27 @@ namespace AppBAL.Sevices.Master
             return result;
         }
 
-        public CommonResponce Update(Student StudentToUpdate)
-        {
-            CommonResponce result = new CommonResponce();
+        public async Task<CommonResponce> UpdateStudentProfile(StudentProfileVM oStudentToUpdate)
+        {            
+            CommonResponce result = new CommonResponce { Stat = false, StatusMsg = "" };
             bool isValid = false;
             try
             {
-                _commonRepository.Update(_mapper.Map<Tblmstudent>(StudentToUpdate));
-                result.Stat = true;
-                result.StatusMsg = "Student information updated successfully";
+                var oStudent = await _DBStudentRepository.GetStudentByStudentId(oStudentToUpdate.Id).ConfigureAwait(false);
+                if (oStudent != null)
+                {
+                    oStudent.RegNo = oStudentToUpdate.RegNo;
+                    oStudent.Name = oStudentToUpdate.Name;                    
+                    oStudent.Address = oStudentToUpdate.Address;
+                    oStudent.Email = oStudentToUpdate.Email;
+                    oStudent.ContactNo = oStudentToUpdate.ContactNo;
+                    oStudent.StandardId = oStudentToUpdate.StandardId;
+                    _commonRepository.Update(oStudent);
+                    result.Stat = true;
+                    result.StatusMsg = "Student information updated successfully";
+                }
+                else      // student not found      
+                    result.StatusMsg = "Not a valid Student";                
             }
             catch { result.Stat = isValid; result.StatusMsg = "Failed to update student information"; }
             return result;
