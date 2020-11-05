@@ -1,0 +1,47 @@
+﻿ @using AppModel.ViewModel
+@model TeacherVM
+@{
+    ViewData["PageTitle"] = "Teachers";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row" style="margin-bottom:7px;">
+    <div class="col-md-12">
+        <button class="btn btn-primary" onclick="AddNewPage()"><i class="fa fa-user-plus"></i> New Teacher</button>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-12">
+        <div id="TeacherList" class="card card-primary" style="padding:10px;">
+            <!-- /.card-header -->
+            <!-- form start -->
+            @await Html.PartialAsync("_HTMLTable", Model.TeacherInfo)
+        </div>
+        <!-- /.card -->
+    </div>
+</div>
+
+@section Scripts {
+    @*<script src="~/lib/jquery-ajax-unobtrusive/jquery.unobtrusive-ajax.js"></script>*@
+    <script type="text/javascript">
+
+        $(function () {
+            $("#appHtmlGrid1").DataTable({
+                "responsive": true,
+                "autoWidth": false,
+            });
+        });
+
+        function AddNewPage() {
+            var url = "/Teacher/TeacherProfile";
+            location.href = url;
+        }
+        function Action1Click(data) {
+            var url = "/Teacher/UpdateTeacherProfile?TeacherID=" + data;
+            location.href = url;            
+        }
+        function Action2Click(data) {
+            alert(data)
+        }
+    </script>
+}

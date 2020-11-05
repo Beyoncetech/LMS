@@ -2,17 +2,21 @@
 using AppDAL.DBRepository;
 using AppModel;
 using AutoMapper;
+using System.Collections.Generic;
 using System.Threading.Tasks;
+using AppModel.BusinessModel.Master;
+using AppUtility.AppIO;
+using AppModel.ViewModel;
 
 namespace AppBAL.Sevices.Master
 {
     public interface ITeacherService
     {
-        Task<CommonResponce> GetAllTeachers();
+        Task<List<TeacherBM>> GetAllTeachers(int RowCount,string AppRootPath);
         Task<CommonResponce> GetTeacherByTeacherId(int TeacherID);        
         Task<CommonResponce> GetTeacherByEmailID(string EmailID);
-        Task<CommonResponce> Insert(Teacher TeacherToInsert);
-        CommonResponce Update(Teacher TeacherToUpdate);
+        Task<CommonResponce> InsertTeacherProfile(TeacherProfileVM TeacherToInsert);
+        Task<CommonResponce> UpdateTeacherProfile(TeacherProfileVM TeacherToUpdate);
         CommonResponce Delete(Teacher TeacherToDelete);
     }
     public class TeacherService : ITeacherService
@@ -20,26 +24,53 @@ namespace AppBAL.Sevices.Master
         private readonly ITeacherRepository _DBTeacherRepository;
         private readonly IMapper _mapper;
         private readonly ICommonRepository<Tblmteacher> _commonRepository;
-        public TeacherService(ITeacherRepository DBTeacherRepository, IMapper mapper, ICommonRepository<Tblmteacher> CommonRepository)
+        private readonly IDirectoryFileService _AppDirectoryFileService;
+        public TeacherService(ITeacherRepository DBTeacherRepository, IMapper mapper, ICommonRepository<Tblmteacher> CommonRepository, IDirectoryFileService AppDirectoryFileService)
         {
             _DBTeacherRepository = DBTeacherRepository;
             _mapper = mapper;
             _commonRepository = CommonRepository;
+            _AppDirectoryFileService = AppDirectoryFileService;
         }
 
-        public async Task<CommonResponce> GetAllTeachers()
+        public async Task<List<TeacherBM>> GetAllTeachers(int RowCount,string AppRootPath)
         {
-            var AllTeachers = await _DBTeacherRepository.GetAllTeachers();
-            CommonResponce result = new CommonResponce { Stat = true, StatusMsg = "", StatusObj = AllTeachers };
+            List<TeacherBM> result = new List<TeacherBM>();
+            var oTeachers = await _DBTeacherRepository.GetAllTeachers(RowCount).ConfigureAwait(false);
+
+            if (oTeachers != null && oTeachers.Count > 0)
+            {
+                foreach (var item in oTeachers)
+                {
+                    result.Add(new TeacherBM
+                    {
+                        Id = item.Id,
+                        UserAvatar = _AppDirectoryFileService.GetAppUserAvatarPath(AppRootPath, item.Id.ToString(), "M"),
+                        Name = item.Name,                        
+                        Address = item.Address,
+                        ContactNo = item.ContactNo,
+                        Email = item.Email,
+                        EducationalQualification = item.EducationalQualification,
+                        Action = item.Id.ToString(),
+                        CreatedOn = item.CreatedOn,                        
+                    });
+                };
+            }
             return result;
         }
         public async Task<CommonResponce> GetTeacherByTeacherId(int TeacherID)
         {
             bool isValid = true;
-            var oTeacher = await _DBTeacherRepository.GetTeacherByTeacherId(TeacherID);
-            if (oTeacher == null)
+            Teacher TeacherProfile = null;
+            var oTeacher= await _DBTeacherRepository.GetTeacherByTeacherId(TeacherID);
+            if (oTeacher != null)
+            {
+                TeacherProfile = _mapper.Map<Teacher>(oTeacher);
+                isValid = true;
+            }
+            else
                 isValid = false;
-            CommonResponce result = new CommonResponce { Stat = isValid, StatusMsg = (isValid ? "" : "Invalid Teacher Id"), StatusObj = oTeacher };
+            CommonResponce result = new CommonResponce { Stat = isValid, StatusMsg = (isValid ? "" : "Invalid Teacher Id"), StatusObj = TeacherProfile };
             return result;
         }
 
@@ -55,28 +86,49 @@ namespace AppBAL.Sevices.Master
         }
 
         #region INSERT/ UPDATE/ DELETE 
-        public async Task<CommonResponce> Insert(Teacher TeacherToInsert)
+        public async Task<CommonResponce> InsertTeacherProfile(TeacherProfileVM TeacherToInsert)
         {
-            CommonResponce result = new CommonResponce();
+            CommonResponce result = new CommonResponce { Stat = false, StatusMsg = "" };
             bool isValid = false;
             try
             {
-                isValid = await _commonRepository.Insert(_mapper.Map<Tblmteacher>(TeacherToInsert));
+                Tblmteacher oTeacher = new Tblmteacher
+                {                    
+                    Name = TeacherToInsert.Name,
+                    Address = TeacherToInsert.Address,
+                    Email = TeacherToInsert.Email,
+                    ContactNo = TeacherToInsert.ContactNo,
+                    EducationalQualification = TeacherToInsert.EducationalQualification
+                };
+                //isValid = await _commonRepository.Insert(_mapper.Map<Tblmstudent>(StudentToInsert));
+                isValid = await _commonRepository.Insert(oTeacher);
+
                 result.Stat = isValid;
                 result.StatusMsg = "Teacher added successfully";
             }
             catch { result.Stat = isValid; result.StatusMsg = "Failed to add new teacher"; }
             return result;
         }
-        public CommonResponce Update(Teacher TeacherToUpdate)
+        public async Task<CommonResponce> UpdateTeacherProfile(TeacherProfileVM TeacherToUpdate)
         {
-            CommonResponce result = new CommonResponce();
+            CommonResponce result = new CommonResponce { Stat = false, StatusMsg = "" };
             bool isValid = false;
             try
             {
-                _commonRepository.Update(_mapper.Map<Tblmteacher>(TeacherToUpdate));
-                result.Stat = true;
-                result.StatusMsg = "Teacher information updated successfully";
+                var oTeacher = await _DBTeacherRepository.GetTeacherByTeacherId(TeacherToUpdate.Id).ConfigureAwait(false);
+                if (oTeacher != null)
+                {
+                    oTeacher.Name = TeacherToUpdate.Name;
+                    oTeacher.Address = TeacherToUpdate.Address;
+                    oTeacher.Email = TeacherToUpdate.Email;                    
+                    oTeacher.ContactNo = TeacherToUpdate.ContactNo;
+                    oTeacher.EducationalQualification = TeacherToUpdate.EducationalQualification;
+                    _commonRepository.Update(oTeacher);
+                    result.Stat = true;
+                    result.StatusMsg = "Teacher information updated successfully";
+                }
+                else      // teacher not found      
+                    result.StatusMsg = "Not a valid Teacher";               
             }
             catch { result.Stat = isValid; result.StatusMsg = "Failed to update teacher information"; }
             return result;
