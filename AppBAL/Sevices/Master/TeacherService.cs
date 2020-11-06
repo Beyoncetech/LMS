@@ -29,7 +29,7 @@ namespace AppBAL.Sevices.Master
 
         public async Task<CommonResponce> GetAllTeachers()
         {
-            var AllTeachers = await _DBTeacherRepository.GetAllTeachers();
+            var AllTeachers = await _DBTeacherRepository.GetAllTeachers(500);
             CommonResponce result = new CommonResponce { Stat = true, StatusMsg = "", StatusObj = AllTeachers };
             return result;
         }

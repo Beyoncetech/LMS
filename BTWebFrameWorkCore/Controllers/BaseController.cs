@@ -95,6 +95,9 @@ namespace BTWebAppFrameWorkCore.Controllers
                 {
                     switch (claim.Type)
                     {
+                        case "ID":
+                            result.ID = claim.Value;
+                            break;
                         case "UserID":
                             result.UserID = claim.Value;
                             break;
