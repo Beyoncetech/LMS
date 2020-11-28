@@ -43,12 +43,13 @@ namespace BTWebAppFrameWorkCore
             Configuration = configuration;
 
             //****use this code if required schedule jobs. otherwise comment the code*****
-            JobManager ojobM = new JobManager();
-            ojobM.ExecuteAllJobs();
+            _JobManager = new JobManager();
+            _JobManager.ExecuteAllJobs();
             //************************************************
         }
 
         public IConfiguration Configuration { get; }
+        private readonly IJobManager _JobManager;
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
