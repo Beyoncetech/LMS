@@ -32,10 +32,11 @@ namespace BTWebAppFrameWorkCore.Controllers
         private readonly IAppUserService _AppUserService;
         private readonly IAppCookiesAuthService _AppCookiesAuth;
         private readonly IAppSettingService _AppSettingService;
+        private readonly IAppJobService _JobService;
 
         public AccountController(ILoginService LoginService, IEmailService EmailSender, AppSettingsConfiguration AppSettingsConfig,
             IAppCookiesAuthService AppCookiesAuth, IAppUserService AppUserService, IAppSettingService ObjAppSettingService,
-            IAppJobService objAppJobService)
+            IAppJobService objAppJobService, IAppJobService JobService)
         {
             _LoginService = LoginService;
             _EmailSender = EmailSender;
@@ -44,6 +45,7 @@ namespace BTWebAppFrameWorkCore.Controllers
             _AppCookiesAuth = AppCookiesAuth;
             _AppSettingService = ObjAppSettingService;
             _AppJobService = objAppJobService;
+            _JobService = JobService;
         }
         #region App login
         [AllowAnonymous]
@@ -66,6 +68,7 @@ namespace BTWebAppFrameWorkCore.Controllers
 
                     var TempClaims = new List<Claim>
                     {
+                        new Claim ("ID", UserInfo.Id.ToString()),
                         new Claim ("UserID", UserInfo.UserId),
                         new Claim ("UserName", UserInfo.Name),
                         new Claim ("UserType", UserInfo.UserType),
@@ -438,7 +441,8 @@ namespace BTWebAppFrameWorkCore.Controllers
                     }
                     else
                     {
-                        await _EmailSender.Initialize();
+                        var oLoginUser = GetLoginUserInfo();
+                        await _JobService.AddNewUserCreateEmailJob(Convert.ToInt64(oLoginUser.ID), model.Name, model.Email, GetBaseService().GetAppRootPath());
                         await GetBaseService().AddActivity(ActivityType.Create, model.BUserID, model.BUserName, "Save User", string.Format("Save new user : {0} info.", model.Name));
                         return Json(new { stat = true, msg = "Successfully saved user" });
                     }

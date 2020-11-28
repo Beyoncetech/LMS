@@ -25,13 +25,13 @@ namespace BTWebAppFrameWorkCore.Controllers
 
             BaseViewModel VModel = null;
 
-            var result = await _TeacherService.GetAllTeachers(500, GetBaseService().GetAppRootPath());
+            //var result = await _TeacherService.GetAllTeachers();
 
-            var TempVModel = new TeacherVM();
-            TempVModel.TeacherInfo= new AppGridModel<TeacherBM>();
-            TempVModel.TeacherInfo.Rows = result;
+            //var TempVModel = new TeacherVM();
+            //TempVModel.TeacherInfo= new AppGridModel<TeacherBM>();
+            //TempVModel.TeacherInfo.Rows = result;
 
-            VModel = await GetViewModel(TempVModel);
+            //VModel = await GetViewModel(TempVModel);
 
             return View("~/Views/Master/Teachers.cshtml",VModel);
         }

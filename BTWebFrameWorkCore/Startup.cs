@@ -159,6 +159,7 @@ namespace BTWebAppFrameWorkCore
             services.AddScoped<IBaseControllerService, BaseControllerService>();
             services.AddScoped<IEmailService, EmailService>();
             services.AddScoped<IAppJobService, AppJobService>();
+            services.AddScoped<IMailTemplateService, MailTemplateService>();
             #endregion
 
             #region Register services

@@ -132,4 +132,11 @@ namespace AppModel
         public DateTime? ValidFrom { get; set; }
         public DateTime? ValidTo { get; set; }
     }
+
+    public class ScheduleEmailInfoBM
+    {
+        public string[] To { get; set; }
+        public string Subject { get; set; }
+        public string MailBody { get; set; }
+    }
 }
