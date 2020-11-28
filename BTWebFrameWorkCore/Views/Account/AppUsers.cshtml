@@ -27,11 +27,15 @@
     <script type="text/javascript">
 
         $(function () {
+            InitGrid();
+        });
+
+        function InitGrid() {
             $("#appHtmlGrid1").DataTable({
                 "responsive": true,
                 "autoWidth": false,
             });
-        });
+        }
 
         function Action1Click(data) {
             window.location.href = "/Account/AppUser/" + data
@@ -74,6 +78,7 @@
 
         function onUserLoadSuccess(result) {
             $('#appUserList').html(result);
+            InitGrid();
             HideAppLoader();
         }
         function onUserLoadFail(result) {

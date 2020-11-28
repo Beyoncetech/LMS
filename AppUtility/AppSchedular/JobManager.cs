@@ -6,7 +6,12 @@ using System.Threading;
 
 namespace AppUtility.AppSchedular
 {
-    public class JobManager
+    public interface IJobManager
+    {
+        void ExecuteAllJobs();
+    }
+
+    public class JobManager : IJobManager
     {
         /// <summary>
         /// Execute all Jobs.

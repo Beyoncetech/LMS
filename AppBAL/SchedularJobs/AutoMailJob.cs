@@ -1,4 +1,5 @@
-﻿using AppUtility.AppSchedular;
+﻿using AppDAL.DBRepository;
+using AppUtility.AppSchedular;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -7,7 +8,13 @@ namespace AppBAL.SchedularJobs
 {
     public class AutoMailJob : AppJob
     {
-        
+        private readonly IAppJobRepository _DBRepository;
+
+        public AutoMailJob(IAppJobRepository DBRepository)
+        {
+            _DBRepository = DBRepository;
+        }
+
         /// <summary>
         /// Get the Job Name, which reflects the class name.
         /// </summary>
@@ -23,6 +30,22 @@ namespace AppBAL.SchedularJobs
         public override void DoJob()
         {
             ////**write code for auto mail
+            var oMailJobs = _DBRepository.GetAllMailJob().Result;
+            if (oMailJobs != null && oMailJobs.Count > 0)
+            {
+                foreach (var item in oMailJobs)
+                {
+                    try
+                    {
+
+                    }
+                    catch (Exception)
+                    {
+                        throw;
+                    }
+
+                }
+            }
             //string TID = "374D9B86-824F-4910-8665-268FE617C028"; // tenant id is fixed for this application
             //List<ScheduleEmailJobInfo> MailJobs = null;
             //using (AppCommonRepository oManager = new AppCommonRepository(TID))
