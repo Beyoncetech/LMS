@@ -5,6 +5,7 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
+
 <div class="row">
     <!-- left column -->
     <div class="col-md-8">
@@ -26,6 +27,12 @@
                         <span asp-validation-for="Name" class="text-danger" style="font-size:small"></span>
                     </div>
                     <div class="form-group">
+                        <label>Student Login Id</label>
+                        <input type="text" name="LoginId" asp-for="LoginId" class="form-control" placeholder="Login Id" />
+                        <span asp-validation-for="LoginId" class="text-danger" style="font-size:small"></span>
+                    </div>
+
+                    <div class="form-group">
                         <label>Student Email</label>
                         <input type="email" name="Email" asp-for="Email" class="form-control" placeholder="User Email" />
                         <span asp-validation-for="Email" class="text-danger" style="font-size:small"></span>
@@ -42,8 +49,7 @@
                     </div>
                     <div class="form-group">
                         <label>Student Standard</label>
-                        <input type="text" name="StandardId" asp-for="StandardId" class="form-control" placeholder="Standard" />
-                        <span asp-validation-for="StandardId" class="text-danger" style="font-size:small"></span>
+                        @Html.DropDownListFor(model => model.StandardId, new SelectList(Model.AllStandards, "Id", "Name", Model.StandardId), "Select Standard", new { @class = "form-control" })
                     </div>
 
                 </div>

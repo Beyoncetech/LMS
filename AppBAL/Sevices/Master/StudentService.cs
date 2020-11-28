@@ -19,7 +19,7 @@ namespace AppBAL.Sevices.Master
         Task<CommonResponce> GetStudentByEmailID(string EmailID);
         Task<CommonResponce> InsertStudentProfile(StudentProfileVM StudentToInsert);
         Task<CommonResponce> UpdateStudentProfile(StudentProfileVM StudentToUpdate);
-        CommonResponce Delete(Student StudentToDelete);
+       Task< CommonResponce> DeleteStudentProfile(int StudentId);
     }
     public class StudentService:IStudentService
     {
@@ -148,17 +148,22 @@ namespace AppBAL.Sevices.Master
             return result;
         }
 
-        public CommonResponce Delete(Student StudentToDelete)
+        public async Task<CommonResponce> DeleteStudentProfile(int StudentId)
         {
-            CommonResponce result = new CommonResponce();
-            bool isValid = false;
+            CommonResponce result = new CommonResponce() { Stat = false, StatusMsg = "Error in deleting Student" };
             try
             {
-                _commonRepository.Delete(_mapper.Map<Tblmstudent>(StudentToDelete));
-                result.Stat = true;
-                result.StatusMsg = "Student inforamtion deleted";
+                var oStudent = await _DBStudentRepository.GetStudentByStudentId(StudentId).ConfigureAwait(false); // get subject details from db
+                if (oStudent != null)  // Student found
+                {
+                    _commonRepository.Delete(oStudent);
+                    result.Stat = true;
+                    result.StatusMsg = "Student deleted successfully";
+                }
+                else
+                    result.StatusMsg = "Not a valid Student";
             }
-            catch { result.Stat = isValid; result.StatusMsg = "Failed to delete student information"; }
+            catch { result.StatusMsg = "Failed to delete Student"; }
             return result;
         }
         #endregion INSERT/ UPDATE/ DELETE 

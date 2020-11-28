@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
+using System.Text;
 using System.Threading.Tasks;
+using AppBAL.Sevices;
 using AppBAL.Sevices.Master;
 using AppModel;
 using AppModel.BusinessModel.Master;
@@ -14,10 +16,14 @@ namespace BTWebAppFrameWorkCore.Controllers
     public class StudentController : BaseController
     {
         private readonly IStudentService _StudentService;
+        private readonly IStandardMasterService _StandardMasterService;
+        private readonly IAppUserService _AppUserService;
 
-        public StudentController(IStudentService StudentService)
+        public StudentController(IStudentService StudentService, IStandardMasterService StandardMasterService, IAppUserService AppUserService)
         {
             _StudentService = StudentService;
+            _StandardMasterService = StandardMasterService;
+            _AppUserService = AppUserService;
         }
         #region STUDENT LIST      
         public async Task<IActionResult> Students()
@@ -35,7 +41,7 @@ namespace BTWebAppFrameWorkCore.Controllers
 
             VModel = await GetViewModel(TempVModel);
 
-            return View("~/Views/Master/Students.cshtml",VModel);
+            return View("~/Views/Master/Students.cshtml", VModel);
         }
 
         #endregion
@@ -45,25 +51,11 @@ namespace BTWebAppFrameWorkCore.Controllers
         {
             CreateBreadCrumb(new[] {new { Name = "Home", ActionUrl = "#" },
                                     new { Name = "Student", ActionUrl = "/Student/StudentProfile" } });
-
+            List<StandardMasterBM> oAllStandards = await _StandardMasterService.GetAllStandards(500, GetBaseService().GetAppRootPath()); // get all standards
             BaseViewModel VModel = null;
-            // CommonResponce CR=await _StudentService.GetStudentByStudentId(StudentID);
-            //if(CR.Stat)
-           // {
-                /*
-                Student StudentInfo =(Student)CR.StatusObj;
-                var TempVModel = new StudentProfileVM
-                {
-                    Id=StudentInfo.Id,
-                    Name=StudentInfo.Name,
-                    RegNo=StudentInfo.RegNo,
-                    Address=StudentInfo.Address,
-                    ContactNo=StudentInfo.ContactNo,
-                    Email=StudentInfo.Email
-                };
-                */
-                var TempVModel = new StudentProfileVM();
-                VModel = await GetViewModel(TempVModel);
+            var TempVModel = new StudentProfileVM();
+            TempVModel.AllStandards.AddRange(oAllStandards); // populate the list
+            VModel = await GetViewModel(TempVModel);
             //}
             //*****get user avtar************
             /*
@@ -87,12 +79,33 @@ namespace BTWebAppFrameWorkCore.Controllers
         [HttpPost]
         public async Task<JsonResult> StudentProfile(StudentProfileVM model)
         {
+            StringBuilder rtnMsg = new StringBuilder();
             if (ModelState.IsValid)
             {
                 var result = await _StudentService.InsertStudentProfile(model);
-                //await GetBaseService().AddActivity(ActivityType.Update, model.UserID, model.UserName, "User Profile", "Updated user profile");
+
                 if (result.Stat == true)
-                    return Json(new { stat = true, msg = "Student Profile Inserted",rtnUrl="/Student/Students" });
+                {
+                    rtnMsg.Append("Student Profile Inserted.");
+                    AppUserVM oAppUserVM = new AppUserVM(); // add an user in the user table
+                    oAppUserVM.Name = model.Name;
+                    oAppUserVM.UserId = model.LoginId;
+                    oAppUserVM.UserType = "A";// admin
+                    oAppUserVM.Email = model.Email;
+                    oAppUserVM.Mobile = model.ContactNo;
+                    oAppUserVM.IsActive = true;
+                    string ResetContext = Guid.NewGuid().ToString().Replace("-", "RP");
+                    DateTime PassValidity = DateTime.Now.AddDays(1); //validity for 1 day
+                    result = await _AppUserService.SaveAppUserAsync(oAppUserVM, ResetContext, PassValidity).ConfigureAwait(false);
+                    if (!result.Stat)// user addition failed
+                        rtnMsg.Append(" Failed to add student Login ID.");
+                    else
+                    {
+                        var CurrentUserInfo = GetLoginUserInfo();
+                        await GetBaseService().AddActivity(ActivityType.Update, CurrentUserInfo.UserID, CurrentUserInfo.UserName, "Student Profile", "Inserted Student profile");
+                    }
+                    return Json(new { stat = true, msg = rtnMsg.ToString(), rtnUrl = "/Student/Students" });
+                }
                 else
                     return Json(new { stat = false, msg = result.StatusMsg });
             }
@@ -111,7 +124,7 @@ namespace BTWebAppFrameWorkCore.Controllers
             CommonResponce CR = await _StudentService.GetStudentByStudentId(StudentID);
             if (CR.Stat)
             {
-
+                List<StandardMasterBM> oAllStandards = await _StandardMasterService.GetAllStandards(500, GetBaseService().GetAppRootPath());
                 Student StudentInfo = (Student)CR.StatusObj;
                 var TempVModel = new StudentProfileVM
                 {
@@ -120,9 +133,10 @@ namespace BTWebAppFrameWorkCore.Controllers
                     RegNo = StudentInfo.RegNo,
                     Address = StudentInfo.Address,
                     ContactNo = StudentInfo.ContactNo,
-                    Email = StudentInfo.Email
+                    Email = StudentInfo.Email,
+                    StandardId = StudentInfo.StandardId
                 };
-
+                TempVModel.AllStandards.AddRange(oAllStandards);// all standard list
                 //var TempVModel = new StudentProfileVM();
                 VModel = await GetViewModel(TempVModel);
             }
@@ -148,18 +162,43 @@ namespace BTWebAppFrameWorkCore.Controllers
         [HttpPost]
         public async Task<JsonResult> UpdateStudentProfile(StudentProfileVM model)
         {
-            if (ModelState.IsValid)
-            {
-                var result = await _StudentService.UpdateStudentProfile(model);
-                //await GetBaseService().AddActivity(ActivityType.Update, model.UserID, model.UserName, "User Profile", "Updated user profile");
-                if (result.Stat == true)
-                    return Json(new { stat = true, msg = "Student Profile Updated", rtnUrl = "/Student/Students" });
-                else
-                    return Json(new { stat = false, msg = result.StatusMsg });
-            }
+              if (ModelState.IsValid)
+             {
+            var result = await _StudentService.UpdateStudentProfile(model);
+            //await GetBaseService().AddActivity(ActivityType.Update, model.UserID, model.UserName, "User Profile", "Updated user profile");
+            if (result.Stat == true)
+                return Json(new { stat = true, msg = "Student Profile Updated", rtnUrl = "/Student/Students" });
             else
-                return Json(new { stat = false, msg = "Invalid Student Profile"});
+                return Json(new { stat = false, msg = result.StatusMsg });
+             }
+               else
+                  return Json(new { stat = false, msg = "Invalid Student Profile"});
         }
         #endregion UPDATE STUDENT
+
+        #region DELETE STUDENT
+        [HttpPost]
+        public async Task<JsonResult> DeleteStudent(int StudentId)
+        {
+            var result = await _StudentService.DeleteStudentProfile(StudentId);
+            if (result.Stat == true)
+            {
+                var CurrentUserInfo = GetLoginUserInfo();
+                await GetBaseService().AddActivity(ActivityType.Delete, CurrentUserInfo.UserID, CurrentUserInfo.UserName,
+                                                                                              "Delete Student", string.Format("Delete Student"));
+            }
+            return Json(new { stat = result.Stat, msg = result.StatusMsg });
+        }
+
+
+        [HttpPost]
+        public async Task<IActionResult> ReloadStudents()
+        {
+            var result = await _StudentService.GetAllStudents(500, GetBaseService().GetAppRootPath());
+            var TempModel = new AppGridModel<StudentBM>();
+            TempModel.Rows = result;
+            return PartialView("_HTMLTable", TempModel);
+        }
+        #endregion DELETE STUDENT
     }
 }

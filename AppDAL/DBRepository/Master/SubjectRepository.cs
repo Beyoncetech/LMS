@@ -8,7 +8,7 @@ namespace AppDAL.DBRepository
 {
     public interface ISubjectRepository
     {
-        Task<List<Tblmsubject>> GetAllSubjects();
+        Task<List<Tblmsubject>> GetAllSubjects(int RowCount);
         Task<Tblmsubject> GetSubjectBySubjectId(int SubjectID);
         Task<Tblmsubject> GetSubjectBySubjectName(string SubjectName);
     }
@@ -21,9 +21,9 @@ namespace AppDAL.DBRepository
             _DBContext = DBContext;
         }
 
-        public async Task<List<Tblmsubject>> GetAllSubjects()
+        public async Task<List<Tblmsubject>> GetAllSubjects(int RowCount)
         {
-            var result = await _DBContext.Tblmsubject.ToListAsync();
+            var result = await _DBContext.Tblmsubject.OrderBy(o=>o.Name).Take(RowCount).ToListAsync();
             return result;
         }
 

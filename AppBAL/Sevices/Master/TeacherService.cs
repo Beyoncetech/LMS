@@ -17,7 +17,7 @@ namespace AppBAL.Sevices.Master
         Task<CommonResponce> GetTeacherByEmailID(string EmailID);
         Task<CommonResponce> InsertTeacherProfile(TeacherProfileVM TeacherToInsert);
         Task<CommonResponce> UpdateTeacherProfile(TeacherProfileVM TeacherToUpdate);
-        CommonResponce Delete(Teacher TeacherToDelete);
+       Task< CommonResponce> DeleteTeacherProfile(int TeacherId);
     }
     public class TeacherService : ITeacherService
     {
@@ -133,17 +133,22 @@ namespace AppBAL.Sevices.Master
             catch { result.Stat = isValid; result.StatusMsg = "Failed to update teacher information"; }
             return result;
         }
-        public CommonResponce Delete(Teacher TeacherToDelete)
+        public async Task<CommonResponce> DeleteTeacherProfile(int TeacherId)
         {
-            CommonResponce result = new CommonResponce();
-            bool isValid = false;
+            CommonResponce result = new CommonResponce() { Stat = false, StatusMsg = "Error in deleting Student" };
             try
             {
-                _commonRepository.Delete(_mapper.Map<Tblmteacher>(TeacherToDelete));
-                result.Stat = true;
-                result.StatusMsg = "Teacher inforamtion deleted";
+                var oTeacher = await _DBTeacherRepository.GetTeacherByTeacherId(TeacherId).ConfigureAwait(false); // get teacher details from db
+                if (oTeacher != null)  // Teacher found
+                {
+                    _commonRepository.Delete(oTeacher);
+                    result.Stat = true;
+                    result.StatusMsg = "Teacher deleted successfully";
+                }
+                else
+                    result.StatusMsg = "Not a valid Teacher";
             }
-            catch { result.Stat = isValid; result.StatusMsg = "Failed to delete teacher information"; }
+            catch { result.StatusMsg = "Failed to delete Teacher"; }
             return result;
         }
         #endregion INSERT/ UPDATE/ DELETE 

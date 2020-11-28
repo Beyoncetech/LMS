@@ -41,7 +41,50 @@
             location.href = url;            
         }
         function Action2Click(data) {
-            alert(data)
+            ezBSAlert({
+                type: "confirm",
+                messageText: "Do you want to delete the Teacher ?",
+                alertType: "info"
+            }).done(function (flag) {
+                if (flag) {
+                    ShowAppLoader();
+                    var postParam = { TeacherId: data };
+                    AppCommonAjaxPost('/Teacher/DeleteTeacher', postParam, onDelSuccess, onDelFail);
+                }
+            });
+            //alert(data)
+        }
+
+        function onDelSuccess(result, textStatus, jqXHR) {
+            HideAppLoader();
+            //alert(result.msg)
+            if (result.stat) {
+                toastr.success(result.msg)
+                //refresh the user grid  
+                ShowAppLoader();
+                AppCommonAjaxPostPartial('/Teacher/ReloadSTeacher', null, onTeacherLoadSuccess, onTeacherLoadFail)
+            } else {
+                toastr.error(result.msg)
+            }
+        }
+
+        function onDelFail(xhr) {
+            toastr.error(xhr.responseText)
+            //alert(`Hi ${xhr.responseText}!`);
+            HideAppLoader();
+        };
+        function onTeacherLoadSuccess(result) {
+            $('#TeacherList').html(result);
+            $("#appHtmlGrid1").DataTable({
+                "responsive": true,
+                "autoWidth": false,
+            });
+            HideAppLoader();
+        }
+
+        function onTeacherLoadFail(result) {
+            HideAppLoader();
+            toastr.error('Something wrong while deleting teacher.')
         }
     </script>
 }

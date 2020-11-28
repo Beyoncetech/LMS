@@ -10,7 +10,7 @@ namespace AppDAL.DBRepository
 {
     public interface IStandardMasterRepository
     {
-        Task<List<Tblmstandard>> GetAllStandards();
+        Task<List<Tblmstandard>> GetAllStandards(int RowCount);
         Task<Tblmstandard> GetStandardByStandardID(int StandardID);
         Task<Tblmstandard> GetStandardByStandardName(string StandardName);
     }
@@ -22,9 +22,9 @@ namespace AppDAL.DBRepository
         {
             _DBContext = DBContext;
         }
-        public async Task<List<Tblmstandard>> GetAllStandards()
+        public async Task<List<Tblmstandard>> GetAllStandards(int RowCount)
         {
-            var result = await _DBContext.Tblmstandard.ToListAsync();
+            var result = await _DBContext.Tblmstandard.OrderBy(o=>o.Name).Take(RowCount).ToListAsync();
             return result;
         }
 

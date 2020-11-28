@@ -1,5 +1,6 @@
 ﻿using AppDAL.DBModels;
 using AppModel;
+using AppModel.BusinessModel.Master;
 using AppModel.ViewModel;
 using AutoMapper;
 using System;
@@ -17,6 +18,10 @@ namespace AppBAL.BusinessConfig
             CreateMap<Appuser, AppUserVM>();
             CreateMap<Activitylog, ActivitylogBM>();
             CreateMap<Tblmstudent, Student>();
+            CreateMap<Tblmteacher, Teacher>();
+            CreateMap<Tblmstandard, StandardMaster>();
+            CreateMap<Tblmsubject, SubjectBM>();
+            
         }
     }
 }

@@ -1,21 +1,21 @@
 ﻿@using AppModel.ViewModel
-@model StudentVM
+@model StandardVM
 @{
-    ViewData["PageTitle"] = "Students";
+    ViewData["PageTitle"] = "Standard";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
 <div class="row" style="margin-bottom:7px;">
     <div class="col-md-12">
-        <button class="btn btn-primary" onclick="AddNewPage()"><i class="fa fa-user-plus"></i> New Student</button>
+        <button class="btn btn-primary" onclick="AddNewPage()"><i class="fa fa-user-plus"></i> New Standard </button>
     </div>
 </div>
 <div class="row">
     <div class="col-md-12">
-        <div id="StudentList" class="card card-primary" style="padding:10px;">
+        <div id="StandardMasterList" class="card card-primary" style="padding:10px;">
             <!-- /.card-header -->
             <!-- form start -->
-            @await Html.PartialAsync("_HTMLTable", Model.StudentInfo)
+            @await Html.PartialAsync("_HTMLTable", Model.StandardMasterInfo)
         </div>
         <!-- /.card -->
     </div>
@@ -33,27 +33,27 @@
         });
         function AddNewPage()
         {
-            var url = "/Student/StudentProfile";
+            var url = "/StandardMaster/AddStandard";
             location.href = url;
         }
 
         function Action1Click(data) {
-           
-            var url = "/Student/UpdateStudentProfile?StudentId=" + data;            
+            alert(data);
+            var url = "/StandardMaster/UpdateStandard?Id=" + data;            
             location.href = url;
                            
         }
-        
+
         function Action2Click(data) {
             ezBSAlert({
                 type: "confirm",
-                messageText: "Do you want to delete the Student ?",
+                messageText: "Do you want to delete the Standard ?",
                 alertType: "info"
             }).done(function (flag) {
                 if (flag) {
                     ShowAppLoader();
-                    var postParam = { StudentId: data };
-                    AppCommonAjaxPost('/Student/DeleteStudent', postParam, onDelSuccess, onDelFail);
+                    var postParam = { Id: data };
+                    AppCommonAjaxPost('/StandardMaster/DeleteStandard', postParam, onDelSuccess, onDelFail);
                 }
             });
             //alert(data)
@@ -66,7 +66,7 @@
                 toastr.success(result.msg)
                 //refresh the user grid  
                 ShowAppLoader();
-                AppCommonAjaxPostPartial('/Student/ReloadStudents', null, onUserLoadSuccess, onUserLoadFail)
+                AppCommonAjaxPostPartial('/StandardMaster/ReloadStandards', null, onUserLoadSuccess, onUserLoadFail)
             } else {
                 toastr.error(result.msg)
             }
@@ -78,7 +78,7 @@
             HideAppLoader();
         };
         function onUserLoadSuccess(result) {
-            $('#StudentList').html(result);
+            $('#StandardMasterList').html(result);
             $("#appHtmlGrid1").DataTable({
                 "responsive": true,
                 "autoWidth": false,
@@ -88,7 +88,8 @@
         }
         function onUserLoadFail(result) {
             HideAppLoader();
-            toastr.error('Something wrong while deleting Student.')
+            toastr.error('Something wrong while deleting Standard.')
         }
+
     </script>
 }

@@ -1,13 +1,8 @@
-﻿using AppModel;
-using AppModel.ViewModel;
-using System;
-using System.Collections.Generic;
+﻿using AppModel.ViewModel;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace BTWebAppFrameWorkCore.Models
-{   
+{
 
     public class UserContactInfo : BaseViewModel
     {

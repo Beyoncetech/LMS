@@ -1,9 +1,10 @@
 ﻿@using AppModel.ViewModel
-@model StudentProfileVM
+@model SubjectMasterVM
 @{
-    ViewData["PageTitle"] = "Student Profile";
+    ViewData["PageTitle"] = "Add Subject";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
+
 
 <div class="row">
     <!-- left column -->
@@ -12,44 +13,14 @@
         <div class="card card-primary">
             <!-- /.card-header -->
             <!-- form start -->
-            <form id="frmStudentProfile" asp-area="" asp-action="UpdateStudentProfile" asp-controller="Student" data-ajax="true" data-ajax-method="post" data-ajax-begin="onBeforeSubmit" data-ajax-success="onSuccess">               
+            <form id="frmAddSubject" asp-area="" asp-action="AddSubject" asp-controller="Subject" data-ajax="true" data-ajax-method="post" data-ajax-begin="onBeforeSubmit" data-ajax-success="onSuccess">               
                 @Html.HiddenFor(model => model.Id)   
                 <div class="card-body">
                     <div class="form-group">
-                        <label>Student Reg. No</label>
-                        <input type="text" name="RegNo" asp-for="RegNo" class="form-control" placeholder="Reg. No" />
-                        <span asp-validation-for="RegNo" class="text-danger" style="font-size:small"></span>
-                    </div>
-                    <div class="form-group">
-                        <label>Student Name</label>
-                        <input type="text" name="Name" asp-for="Name" class="form-control" placeholder="Student Name" />
+                        <label>Subject Name</label>
+                        <input type="text" name="Name" asp-for="Name" class="form-control" placeholder="Subject Name" />
                         <span asp-validation-for="Name" class="text-danger" style="font-size:small"></span>
                     </div>
-                    <div class="form-group">
-                        <label>Student Login Id</label>
-                        <input type="text" name="LoginId" asp-for="LoginId" class="form-control" placeholder="Login Id" />
-                        <span asp-validation-for="LoginId" class="text-danger" style="font-size:small"></span>
-                    </div>
-                    <div class="form-group">
-                        <label>Student Email</label>
-                        <input type="email" name="Email" asp-for="Email" class="form-control" placeholder="User Email" />
-                        <span asp-validation-for="Email" class="text-danger" style="font-size:small"></span>
-                    </div>
-                    <div class="form-group">
-                        <label>Address</label>
-                        <input type="text" name="Address" asp-for="Address" class="form-control datetimepicker-input" placeholder="Address" />
-                        <span asp-validation-for="Address" class="text-danger" style="font-size:small"></span>
-                    </div>
-                    <div class="form-group">
-                        <label>Student Contact</label>
-                        <input type="text" name="ContactNo" asp-for="ContactNo" class="form-control" placeholder="Comtact No" />
-                        <span asp-validation-for="ContactNo" class="text-danger" style="font-size:small"></span>
-                    </div>
-                    <div class="form-group">
-                        <label>Student Standard</label>
-                        @Html.DropDownListFor(model => model.StandardId, new SelectList(Model.AllStandards, "Id", "Name", Model.StandardId), "Select Standard", new { @class = "form-control" })
-                    </div>
-
                 </div>
                 <!-- /.card-body -->
                 <div class="card-footer">
@@ -90,7 +61,7 @@
             //alert(result.msg)
             if (result.stat) {
                 toastr.success(result.msg)
-                location.href = result.rtnUrl;                
+                location.href = result.rtnUrl;    
             } else {
                 toastr.error(result.msg)
             }

@@ -1,21 +1,21 @@
 ﻿@using AppModel.ViewModel
-@model StudentVM
+@model SubjectVM
 @{
-    ViewData["PageTitle"] = "Students";
+    ViewData["PageTitle"] = "Subjects";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
 <div class="row" style="margin-bottom:7px;">
     <div class="col-md-12">
-        <button class="btn btn-primary" onclick="AddNewPage()"><i class="fa fa-user-plus"></i> New Student</button>
+        <button class="btn btn-primary" onclick="AddNewPage()"><i class="fa fa-user-plus"></i> New Subject</button>
     </div>
 </div>
 <div class="row">
     <div class="col-md-12">
-        <div id="StudentList" class="card card-primary" style="padding:10px;">
+        <div id="SubjectList" class="card card-primary" style="padding:10px;">
             <!-- /.card-header -->
             <!-- form start -->
-            @await Html.PartialAsync("_HTMLTable", Model.StudentInfo)
+            @await Html.PartialAsync("_HTMLTable", Model.SubjectInfo)
         </div>
         <!-- /.card -->
     </div>
@@ -33,27 +33,25 @@
         });
         function AddNewPage()
         {
-            var url = "/Student/StudentProfile";
+            var url = "/Subject/AddSubject";
             location.href = url;
         }
 
         function Action1Click(data) {
            
-            var url = "/Student/UpdateStudentProfile?StudentId=" + data;            
-            location.href = url;
-                           
+            var url = "/Subject/UpdateSubject?SubjectId=" + data;            
+            location.href = url;                           
         }
-        
         function Action2Click(data) {
             ezBSAlert({
                 type: "confirm",
-                messageText: "Do you want to delete the Student ?",
+                messageText: "Do you want to delete the Subject ?",
                 alertType: "info"
             }).done(function (flag) {
                 if (flag) {
                     ShowAppLoader();
-                    var postParam = { StudentId: data };
-                    AppCommonAjaxPost('/Student/DeleteStudent', postParam, onDelSuccess, onDelFail);
+                    var postParam = { SubjectId: data };
+                    AppCommonAjaxPost('/Subject/DeleteSubject', postParam, onDelSuccess, onDelFail);
                 }
             });
             //alert(data)
@@ -66,7 +64,7 @@
                 toastr.success(result.msg)
                 //refresh the user grid  
                 ShowAppLoader();
-                AppCommonAjaxPostPartial('/Student/ReloadStudents', null, onUserLoadSuccess, onUserLoadFail)
+                AppCommonAjaxPostPartial('/Subject/ReloadSubjects', null, onUserLoadSuccess, onUserLoadFail)
             } else {
                 toastr.error(result.msg)
             }
@@ -78,17 +76,16 @@
             HideAppLoader();
         };
         function onUserLoadSuccess(result) {
-            $('#StudentList').html(result);
+            $('#SubjectList').html(result);
             $("#appHtmlGrid1").DataTable({
                 "responsive": true,
                 "autoWidth": false,
             });
-
             HideAppLoader();
         }
         function onUserLoadFail(result) {
             HideAppLoader();
-            toastr.error('Something wrong while deleting Student.')
+            toastr.error('Something wrong while deleting Subject.')
         }
     </script>
 }
