@@ -298,10 +298,7 @@ namespace AppDAL.DBModels
                     .HasColumnName("ID")
                     .HasColumnType("int(11)");
 
-                entity.Property(e => e.CreatedBy)
-                    .HasColumnType("varchar(255)")
-                    .HasCharSet("latin1")
-                    .HasCollation("latin1_swedish_ci");
+                entity.Property(e => e.CreatedBy).HasColumnType("int(11)");
 
                 entity.Property(e => e.CreatedOn).HasColumnType("date");
 
@@ -341,6 +338,8 @@ namespace AppDAL.DBModels
                     .HasDefaultValueSql("''")
                     .HasCharSet("latin1")
                     .HasCollation("latin1_swedish_ci");
+
+                entity.Property(e => e.LoginUserId).HasColumnType("bigint(20)");
 
                 entity.Property(e => e.Name)
                     .IsRequired()
@@ -411,6 +410,8 @@ namespace AppDAL.DBModels
                     .HasDefaultValueSql("''")
                     .HasCharSet("latin1")
                     .HasCollation("latin1_swedish_ci");
+
+                entity.Property(e => e.LoginUserId).HasColumnType("bigint(20)");
 
                 entity.Property(e => e.Name)
                     .IsRequired()

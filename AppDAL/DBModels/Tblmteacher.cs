@@ -13,5 +13,6 @@ namespace AppDAL.DBModels
         public string EducationalQualification { get; set; }
         public DateTime? CreatedOn { get; set; }
         public int? CreatdBy { get; set; }
+        public long? LoginUserId { get; set; }
     }
 }

@@ -18,7 +18,8 @@ namespace AppModel.ViewModel
         [Required(ErrorMessage = "Registration no. cannot be blank")]
         public int RegNo { get; set; }
         [Required(ErrorMessage = "Login Id cannot be blank")]
-        public string LoginId { get; set; } // student user id for log in         
+        public string LoginId { get; set; } // student user id for log in   
+        public long LoginUserId { get; set; }
         public string Address { get; set; }
 
         [RegularExpression(@"^([0-9]{10})$", ErrorMessage = "Invalid Mobile Number.")]
@@ -32,5 +33,7 @@ namespace AppModel.ViewModel
         public int StandardId { get; set; }
         [Required(ErrorMessage ="Select a Standard")]
         public List<StandardMasterBM> AllStandards { get; set; }
+        public string StudentImgPath { get; set; }
+        public FileUploadInfo AttachStudentImage { get; set; }
     }
 }

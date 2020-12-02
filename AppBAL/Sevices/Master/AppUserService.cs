@@ -182,6 +182,7 @@ namespace AppBAL.Sevices.Master
                     {
                         result.Stat = true;
                         result.StatusMsg = "Successfully Save User.";
+                        result.StatusObj = oUser.Id;
                     }
                     else
                         result.StatusMsg = "Error on saving user.";

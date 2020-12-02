@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
 using System.Text;
@@ -55,62 +56,81 @@ namespace BTWebAppFrameWorkCore.Controllers
             BaseViewModel VModel = null;
             var TempVModel = new StudentProfileVM();
             TempVModel.AllStandards.AddRange(oAllStandards); // populate the list
-            VModel = await GetViewModel(TempVModel);
+
             //}
             //*****get user avtar************
-            /*
-            string UsrImgPath = string.Format("{0}\\{1}.{2}", Path.Combine(GetBaseService().GetAppRootPath(), "AppFileRepo\\UserAvatar"), CurrentUserInfo.UserID, "jpg");
+            
+            string UsrImgPath = string.Format("{0}\\{1}.{2}", Path.Combine(GetBaseService().GetAppRootPath(), "AppFileRepo\\StudentAvatar"), TempVModel.RegNo, "jpg");
             if (System.IO.File.Exists(UsrImgPath))
             {
-                UsrImgPath = string.Format("~/AppFileRepo/UserAvatar/{0}.{1}", CurrentUserInfo.UserID, "jpg");
+                UsrImgPath = string.Format("~/AppFileRepo/StudentAvatar/{0}.{1}", TempVModel.RegNo, "jpg");
             }
             else
             {
-                if (CurrentUserInfo.UserGender.Equals("M"))
+                //if (CurrentUserInfo.UserGender.Equals("M"))
                     UsrImgPath = "~/img/avatar5.png";
-                else
-                    UsrImgPath = "~/img/avatar3.png";
+                //else
+                //    UsrImgPath = "~/img/avatar3.png";
             }
-            */
+            
             //*******************************
+            VModel = await GetViewModel(TempVModel);
             return View("~/Views/Master/StudentProfile.cshtml", VModel);
         }
 
         [HttpPost]
         public async Task<JsonResult> StudentProfile(StudentProfileVM model)
         {
+            CommonResponce result = null;
             StringBuilder rtnMsg = new StringBuilder();
             if (ModelState.IsValid)
             {
-                var result = await _StudentService.InsertStudentProfile(model);
 
+                AppUserVM oAppUserVM = new AppUserVM(); // add an user in the user table
+                oAppUserVM.Name = model.Name;
+                oAppUserVM.UserId = model.LoginId;
+                oAppUserVM.UserType = "A";// admin
+                oAppUserVM.Email = model.Email;
+                oAppUserVM.Mobile = model.ContactNo;
+                oAppUserVM.IsActive = true;
+                string ResetContext = Guid.NewGuid().ToString().Replace("-", "RP");
+                DateTime PassValidity = DateTime.Now.AddDays(1); //validity for 1 day
+                 result = await _AppUserService.SaveAppUserAsync(oAppUserVM, ResetContext, PassValidity).ConfigureAwait(false);
+                if (!result.Stat)// user addition failed
+                    rtnMsg.Append(" Failed to add student Login ID.");
+                else
+                {
+                    model.LoginUserId = result.StatusObj;
+                    result = await _StudentService.InsertStudentProfile(model);
+                }
                 if (result.Stat == true)
                 {
                     rtnMsg.Append("Student Profile Inserted.");
-                    AppUserVM oAppUserVM = new AppUserVM(); // add an user in the user table
-                    oAppUserVM.Name = model.Name;
-                    oAppUserVM.UserId = model.LoginId;
-                    oAppUserVM.UserType = "A";// admin
-                    oAppUserVM.Email = model.Email;
-                    oAppUserVM.Mobile = model.ContactNo;
-                    oAppUserVM.IsActive = true;
-                    string ResetContext = Guid.NewGuid().ToString().Replace("-", "RP");
-                    DateTime PassValidity = DateTime.Now.AddDays(1); //validity for 1 day
-                    result = await _AppUserService.SaveAppUserAsync(oAppUserVM, ResetContext, PassValidity).ConfigureAwait(false);
-                    if (!result.Stat)// user addition failed
-                        rtnMsg.Append(" Failed to add student Login ID.");
-                    else
+                    //save the user picture
+                    if (model.AttachStudentImage.FileSize > 0)
                     {
-                        var CurrentUserInfo = GetLoginUserInfo();
-                        await GetBaseService().AddActivity(ActivityType.Update, CurrentUserInfo.UserID, CurrentUserInfo.UserName, "Student Profile", "Inserted Student profile");
+                        string StudentImgPath = Path.Combine(GetBaseService().GetAppRootPath(), "AppFileRepo\\StudentAvatar");
+                        if (GetBaseService().DirectoryFileService.CreateDirectoryIfNotExist(StudentImgPath))
+                        {
+                            StudentImgPath = string.Format("{0}\\{1}.{2}", StudentImgPath, model.RegNo, "jpg");
+                            if (GetBaseService().DirectoryFileService.CreateFileFromBase64String(model.AttachStudentImage.FileContentsBase64, StudentImgPath))
+                            {
+                                model.StudentImgPath = string.Format("~/AppFileRepo/StudentAvatar/{0}.{1}?r={2}", model.RegNo, "jpg", DateTime.Now.Ticks.ToString());
+                                model.BUserImgPath = model.StudentImgPath; // update the Student avatar
+                            }
+                        }
                     }
-                    return Json(new { stat = true, msg = rtnMsg.ToString(), rtnUrl = "/Student/Students" });
+                    var CurrentUserInfo = GetLoginUserInfo();// get current user
+                    await GetBaseService().AddActivity(ActivityType.Update, CurrentUserInfo.UserID, CurrentUserInfo.UserName, "Student Profile", "Inserted Student profile");
                 }
-                else
-                    return Json(new { stat = false, msg = result.StatusMsg });
+                return Json(new { stat = true, msg = rtnMsg.ToString(), rtnUrl = "/Student/Students" });
             }
+
             else
-                return Json(new { stat = false, msg = "Invalid Student Profile" });
+                return Json(new { stat = false, msg = result.StatusMsg });
+            //  }
+            //  else
+            //      return Json(new { stat = false, msg = "Invalid Student Profile" });
         }
         #endregion ADD STUDENT
 
@@ -126,35 +146,32 @@ namespace BTWebAppFrameWorkCore.Controllers
             {
                 List<StandardMasterBM> oAllStandards = await _StandardMasterService.GetAllStandards(500, GetBaseService().GetAppRootPath());
                 Student StudentInfo = (Student)CR.StatusObj;
+                //*****get user avtar************
+
+                string UsrImgPath = string.Format("{0}\\{1}.{2}", Path.Combine(GetBaseService().GetAppRootPath(), "AppFileRepo\\StudentAvatar"), StudentInfo.RegNo, "jpg");
+                if (System.IO.File.Exists(UsrImgPath))
+                    UsrImgPath = string.Format("~/AppFileRepo/StudentAvatar/{0}.{1}", StudentInfo.RegNo, "jpg");
+                else
+                    UsrImgPath = "~/img/avatar5.png";
+
                 var TempVModel = new StudentProfileVM
                 {
                     Id = StudentInfo.Id,
                     Name = StudentInfo.Name,
                     RegNo = StudentInfo.RegNo,
+                    //LoginId=StudentInfo.LoginId,  // login id to be incorporated
                     Address = StudentInfo.Address,
                     ContactNo = StudentInfo.ContactNo,
                     Email = StudentInfo.Email,
-                    StandardId = StudentInfo.StandardId
+                    StandardId = StudentInfo.StandardId,
+                    StudentImgPath = UsrImgPath,
+                    AttachStudentImage = new FileUploadInfo()
                 };
                 TempVModel.AllStandards.AddRange(oAllStandards);// all standard list
                 //var TempVModel = new StudentProfileVM();
                 VModel = await GetViewModel(TempVModel);
+
             }
-            //*****get user avtar************
-            /*
-            string UsrImgPath = string.Format("{0}\\{1}.{2}", Path.Combine(GetBaseService().GetAppRootPath(), "AppFileRepo\\UserAvatar"), CurrentUserInfo.UserID, "jpg");
-            if (System.IO.File.Exists(UsrImgPath))
-            {
-                UsrImgPath = string.Format("~/AppFileRepo/UserAvatar/{0}.{1}", CurrentUserInfo.UserID, "jpg");
-            }
-            else
-            {
-                if (CurrentUserInfo.UserGender.Equals("M"))
-                    UsrImgPath = "~/img/avatar5.png";
-                else
-                    UsrImgPath = "~/img/avatar3.png";
-            }
-            */
             //*******************************
             return View("~/Views/Master/UpdateStudentProfile.cshtml", VModel);
         }
@@ -162,17 +179,36 @@ namespace BTWebAppFrameWorkCore.Controllers
         [HttpPost]
         public async Task<JsonResult> UpdateStudentProfile(StudentProfileVM model)
         {
-              if (ModelState.IsValid)
-             {
-            var result = await _StudentService.UpdateStudentProfile(model);
-            //await GetBaseService().AddActivity(ActivityType.Update, model.UserID, model.UserName, "User Profile", "Updated user profile");
-            if (result.Stat == true)
-                return Json(new { stat = true, msg = "Student Profile Updated", rtnUrl = "/Student/Students" });
+            if (ModelState.IsValid)
+            {
+                var result = await _StudentService.UpdateStudentProfile(model);
+
+                if (result.Stat == true)
+                {
+                    var CurrentUserInfo = GetLoginUserInfo();// get current user
+                    await GetBaseService().AddActivity(ActivityType.Update, CurrentUserInfo.UserID, CurrentUserInfo.UserName, "Student Profile", "Updated Student profile");
+
+                    if (model.AttachStudentImage.FileSize > 0)
+                    {
+                        string StudentImgPath = Path.Combine(GetBaseService().GetAppRootPath(), "AppFileRepo\\StudentAvatar");
+                        if (GetBaseService().DirectoryFileService.CreateDirectoryIfNotExist(StudentImgPath))
+                        {
+                            StudentImgPath = string.Format("{0}\\{1}.{2}", StudentImgPath, model.RegNo, "jpg");
+                            if (GetBaseService().DirectoryFileService.CreateFileFromBase64String(model.AttachStudentImage.FileContentsBase64, StudentImgPath))
+                            {
+                                model.StudentImgPath = string.Format("~/AppFileRepo/StudentAvatar/{0}.{1}?r={2}", model.RegNo, "jpg", DateTime.Now.Ticks.ToString());
+                                model.BUserImgPath = model.StudentImgPath; // update the Student avatar
+                            }
+                        }
+                    }
+
+                    return Json(new { stat = true, msg = "Student Profile Updated", rtnUrl = "/Student/Students" });
+                }
+                else
+                    return Json(new { stat = false, msg = result.StatusMsg });
+            }
             else
-                return Json(new { stat = false, msg = result.StatusMsg });
-             }
-               else
-                  return Json(new { stat = false, msg = "Invalid Student Profile"});
+                return Json(new { stat = false, msg = "Invalid Student Profile" });
         }
         #endregion UPDATE STUDENT
 

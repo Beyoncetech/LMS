@@ -13,8 +13,12 @@
         <div class="card card-primary">
             <!-- /.card-header -->
             <!-- form start -->
-            <form id="frmStudentProfile" asp-area="" asp-action="StudentProfile" asp-controller="Student" data-ajax="true" data-ajax-method="post" data-ajax-begin="onBeforeSubmit" data-ajax-success="onSuccess">               
-                @Html.HiddenFor(model => model.Id)   
+            <form id="frmStudentProfile" asp-area="" asp-action="StudentProfile" asp-controller="Student" data-ajax="true" data-ajax-method="post" data-ajax-begin="onBeforeSubmit" data-ajax-success="onSuccess">
+                @Html.HiddenFor(model => model.AttachStudentImage.FileName)
+                @Html.HiddenFor(model => model.AttachStudentImage.FileSize)
+                @Html.HiddenFor(model => model.AttachStudentImage.FileType)
+                @Html.HiddenFor(model => model.AttachStudentImage.FileContentsBase64)
+                @Html.HiddenFor(model => model.Id)
                 <div class="card-body">
                     <div class="form-group">
                         <label>Student Reg. No</label>
@@ -63,6 +67,36 @@
     </div>
     <!--/.col (left) -->
     <!-- right column -->
+    <div class="col-md-4">
+        <!-- jquery validation -->
+        <div class="card card-primary">
+            <!-- /.card-header -->
+            <!-- contain start -->
+            <div class="card-body">
+                <div class="form-group">
+                    <table>
+                        <tr>
+                            <td>
+                                @*@Html.HiddenFor(model => model.UserImgPath)*@
+                                <img id="StudentImg" alt="No Image Found" src="@Url.Content(Model.StudentImgPath)" style="border:groove;" width="150" height="150" />
+                            </td>
+                            <td style="padding-left:10px;">
+                                <div style="position:relative;">
+                                    <a class='btn btn-primary' href='javascript:;'>
+                                        Browse ...
+                                        <input type="file" name="UpldStudentImg" style='position:absolute;z-index:2;top:0;left:0;filter: alpha(opacity=0);-ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";opacity:0;background-color:transparent;color:transparent;' size="40" onchange='OnImageSelect(this);'>
+                                    </a>
+                                    &nbsp;
+                                    <span class='label label-success' id="upload-file-info"></span>
+                                </div>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <!-- /.card -->
+    </div>
     <!--/.col (right) -->
 </div>
 
@@ -117,16 +151,16 @@
                     input.value = '';
                     return;
                 }
-                $("#AttachUserImage_FileName").val(input.files[0].name);
-                $("#AttachUserImage_FileSize").val(input.files[0].size);
-                $("#AttachUserImage_FileType").val(input.files[0].type || "application/octet-stream");
+                $("#AttachStudentImage_FileName").val(input.files[0].name);
+                $("#AttachStudentImage_FileSize").val(input.files[0].size);
+                $("#AttachStudentImage_FileType").val(input.files[0].type || "application/octet-stream");
 
                 //$("#upload-file-info").html(input.value);
                 var reader = new FileReader();
 
                 reader.onload = function (e) {
-                    $('#EmpImg').attr('src', e.target.result);
-                    $("#AttachUserImage_FileContentsBase64").val(e.target.result);
+                    $('#StudentImg').attr('src', e.target.result);
+                    $("#AttachStudentImage_FileContentsBase64").val(e.target.result);
                 }
 
                 reader.readAsDataURL(input.files[0]);
