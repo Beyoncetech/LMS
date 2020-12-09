@@ -19,10 +19,13 @@ namespace AppModel.ViewModel
         public string ContactNo { get; set; }
         [Required(ErrorMessage ="Login Id cannot be blank")]
         public string LoginId { get; set; }
+        public long? LoginUserId { get; set; }
         [Required(ErrorMessage ="Field cannot be blank")]
         [EmailAddress(ErrorMessage ="Invalid Email address")]
         public string Email { get; set; }
         public string EducationalQualification { get; set; }
+        public string TeacherImgPath { get; set; }
+        public FileUploadInfo AttachTeacherImage { get; set; }        
     }
 
 }

@@ -13,6 +13,7 @@
             <!-- /.card-header -->
             <!-- form start -->
             <form id="frmStudentProfile" asp-area="" asp-action="UpdateStudentProfile" asp-controller="Student" data-ajax="true" data-ajax-method="post" data-ajax-begin="onBeforeSubmit" data-ajax-success="onSuccess">
+                @Html.HiddenFor(model => model.LoginId)
                 @Html.HiddenFor(model => model.AttachStudentImage.FileName)
                 @Html.HiddenFor(model => model.AttachStudentImage.FileSize)
                 @Html.HiddenFor(model => model.AttachStudentImage.FileType)
@@ -31,8 +32,8 @@
                     </div>
                     <div class="form-group">
                         <label>Student Login Id</label>
-                        <input type="text" name="LoginId" asp-for="LoginId" class="form-control" placeholder="Login Id" />
-                        <span asp-validation-for="LoginId" class="text-danger" style="font-size:small"></span>
+                        <input type="text" name="LoginId" asp-for="LoginId" class="form-control" placeholder="Login Id" disabled="disabled" />
+                        <!--<span asp-validation-for="LoginId" class="text-danger" style="font-size:small"></span>-->
                     </div>
                     <div class="form-group">
                         <label>Student Email</label>
@@ -57,7 +58,7 @@
                 </div>
                 <!-- /.card-body -->
                 <div class="card-footer">
-                    <input type="submit" class="btn btn-primary" value="Save" />
+                    <input type="submit" class="btn btn-primary" value="Save" id="btnStudentSave"/>
                 </div>
             </form>
         </div>
@@ -112,6 +113,22 @@
             });
         });
 
+        $('#btnStudentSave').click(function (e) {
+            e.preventDefault();
+            var isFormValid = $('#frmStudentProfile').valid();
+            if (isFormValid) {
+                ezBSAlert({
+                    type: "confirm",
+                    messageText: "Do you want to Save the Student ?",
+                    alertType: "info"
+                }).done(function (flag) {
+                    if (flag) {
+                        $('#frmStudentProfile').submit();
+
+                    }
+                });
+            }
+        });
 
         function onBeforeSubmit() {
             debugger;

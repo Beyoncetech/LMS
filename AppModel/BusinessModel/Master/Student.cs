@@ -13,5 +13,6 @@ namespace AppModel
         public int StandardId { get; set; }
         public DateTime CreatedOn { get; set; }
         public int? CreatedBy { get; set; }
+        public long? LoginUserId { get; set; }
     }
 }

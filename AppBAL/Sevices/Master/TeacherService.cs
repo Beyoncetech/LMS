@@ -98,7 +98,8 @@ namespace AppBAL.Sevices.Master
                     Address = TeacherToInsert.Address,
                     Email = TeacherToInsert.Email,
                     ContactNo = TeacherToInsert.ContactNo,
-                    EducationalQualification = TeacherToInsert.EducationalQualification
+                    EducationalQualification = TeacherToInsert.EducationalQualification,
+                    LoginUserId=TeacherToInsert.LoginUserId
                 };
                 //isValid = await _commonRepository.Insert(_mapper.Map<Tblmstudent>(StudentToInsert));
                 isValid = await _commonRepository.Insert(oTeacher);

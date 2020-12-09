@@ -111,7 +111,8 @@ namespace AppBAL.Sevices.Master
                     Address = StudentToInsert.Address,
                     Email = StudentToInsert.Email,
                     ContactNo = StudentToInsert.ContactNo,
-                    StandardId = StudentToInsert.StandardId
+                    StandardId = StudentToInsert.StandardId,
+                    LoginUserId=StudentToInsert.LoginUserId
                 };
                 //isValid = await _commonRepository.Insert(_mapper.Map<Tblmstudent>(StudentToInsert));
                 isValid = await _commonRepository.Insert(oStudent);

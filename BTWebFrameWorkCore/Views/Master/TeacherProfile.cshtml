@@ -12,8 +12,12 @@
         <div class="card card-primary">
             <!-- /.card-header -->
             <!-- form start -->
-            <form id="frmTeacherProfile" asp-area="" asp-action="TeacherProfile" asp-controller="Teacher" data-ajax="true" data-ajax-method="post" data-ajax-begin="onBeforeSubmit" data-ajax-success="onSuccess">               
-                @Html.HiddenFor(model => model.Id)   
+            <form id="frmTeacherProfile" asp-area="" asp-action="TeacherProfile" asp-controller="Teacher" data-ajax="true" data-ajax-method="post" data-ajax-begin="onBeforeSubmit" data-ajax-success="onSuccess">
+                @Html.HiddenFor(model => model.AttachTeacherImage.FileName)
+                @Html.HiddenFor(model => model.AttachTeacherImage.FileSize)
+                @Html.HiddenFor(model => model.AttachTeacherImage.FileType)
+                @Html.HiddenFor(model => model.AttachTeacherImage.FileContentsBase64)
+                @Html.HiddenFor(model => model.Id)
                 <div class="card-body">
                     <div class="form-group">
                         <label>Name</label>
@@ -49,7 +53,7 @@
                 </div>
                 <!-- /.card-body -->
                 <div class="card-footer">
-                    <input type="submit" class="btn btn-primary" value="Save" />
+                    <input type="submit" class="btn btn-primary" value="Save" id="btnTeacherSave" />
                 </div>
             </form>
         </div>
@@ -57,74 +61,118 @@
     </div>
     <!--/.col (left) -->
     <!-- right column -->
-    <!--/.col (right) -->
-</div>
+    <div class="col-md-4">
+        <!-- jquery validation -->
+        <div class="card card-primary">
+            <!-- /.card-header -->
+            <!-- contain start -->
+            <div class="card-body">
+                <div class="form-group">
+                    <table>
+                        <tr>
+                            <td>
+                                @*@Html.HiddenFor(model => model.UserImgPath)*@
+                                <img id="TeacherImg" alt="No Image Found" src="@Url.Content(Model.TeacherImgPath)" style="border:groove;" width="150" height="150" />
+                            </td>
+                            <td style="padding-left:10px;">
+                                <div style="position:relative;">
+                                    <a class='btn btn-primary' href='javascript:;'>
+                                        Browse ...
+                                        <input type="file" name="UpldTeacherImg" style='position:absolute;z-index:2;top:0;left:0;filter: alpha(opacity=0);-ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";opacity:0;background-color:transparent;color:transparent;' size="40" onchange='OnImageSelect(this);'>
+                                    </a>
+                                    &nbsp;
+                                    <span class='label label-success' id="upload-file-info"></span>
+                                </div>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <!--/.col (right) -->
+    </div>
 
-@section Scripts {
-    @*<script src="~/lib/jquery-ajax-unobtrusive/jquery.unobtrusive-ajax.js"></script>*@
-    <script type="text/javascript">
+    @section Scripts {
+        @*<script src="~/lib/jquery-ajax-unobtrusive/jquery.unobtrusive-ajax.js"></script>*@
+        <script type="text/javascript">
 
-        $(function () {
-            //Date range picker
-            //$('#dobdate').datepicker({
-            //    dateFormat: 'dd/mm/yy'
-            //});
-            $('#dobdate').datetimepicker({
-                format: 'DD/MM/YYYY'
+            $(function () {
+                //Date range picker
+                //$('#dobdate').datepicker({
+                //    dateFormat: 'dd/mm/yy'
+                //});
+                $('#dobdate').datetimepicker({
+                    format: 'DD/MM/YYYY'
+                });
             });
-        });
 
+            $('#btnTeacherSave').click(function (e) {
+                e.preventDefault();
+                var isFormValid = $('#frmTeacherProfile').valid();
+                if (isFormValid) {
+                    ezBSAlert({
+                        type: "confirm",
+                        messageText: "Do you want to Save the Teacher ?",
+                        alertType: "info"
+                    }).done(function (flag) {
+                        if (flag) {
+                            $('#frmTeacherProfile').submit();
 
-        function onBeforeSubmit() {
-            debugger;
-            ShowAppLoader();
-        }
+                        }
+                    });
+                }
+            });
 
-        function onSuccess(result, textStatus, jqXHR) {
-            debugger;
-            HideAppLoader();
-            //alert(result.msg)
-            if (result.stat) {
-                toastr.success(result.msg)
-                location.href = result.rtnUrl;    
-            } else {
-                toastr.error(result.msg)
+            function onBeforeSubmit() {
+                debugger;
+                ShowAppLoader();
             }
 
-        }
-
-        onFail = function (xhr) {
-            debugger;
-            alert(`Hi ${xhr.responseText}!`);
-            HideAppLoader();
-        };
-
-        function OnImageSelect(input) {
-            if (input.files && input.files[0]) {
-                if (input.files[0].size > 1048576) {
-                    toastr.warning('The selected User image is lerger than 1MB. Please select Image less than 1MB.')
-                    //ezBSAlert({
-                    //    messageText: "The selected User image is lerger than 1MB. Please select Image less than 1MB.",
-                    //    alertType: "danger",
-                    //    topMargin: '300px'
-                    //});
-                    input.value = '';
-                    return;
-                }
-                $("#AttachUserImage_FileName").val(input.files[0].name);
-                $("#AttachUserImage_FileSize").val(input.files[0].size);
-                $("#AttachUserImage_FileType").val(input.files[0].type || "application/octet-stream");
-
-                //$("#upload-file-info").html(input.value);
-                var reader = new FileReader();
-
-                reader.onload = function (e) {
-                    $('#EmpImg').attr('src', e.target.result);
-                    $("#AttachUserImage_FileContentsBase64").val(e.target.result);
+            function onSuccess(result, textStatus, jqXHR) {
+                debugger;
+                HideAppLoader();
+                //alert(result.msg)
+                if (result.stat) {
+                    toastr.success(result.msg)
+                    location.href = result.rtnUrl;
+                } else {
+                    toastr.error(result.msg)
                 }
 
-                reader.readAsDataURL(input.files[0]);
             }
-        }
-    </script>
-}
+
+            onFail = function (xhr) {
+                debugger;
+                alert(`Hi ${xhr.responseText}!`);
+                HideAppLoader();
+            };
+
+            function OnImageSelect(input) {
+                if (input.files && input.files[0]) {
+                    if (input.files[0].size > 1048576) {
+                        toastr.warning('The selected Teacher image is lerger than 1MB. Please select Image less than 1MB.')
+                        //ezBSAlert({
+                        //    messageText: "The selected User image is lerger than 1MB. Please select Image less than 1MB.",
+                        //    alertType: "danger",
+                        //    topMargin: '300px'
+                        //});
+                        input.value = '';
+                        return;
+                    }
+                    $("#AttachTeacherImage_FileName").val(input.files[0].name);
+                    $("#AttachTeacherImage_FileSize").val(input.files[0].size);
+                    $("#AttachTeacherImage_FileType").val(input.files[0].type || "application/octet-stream");
+
+                    //$("#upload-file-info").html(input.value);
+                    var reader = new FileReader();
+
+                    reader.onload = function (e) {
+                        $('#TeacherImg').attr('src', e.target.result);
+                        $("#AttachTeacherImage_FileContentsBase64").val(e.target.result);
+                    }
+
+                    reader.readAsDataURL(input.files[0]);
+                }
+            }
+        </script>
+    }

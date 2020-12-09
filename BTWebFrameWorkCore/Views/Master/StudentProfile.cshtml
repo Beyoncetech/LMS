@@ -59,7 +59,7 @@
                 </div>
                 <!-- /.card-body -->
                 <div class="card-footer">
-                    <input type="submit" class="btn btn-primary" value="Save" />
+                    <input type="submit" class="btn btn-primary" value="Save" id="btnStudentSave"/>
                 </div>
             </form>
         </div>
@@ -114,6 +114,22 @@
             });
         });
 
+        $('#btnStudentSave').click(function (e) {
+            e.preventDefault();
+            var isFormValid = $('#frmStudentProfile').valid();
+            if (isFormValid) {
+                ezBSAlert({
+                    type: "confirm",
+                    messageText: "Do you want to Save the Student ?",
+                    alertType: "info"
+                }).done(function (flag) {
+                    if (flag) {
+                        $('#frmStudentProfile').submit();
+
+                    }
+                });
+            }
+        });
 
         function onBeforeSubmit() {
             debugger;

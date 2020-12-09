@@ -24,7 +24,7 @@
                 </div>
                 <!-- /.card-body -->
                 <div class="card-footer">
-                    <input type="submit" class="btn btn-primary" value="Save" />
+                    <input type="submit" class="btn btn-primary" value="Save" id="btnSubjectSave"/>
                 </div>
             </form>
         </div>
@@ -49,6 +49,22 @@
             });
         });
 
+        $('#btnSubjectSave').click(function (e) {
+            e.preventDefault();
+            var isFormValid = $('#frmAddSubject').valid();
+            if (isFormValid) {
+                ezBSAlert({
+                    type: "confirm",
+                    messageText: "Do you want to Save the Subject ?",
+                    alertType: "info"
+                }).done(function (flag) {
+                    if (flag) {
+                        $('#frmAddSubject').submit();
+
+                    }
+                });
+            }
+        });
 
         function onBeforeSubmit() {
             debugger;

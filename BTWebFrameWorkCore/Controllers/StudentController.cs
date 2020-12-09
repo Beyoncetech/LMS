@@ -72,7 +72,9 @@ namespace BTWebAppFrameWorkCore.Controllers
                 //else
                 //    UsrImgPath = "~/img/avatar3.png";
             }
-            
+            TempVModel.StudentImgPath = UsrImgPath;
+            TempVModel.AttachStudentImage = new FileUploadInfo();
+
             //*******************************
             VModel = await GetViewModel(TempVModel);
             return View("~/Views/Master/StudentProfile.cshtml", VModel);
@@ -158,8 +160,7 @@ namespace BTWebAppFrameWorkCore.Controllers
                 {
                     Id = StudentInfo.Id,
                     Name = StudentInfo.Name,
-                    RegNo = StudentInfo.RegNo,
-                    //LoginId=StudentInfo.LoginId,  // login id to be incorporated
+                    RegNo = StudentInfo.RegNo,                    
                     Address = StudentInfo.Address,
                     ContactNo = StudentInfo.ContactNo,
                     Email = StudentInfo.Email,
@@ -169,8 +170,13 @@ namespace BTWebAppFrameWorkCore.Controllers
                 };
                 TempVModel.AllStandards.AddRange(oAllStandards);// all standard list
                 //var TempVModel = new StudentProfileVM();
+                if (StudentInfo.LoginUserId != null)
+                {
+                    var AppVM = await _AppUserService.GetAppUserByID((int)StudentInfo.LoginUserId);
+                    if (AppVM != null)
+                        TempVModel.LoginId = AppVM.UserId;
+                }
                 VModel = await GetViewModel(TempVModel);
-
             }
             //*******************************
             return View("~/Views/Master/UpdateStudentProfile.cshtml", VModel);

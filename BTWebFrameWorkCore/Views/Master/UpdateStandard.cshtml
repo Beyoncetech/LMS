@@ -23,7 +23,7 @@
                 </div>
                 <!-- /.card-body -->
                 <div class="card-footer">
-                    <input type="submit" class="btn btn-primary" value="Save" />
+                    <input type="submit" class="btn btn-primary" value="Save" id="btnStandardSave"/>
                 </div>
             </form>
         </div>
@@ -48,6 +48,22 @@
             });
         });
 
+        $('#btnStandardSave').click(function (e) {
+            e.preventDefault();
+            var isFormValid = $('#frmStandardProfile').valid();
+            if (isFormValid) {
+                ezBSAlert({
+                    type: "confirm",
+                    messageText: "Do you want to Save the Standard ?",
+                    alertType: "info"
+                }).done(function (flag) {
+                    if (flag) {
+                        $('#frmStandardProfile').submit();
+
+                    }
+                });
+            }
+        });
 
         function onBeforeSubmit() {
             debugger;
