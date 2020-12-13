@@ -17,6 +17,7 @@ namespace AppBAL.Sevices.Master
         Task<CommonResponce> GetStudentByStudentId(int StudentID);
         Task<CommonResponce> GetStudentByRegNo(int RegNo);
         Task<CommonResponce> GetStudentByEmailID(string EmailID);
+        Task<CommonResponce> CheckDataValidation(StudentProfileVM StudentToInsert, bool IsAdd);
         Task<CommonResponce> InsertStudentProfile(StudentProfileVM StudentToInsert);
         Task<CommonResponce> UpdateStudentProfile(StudentProfileVM StudentToUpdate);
        Task< CommonResponce> DeleteStudentProfile(int StudentId);
@@ -98,13 +99,52 @@ namespace AppBAL.Sevices.Master
         }
 
         #region INSERT/ UPDATE/ DELETE 
+        public async Task<CommonResponce> CheckDataValidation(StudentProfileVM StudentToInsert, bool IsAdd)
+        {            
+            CommonResponce result = new CommonResponce { Stat = true, StatusMsg = "" };
+            Tblmstudent oStudent = null;
+            if (IsAdd)  // check validation while adding a new student
+            {
+                oStudent = await _DBStudentRepository.GetStudentByRegNo(StudentToInsert.RegNo).ConfigureAwait(false);
+                if (oStudent != null)
+                { result.Stat = false; result.StatusMsg = "Registration No already in use"; }
+                else
+                {
+                    oStudent = await _DBStudentRepository.GetStudentByEmailID(StudentToInsert.Email);
+                    if (oStudent != null)
+                    { result.Stat = false; result.StatusMsg = "Email Id already in use"; }
+                }
+            }
+            else  // validation while updating
+            {
+                oStudent = await _DBStudentRepository.GetStudentByRegNo(StudentToInsert.RegNo).ConfigureAwait(false);
+                if (oStudent != null)  // got result
+                {
+                    if (StudentToInsert.Id != oStudent.Id)  // different student with same reg no
+                    { result.Stat = false; result.StatusMsg = "Registration No already in use"; }
+                    else // same student found check duplicate email id
+                    {
+                        oStudent = await _DBStudentRepository.GetStudentByEmailID(StudentToInsert.Email);
+                        if (oStudent != null)
+                        {
+                            if (StudentToInsert.Id != oStudent.Id)  // different student with same email id
+                                result.Stat = false; result.StatusMsg = "Email Id already in use";
+                        }
+                    }
+                }                
+            }
+            return result;
+        }
+
         public async Task<CommonResponce> InsertStudentProfile(StudentProfileVM StudentToInsert)
         {
-            CommonResponce result = new CommonResponce { Stat = false, StatusMsg = "" }; 
+            CommonResponce result = new CommonResponce { Stat = false, StatusMsg = "" };
+            CommonResponce DataValidationResult = new CommonResponce { Stat = false, StatusMsg = "" };
             bool isValid = false;
+            Tblmstudent oStudent = null;
             try
             {
-                Tblmstudent oStudent = new Tblmstudent
+                oStudent = new Tblmstudent
                 {
                     RegNo = StudentToInsert.RegNo,
                     Name = StudentToInsert.Name,
@@ -112,7 +152,7 @@ namespace AppBAL.Sevices.Master
                     Email = StudentToInsert.Email,
                     ContactNo = StudentToInsert.ContactNo,
                     StandardId = StudentToInsert.StandardId,
-                    LoginUserId=StudentToInsert.LoginUserId
+                    LoginUserId = StudentToInsert.LoginUserId
                 };
                 //isValid = await _commonRepository.Insert(_mapper.Map<Tblmstudent>(StudentToInsert));
                 isValid = await _commonRepository.Insert(oStudent);

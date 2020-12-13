@@ -78,6 +78,13 @@ namespace BTWebAppFrameWorkCore.Controllers
             CommonResponce result = null;
             if (ModelState.IsValid)
             {
+                result = await _TeacherService.CheckDataValidation(model, true);
+                if (!result.Stat)// validation failed
+                    return Json(new { stat = false, msg = result.StatusMsg });
+                result = await _AppUserService.GetUserProfile(model.LoginId); // check same login id
+                if (result.Stat)// login id exists
+                    return Json(new { stat = false, msg = "Login Id already in use" });
+
                 AppUserVM oAppUserVM = new AppUserVM(); // add an user in the user table for teacher
                 oAppUserVM.Name = model.Name;
                 oAppUserVM.UserId = model.LoginId;
@@ -173,9 +180,14 @@ namespace BTWebAppFrameWorkCore.Controllers
         [HttpPost]
         public async Task<JsonResult> UpdateTeacherProfile(TeacherProfileVM model)
         {
+            CommonResponce result = null;
             // if (ModelState.IsValid)
             //{
-            var result = await _TeacherService.UpdateTeacherProfile(model);
+            result = await _TeacherService.CheckDataValidation(model, true);
+            if (!result.Stat)// validation failed
+                return Json(new { stat = false, msg = result.StatusMsg });
+
+            result = await _TeacherService.UpdateTeacherProfile(model);
             if (result.Stat == true)
             {
                 if (model.AttachTeacherImage.FileSize > 0)

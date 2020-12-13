@@ -15,6 +15,7 @@ namespace AppBAL.Sevices.Master
         Task<List<TeacherBM>> GetAllTeachers(int RowCount,string AppRootPath);
         Task<CommonResponce> GetTeacherByTeacherId(int TeacherID);        
         Task<CommonResponce> GetTeacherByEmailID(string EmailID);
+        Task<CommonResponce> CheckDataValidation(TeacherProfileVM TeacherToInsert, bool IsAdd);
         Task<CommonResponce> InsertTeacherProfile(TeacherProfileVM TeacherToInsert);
         Task<CommonResponce> UpdateTeacherProfile(TeacherProfileVM TeacherToUpdate);
        Task< CommonResponce> DeleteTeacherProfile(int TeacherId);
@@ -86,6 +87,29 @@ namespace AppBAL.Sevices.Master
         }
 
         #region INSERT/ UPDATE/ DELETE 
+
+        public async Task<CommonResponce> CheckDataValidation(TeacherProfileVM TeacherToInsert, bool IsAdd)
+        {
+            CommonResponce result = new CommonResponce { Stat = true, StatusMsg = "" };
+            Tblmteacher oTeacher = null;
+            if (IsAdd)  // check validation while adding a new teacher
+            {
+                oTeacher = await _DBTeacherRepository.GetTeacherByEmailID(TeacherToInsert.Email).ConfigureAwait(false);
+                if (oTeacher != null)
+                { result.Stat = false; result.StatusMsg = "Email Id already in use"; }                
+            }
+            else//check validation while updating a teacher profile
+            {
+                oTeacher = await _DBTeacherRepository.GetTeacherByEmailID(TeacherToInsert.Email).ConfigureAwait(false);
+                if (oTeacher != null)
+                {
+                    if (oTeacher.Id != TeacherToInsert.Id)// different teacher with same email id
+                        result.Stat = false; result.StatusMsg = "Email Id already in use";
+                }
+            }
+            return result;
+        }
+
         public async Task<CommonResponce> InsertTeacherProfile(TeacherProfileVM TeacherToInsert)
         {
             CommonResponce result = new CommonResponce { Stat = false, StatusMsg = "" };

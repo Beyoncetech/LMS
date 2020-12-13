@@ -87,7 +87,12 @@ namespace BTWebAppFrameWorkCore.Controllers
             StringBuilder rtnMsg = new StringBuilder();
             if (ModelState.IsValid)
             {
-
+                result = await _StudentService.CheckDataValidation(model, true);
+                if (!result.Stat)// validation failed
+                    return Json(new { stat = false, msg = result.StatusMsg });
+                result = await _AppUserService.GetUserProfile(model.LoginId); // check same login id
+                if (result.Stat)// login id exists
+                    return Json(new { stat = false, msg = "Login Id already in use" });
                 AppUserVM oAppUserVM = new AppUserVM(); // add an user in the user table
                 oAppUserVM.Name = model.Name;
                 oAppUserVM.UserId = model.LoginId;
@@ -97,42 +102,41 @@ namespace BTWebAppFrameWorkCore.Controllers
                 oAppUserVM.IsActive = true;
                 string ResetContext = Guid.NewGuid().ToString().Replace("-", "RP");
                 DateTime PassValidity = DateTime.Now.AddDays(1); //validity for 1 day
-                 result = await _AppUserService.SaveAppUserAsync(oAppUserVM, ResetContext, PassValidity).ConfigureAwait(false);
+                result = await _AppUserService.SaveAppUserAsync(oAppUserVM, ResetContext, PassValidity).ConfigureAwait(false);
                 if (!result.Stat)// user addition failed
-                    rtnMsg.Append(" Failed to add student Login ID.");
+                    return Json(new { stat = false, msg = " Failed to add student Login ID." });
                 else
                 {
                     model.LoginUserId = result.StatusObj;
                     result = await _StudentService.InsertStudentProfile(model);
-                }
-                if (result.Stat == true)
-                {
-                    rtnMsg.Append("Student Profile Inserted.");
-                    //save the user picture
-                    if (model.AttachStudentImage.FileSize > 0)
+
+                    if (result.Stat == true)
                     {
-                        string StudentImgPath = Path.Combine(GetBaseService().GetAppRootPath(), "AppFileRepo\\StudentAvatar");
-                        if (GetBaseService().DirectoryFileService.CreateDirectoryIfNotExist(StudentImgPath))
+                        rtnMsg.Append("Student Profile Inserted.");
+                        //save the user picture
+                        if (model.AttachStudentImage.FileSize > 0)
                         {
-                            StudentImgPath = string.Format("{0}\\{1}.{2}", StudentImgPath, model.RegNo, "jpg");
-                            if (GetBaseService().DirectoryFileService.CreateFileFromBase64String(model.AttachStudentImage.FileContentsBase64, StudentImgPath))
+                            string StudentImgPath = Path.Combine(GetBaseService().GetAppRootPath(), "AppFileRepo\\StudentAvatar");
+                            if (GetBaseService().DirectoryFileService.CreateDirectoryIfNotExist(StudentImgPath))
                             {
-                                model.StudentImgPath = string.Format("~/AppFileRepo/StudentAvatar/{0}.{1}?r={2}", model.RegNo, "jpg", DateTime.Now.Ticks.ToString());
-                                model.BUserImgPath = model.StudentImgPath; // update the Student avatar
+                                StudentImgPath = string.Format("{0}\\{1}.{2}", StudentImgPath, model.RegNo, "jpg");
+                                if (GetBaseService().DirectoryFileService.CreateFileFromBase64String(model.AttachStudentImage.FileContentsBase64, StudentImgPath))
+                                {
+                                    model.StudentImgPath = string.Format("~/AppFileRepo/StudentAvatar/{0}.{1}?r={2}", model.RegNo, "jpg", DateTime.Now.Ticks.ToString());
+                                    model.BUserImgPath = model.StudentImgPath; // update the Student avatar
+                                }
                             }
                         }
+                        var CurrentUserInfo = GetLoginUserInfo();// get current user
+                        await GetBaseService().AddActivity(ActivityType.Update, CurrentUserInfo.UserID, CurrentUserInfo.UserName, "Student Profile", "Inserted Student profile");
+                        return Json(new { stat = true, msg = rtnMsg.ToString(), rtnUrl = "/Student/Students" });
                     }
-                    var CurrentUserInfo = GetLoginUserInfo();// get current user
-                    await GetBaseService().AddActivity(ActivityType.Update, CurrentUserInfo.UserID, CurrentUserInfo.UserName, "Student Profile", "Inserted Student profile");
+                    else
+                        return Json(new { stat = false, msg = result.StatusMsg });
                 }
-                return Json(new { stat = true, msg = rtnMsg.ToString(), rtnUrl = "/Student/Students" });
             }
-
             else
                 return Json(new { stat = false, msg = result.StatusMsg });
-            //  }
-            //  else
-            //      return Json(new { stat = false, msg = "Invalid Student Profile" });
         }
         #endregion ADD STUDENT
 
@@ -185,9 +189,13 @@ namespace BTWebAppFrameWorkCore.Controllers
         [HttpPost]
         public async Task<JsonResult> UpdateStudentProfile(StudentProfileVM model)
         {
+            CommonResponce result = null;
             if (ModelState.IsValid)
             {
-                var result = await _StudentService.UpdateStudentProfile(model);
+                result = await _StudentService.CheckDataValidation(model, false);
+                if (!result.Stat)// validation failed
+                    return Json(new { stat = false, msg = result.StatusMsg });
+                result = await _StudentService.UpdateStudentProfile(model);
 
                 if (result.Stat == true)
                 {
