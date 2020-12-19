@@ -247,6 +247,8 @@ namespace AppDAL.DBModels
                     .HasColumnName("ID")
                     .HasColumnType("int(11)");
 
+                entity.Property(e => e.ClassActivationThreshold).HasColumnType("int(11)");
+
                 entity.Property(e => e.CreatedBy)
                     .HasColumnType("varchar(255)")
                     .HasCharSet("latin1")
@@ -276,7 +278,7 @@ namespace AppDAL.DBModels
 
                 entity.Property(e => e.Scheduler)
                     .IsRequired()
-                    .HasColumnType("varchar(2000)")
+                    .HasColumnType("varchar(4000)")
                     .HasDefaultValueSql("''")
                     .HasCharSet("latin1")
                     .HasCollation("latin1_swedish_ci");
@@ -298,7 +300,10 @@ namespace AppDAL.DBModels
                     .HasColumnName("ID")
                     .HasColumnType("int(11)");
 
-                entity.Property(e => e.CreatedBy).HasColumnType("int(11)");
+                entity.Property(e => e.CreatedBy)
+                    .HasColumnType("varchar(255)")
+                    .HasCharSet("latin1")
+                    .HasCollation("latin1_swedish_ci");
 
                 entity.Property(e => e.CreatedOn).HasColumnType("date");
 
@@ -338,8 +343,6 @@ namespace AppDAL.DBModels
                     .HasDefaultValueSql("''")
                     .HasCharSet("latin1")
                     .HasCollation("latin1_swedish_ci");
-
-                entity.Property(e => e.LoginUserId).HasColumnType("bigint(20)");
 
                 entity.Property(e => e.Name)
                     .IsRequired()
@@ -411,8 +414,6 @@ namespace AppDAL.DBModels
                     .HasCharSet("latin1")
                     .HasCollation("latin1_swedish_ci");
 
-                entity.Property(e => e.LoginUserId).HasColumnType("bigint(20)");
-
                 entity.Property(e => e.Name)
                     .IsRequired()
                     .HasColumnType("varchar(50)")
@@ -454,8 +455,6 @@ namespace AppDAL.DBModels
                 entity.Property(e => e.Id)
                     .HasColumnName("ID")
                     .HasColumnType("int(11)");
-
-                entity.Property(e => e.ClassActivationThreshold).HasColumnType("int(11)");
 
                 entity.Property(e => e.ClassRoomId)
                     .HasColumnName("ClassRoomID")

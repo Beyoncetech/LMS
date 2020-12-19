@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using System.Text.Json;
 using System.Xml;
 using System.Xml.Serialization;
 
@@ -87,6 +88,40 @@ namespace AppUtility.Extension
             catch (Exception)
             {
                 throw new Exception("Wrong XML String");
+            }
+
+        }
+
+        public static string ToJSONString<T>(this T value, bool IsIndent = false)
+        {
+            if (value == null) return string.Empty;
+
+            var options = new JsonSerializerOptions
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                WriteIndented = false
+            };
+
+            return JsonSerializer.Serialize(value, options);            
+        }
+
+        public static T JSONStringToObject<T>(this string JSONString)
+        {
+            try
+            {
+                var options = new JsonSerializerOptions
+                {
+                    PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                    WriteIndented = false
+                };
+
+                var result = JsonSerializer.Deserialize<T>(JSONString, options);                
+
+                return result;
+            }
+            catch (Exception)
+            {
+                throw new Exception("Wrong JSON String");
             }
 
         }

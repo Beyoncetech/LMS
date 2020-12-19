@@ -11,6 +11,7 @@ namespace AppDAL.DBModels
         public string Description { get; set; }
         public int SubjectId { get; set; }
         public int StandardId { get; set; }
+        public int? ClassActivationThreshold { get; set; }
         public string Scheduler { get; set; }
         public DateTime CreatedOn { get; set; }
         public string CreatedBy { get; set; }
