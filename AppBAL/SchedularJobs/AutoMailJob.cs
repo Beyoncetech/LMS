@@ -1,18 +1,25 @@
-﻿using AppDAL.DBRepository;
-using AppUtility.AppSchedular;
+﻿using AppBAL.CoreJobService;
+using AppBAL.Sevices.AppCore;
+using AppDAL.DBRepository;
+using AppModel;
+using AppUtility.AppModels;
+using AppUtility.Extension;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace AppBAL.SchedularJobs
 {
     public class AutoMailJob : AppJob
     {
         private readonly IAppJobRepository _DBRepository;
+        private readonly IEmailSender _EmailSender;
 
-        public AutoMailJob(IAppJobRepository DBRepository)
+        public AutoMailJob(IAppJobRepository DBRepository, IEmailSender objEmailSender)
         {
             _DBRepository = DBRepository;
+            _EmailSender = objEmailSender;
         }
 
         /// <summary>
@@ -24,58 +31,57 @@ namespace AppBAL.SchedularJobs
             return "Auto Mail Job";
         }
 
+        public override void OnBeforeJobExecute()
+        {
+            _DBRepository.InitDBContext();
+            _EmailSender.InitDBContext();
+            _EmailSender.SetEmailConfigFromDB();
+        }
+
         /// <summary>
         /// Execute the Job itself. Just print a message.
         /// </summary>
-        public override void DoJob()
+        public override async Task DoJob()
         {
-            ////**write code for auto mail
-            var oMailJobs = _DBRepository.GetAllMailJob().Result;
+            ////**write code for auto mail            
+            var oMailJobs = await _DBRepository.GetAllMailJob().ConfigureAwait(false);
             if (oMailJobs != null && oMailJobs.Count > 0)
             {
                 foreach (var item in oMailJobs)
                 {
                     try
                     {
+                        //check the job expiration validation
+                        DateTime CurTimeStamp = DateTime.Now;
+                        if(CurTimeStamp >= item.ValidFrom && CurTimeStamp <= item.ValidTo)
+                        {
+                            var MailInfo = item.CommandData.XMLStringToObject<ScheduleEmailInfoBM>();
 
+                            var message = new EmailMessage(MailInfo.To, MailInfo.Subject, MailInfo.MailBody, true, null);
+                            await _EmailSender.SendEmailAsync(message);
+
+                            item.Status = 1;
+                            item.FinishedOn = CurTimeStamp;                            
+
+                            await _DBRepository.Update(item).ConfigureAwait(false);
+                        }
+                        else
+                        {
+                            item.Status = -1;
+                            item.FinishedOn = CurTimeStamp;
+                            item.ErrorCode = "E05"; // for job time expiration
+                            item.ErrorMsg = "Job is expired";
+
+                            await _DBRepository.Update(item).ConfigureAwait(false);
+                        }
                     }
                     catch (Exception)
                     {
-                        throw;
+                        //throw;
                     }
 
                 }
-            }
-            //string TID = "374D9B86-824F-4910-8665-268FE617C028"; // tenant id is fixed for this application
-            //List<ScheduleEmailJobInfo> MailJobs = null;
-            //using (AppCommonRepository oManager = new AppCommonRepository(TID))
-            //{
-            //    MailJobs = oManager.GetProjectNotificationEmailJob();
-            //    //create obj for email
-            //    if (MailJobs.Count() > 0)
-            //    {
-            //        var MailManager = AppEmailGenerator.Create(TID);
-            //        foreach (var item in MailJobs)
-            //        {
-            //            try
-            //            {
-            //                MailManager.IsHtmlBody(true)
-            //                .To(item.MailInfo.To)
-            //                .Subject(item.MailInfo.Subject)
-            //                .MailBody(item.MailInfo.MailBody)
-            //                .Send();
-
-            //                oManager.UpdateAppJob(item.JobID, false, "");
-            //            }
-            //            catch (Exception ex)
-            //            {
-            //                oManager.UpdateAppJob(item.JobID, true, ex.Message);
-            //                LogError(ex);
-            //            }
-
-            //        }
-            //    }
-            //}
+            }           
         }
 
         /// <summary>

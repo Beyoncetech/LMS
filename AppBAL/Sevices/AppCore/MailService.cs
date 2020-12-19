@@ -10,35 +10,46 @@ using System.Threading.Tasks;
 
 namespace AppBAL.Sevices.AppCore
 {
-    public interface IEmailService
+    public interface IEmailSender
     {
+        void InitDBContext();
         void SendEmail(EmailMessage message);
         Task SendEmailAsync(EmailMessage message);
+        void SetEmailConfigFromDB();
         string GetLastError();
-        Task Initialize();
     }
 
-    public class EmailService : IEmailService
+    public class EmailSender : IEmailSender
     {
+        private readonly EmailConfiguration _emailConfig;
         private readonly IAppSettingService _AppSettingService;
-        private MailSettingBM _MailConfig;
         private string ErrMsg;
 
-        public EmailService(EmailConfiguration emailConfig, IAppSettingService ObjAppSettingService)
+        public EmailSender(EmailConfiguration emailConfig, IAppSettingService ObjAppSettingService)
         {
+            _emailConfig = emailConfig;
             _AppSettingService = ObjAppSettingService;
         }
 
-        public async Task Initialize()
+        public void InitDBContext()
         {
-            if (_MailConfig == null)
-                _MailConfig = await _AppSettingService.GetMailSetting().ConfigureAwait(false);
+            _AppSettingService.InitDBContext();
+        }
+
+        public void SetEmailConfigFromDB()
+        {
+            var oMailSetup = _AppSettingService.GetMailSettingSync();
+            _emailConfig.From = oMailSetup.FromMailID;
+            _emailConfig.SmtpServer = oMailSetup.SmtpServer;
+            _emailConfig.Port = Convert.ToInt32(oMailSetup.SmtpServerPort);
+            _emailConfig.UserName = oMailSetup.MailUserID;
+            _emailConfig.Password = oMailSetup.MailPassword;
         }
 
         private MimeMessage CreateEmailMessage(EmailMessage message)
         {
             var emailMessage = new MimeMessage();
-            emailMessage.From.Add(new MailboxAddress(_MailConfig.FromMailID));
+            emailMessage.From.Add(new MailboxAddress(_emailConfig.From));
             emailMessage.To.AddRange(message.To);
             emailMessage.Subject = message.Subject;
 
@@ -68,10 +79,9 @@ namespace AppBAL.Sevices.AppCore
             {
                 try
                 {
-                    int ServerPort = Convert.ToInt32(_MailConfig.SmtpServerPort);
-                    client.Connect(_MailConfig.SmtpServer, ServerPort, true);
+                    client.Connect(_emailConfig.SmtpServer, _emailConfig.Port, true);
                     client.AuthenticationMechanisms.Remove("XOAUTH2");
-                    client.Authenticate(_MailConfig.MailUserID, _MailConfig.MailPassword);
+                    client.Authenticate(_emailConfig.UserName, _emailConfig.Password);
 
                     client.Send(mailMessage);
                 }
@@ -96,10 +106,9 @@ namespace AppBAL.Sevices.AppCore
             {
                 try
                 {
-                    int ServerPort = Convert.ToInt32(_MailConfig.SmtpServerPort);
-                    await client.ConnectAsync(_MailConfig.SmtpServer, ServerPort, true);
+                    await client.ConnectAsync(_emailConfig.SmtpServer, _emailConfig.Port, true);
                     client.AuthenticationMechanisms.Remove("XOAUTH2");
-                    await client.AuthenticateAsync(_MailConfig.MailUserID, _MailConfig.MailPassword);
+                    await client.AuthenticateAsync(_emailConfig.UserName, _emailConfig.Password);
 
                     await client.SendAsync(mailMessage);
                 }

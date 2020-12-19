@@ -1,22 +1,36 @@
-﻿using System;
+﻿using AppBAL.Sevices.AppCore;
+using AppDAL.DBRepository;
+using Microsoft.Extensions.DependencyInjection;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 
-namespace AppUtility.AppSchedular
+namespace AppBAL.CoreJobService
 {
     public interface IJobManager
     {
-        void ExecuteAllJobs();
+        Task InitialiseJobs();
     }
 
     public class JobManager : IJobManager
     {
+        private readonly IAppJobRepository _DBRepository;
+        private readonly IEmailSender _EmailSender;
+
+
+        public JobManager(IAppJobRepository DBRepository, IEmailSender objEmailSender)
+        {
+            _DBRepository = DBRepository;
+            _EmailSender = objEmailSender;
+        }
         /// <summary>
         /// Execute all Jobs.
         /// </summary>
-        public void ExecuteAllJobs()
+        public async Task InitialiseJobs()
         {
             try
             {
@@ -35,17 +49,20 @@ namespace AppUtility.AppSchedular
                             try
                             {
                                 // instantiate job by reflection
-                                instanceJob = (AppJob)Activator.CreateInstance(job);
+                                instanceJob = (AppJob)Activator.CreateInstance(job, _DBRepository, _EmailSender);
+                                //var instance = (AppJob)ActivatorUtilities.CreateInstance(serviceProvider, job);
+                                
                                 //instanceJob.WriteLog(0, String.Format("The Job \"{0}\" has been instantiated successfully.", instanceJob.GetName()));
                                 if (instanceJob.IsActive())
                                 {
                                     thread = new Thread(new ThreadStart(instanceJob.ExecuteJob));
                                     // start thread executing the job
                                     thread.Start();
+                                    await Task.Delay(10);
                                 }
                                 //instanceJob.WriteLog(0, String.Format("The Job \"{0}\" has its thread started successfully.", instanceJob.GetName()));
                             }
-                            catch (Exception)
+                            catch (Exception ex)
                             {
                                 //if (instanceJob != null)
                                 //    instanceJob.WriteLog(-100, ex.Message);
@@ -73,12 +90,18 @@ namespace AppUtility.AppSchedular
         /// </summary>
         private IEnumerable<Type> GetAllTypesImplementingInterface(Type desiredType)
         {
-            return AppDomain
-                .CurrentDomain
-                .GetAssemblies()
-                .SelectMany(assembly => assembly.GetTypes())
-                .Where(type => desiredType.IsAssignableFrom(type));
+            //return AppDomain                
+            //    .CurrentDomain
+            //    .GetAssemblies()
+            //    .SelectMany(assembly => assembly.GetTypes())
+            //    .Where(type => desiredType.IsAssignableFrom(type));
 
+            return Assembly
+                .GetEntryAssembly()
+                .GetReferencedAssemblies()
+                .Select(Assembly.Load)
+                .SelectMany(x => x.DefinedTypes)
+                .Where(type => desiredType.IsAssignableFrom(type));
         }
 
         /// <summary>

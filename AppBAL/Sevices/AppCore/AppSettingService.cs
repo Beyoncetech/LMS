@@ -11,6 +11,8 @@ namespace AppBAL.Sevices.AppCore
 {
     public interface IAppSettingService
     {
+        void InitDBContext();
+        MailSettingBM GetMailSettingSync();
         Task<MailSettingBM> GetMailSetting();
         Task<CommonResponce> SaveMailSetting(MailSettingBM oEntity);
         Task<GeneralSettingBM> GetAppGeneralSetting();
@@ -24,6 +26,29 @@ namespace AppBAL.Sevices.AppCore
         {
             _DBSettingRepository = DBSettingRepository;
             _mapper = mapper;
+        }
+        public void InitDBContext()
+        {
+            _DBSettingRepository.InitDBContext();
+        }
+        public MailSettingBM GetMailSettingSync()
+        {
+            _DBSettingRepository.InitDBContext();
+            MailSettingBM result = new MailSettingBM();
+            var oSettings = _DBSettingRepository.GetSettingByKeySync("Mail-AppMailSetup");
+
+            if (oSettings != null && oSettings.Count > 0)
+            {
+                try
+                {
+                    result = oSettings[0].AppVal.XMLStringToObject<MailSettingBM>();
+                }
+                catch (Exception)
+                {
+                    // code to do exception
+                }
+            }
+            return result;
         }
         public async Task<MailSettingBM> GetMailSetting()
         {

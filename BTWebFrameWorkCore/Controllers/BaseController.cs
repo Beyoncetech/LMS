@@ -133,6 +133,11 @@ namespace BTWebAppFrameWorkCore.Controllers
             return _BaseService;
         }
 
+        public string GetAppRootUrl()
+        {
+            return HttpContext.Request.Host.Value;
+        }
+
         private async Task GetUserMessage()
         {
             if (Request.HttpContext.User.Identity.IsAuthenticated)

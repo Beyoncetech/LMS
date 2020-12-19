@@ -26,7 +26,7 @@ namespace BTWebAppFrameWorkCore.Controllers
     [Authorize(Policy = "AllowAuthUsers")]
     public class AccountController : BaseController
     {
-        private readonly IEmailService _EmailSender;
+        private readonly IEmailSender _EmailSender;
         private readonly IAppJobService _AppJobService;
         private readonly ILoginService _LoginService;
         private readonly IAppUserService _AppUserService;
@@ -34,7 +34,7 @@ namespace BTWebAppFrameWorkCore.Controllers
         private readonly IAppSettingService _AppSettingService;
         private readonly IAppJobService _JobService;
 
-        public AccountController(ILoginService LoginService, IEmailService EmailSender, AppSettingsConfiguration AppSettingsConfig,
+        public AccountController(ILoginService LoginService, IEmailSender EmailSender, AppSettingsConfiguration AppSettingsConfig,
             IAppCookiesAuthService AppCookiesAuth, IAppUserService AppUserService, IAppSettingService ObjAppSettingService,
             IAppJobService objAppJobService, IAppJobService JobService)
         {
@@ -442,7 +442,7 @@ namespace BTWebAppFrameWorkCore.Controllers
                     else
                     {
                         var oLoginUser = GetLoginUserInfo();
-                        await _JobService.AddNewUserCreateEmailJob(Convert.ToInt64(oLoginUser.ID), model.Name, model.Email, GetBaseService().GetAppRootPath());
+                        await _JobService.AddNewUserCreateEmailJob(Convert.ToInt64(oLoginUser.ID), model.Name, model.Email, GetAppRootUrl());
                         await GetBaseService().AddActivity(ActivityType.Create, model.BUserID, model.BUserName, "Save User", string.Format("Save new user : {0} info.", model.Name));
                         return Json(new { stat = true, msg = "Successfully saved user" });
                     }
