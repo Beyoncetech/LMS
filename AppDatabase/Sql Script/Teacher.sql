@@ -14,3 +14,17 @@ ENGINE = INNODB,
 AUTO_INCREMENT = 7,
 CHARACTER SET latin1,
 COLLATE latin1_swedish_ci;
+
+
+CREATE TABLE lmsdb.tblrteacherclassroom (
+  ID INT(11) NOT NULL AUTO_INCREMENT,
+  TeacherID INT(11) NOT NULL,
+  ClassRoomID INT(11) NOT NULL,
+  CreatedOn DATE NOT NULL,
+  ClosedOn DATE DEFAULT NULL,
+  CreatedBy INT(11) DEFAULT NULL,
+  PRIMARY KEY (ID)
+)
+ENGINE = INNODB,
+CHARACTER SET latin1,
+COLLATE latin1_swedish_ci;

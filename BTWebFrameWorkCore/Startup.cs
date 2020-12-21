@@ -31,8 +31,8 @@ using AppUtility.AppIO;
 using BTWebAppFrameWorkCore.Services;
 using AppBAL.Sevices.AppCore;
 using AppUtility.AppMessage;
-using AppUtility.AppSchedular;
 using AppBAL.Sevices;
+using AppBAL.CoreJobService;
 
 namespace BTWebAppFrameWorkCore
 {
@@ -40,16 +40,11 @@ namespace BTWebAppFrameWorkCore
     {
         public Startup(IConfiguration configuration)
         {
-            Configuration = configuration;
-
-            //****use this code if required schedule jobs. otherwise comment the code*****
-            _JobManager = new JobManager();
-            _JobManager.ExecuteAllJobs();
-            //************************************************
+            Configuration = configuration;            
         }
 
         public IConfiguration Configuration { get; }
-        private readonly IJobManager _JobManager;
+        private IJobManager _objJobMgr;        
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
@@ -107,7 +102,7 @@ namespace BTWebAppFrameWorkCore
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IJobManager objJobMgr)
         {
             if (env.IsDevelopment())
             {
@@ -147,6 +142,8 @@ namespace BTWebAppFrameWorkCore
                 endpoints.MapHub<ChatHub>("/chathub");
             });
 
+            _objJobMgr = objJobMgr;
+            _objJobMgr.InitialiseJobs(); // initialise all schedule jobs
         }
 
         private void RegisterAppServices(IServiceCollection services)
@@ -158,10 +155,10 @@ namespace BTWebAppFrameWorkCore
             services.AddScoped<IAppCookiesAuthService, AppCookiesAuthService>();
             services.AddScoped<IEncriptionService, EncriptionService>();
             services.AddScoped<IAuthorizationHandler, CanAllowOnlyAuthUsersHandler>();
-            services.AddScoped<IBaseControllerService, BaseControllerService>();
-            services.AddScoped<IEmailService, EmailService>();
+            services.AddScoped<IBaseControllerService, BaseControllerService>();            
             services.AddScoped<IAppJobService, AppJobService>();
             services.AddScoped<IMailTemplateService, MailTemplateService>();
+            services.AddScoped<IJobManager, JobManager>();
             #endregion
 
             #region Register services

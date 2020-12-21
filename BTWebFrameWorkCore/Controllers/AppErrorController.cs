@@ -10,10 +10,10 @@ namespace BTWebAppFrameWorkCore.Controllers
 {
     public class AppErrorController : BaseController
     {
-        private readonly IEmailService _EmailSender;
-        public AppErrorController(IEmailService EmailSender)
+        private readonly IEmailSender _EmailSender;
+        public AppErrorController(IEmailSender objEmailSender)
         {            
-            _EmailSender = EmailSender;           
+            _EmailSender = objEmailSender;           
         }
         public async Task<IActionResult> UnAuthorised401()
         {

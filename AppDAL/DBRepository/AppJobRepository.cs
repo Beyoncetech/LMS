@@ -7,20 +7,26 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace AppDAL.DBRepository
-{    
+{
     public interface IAppJobRepository
     {
-        Task<List<Mjob>> GetAllMailJob();           
+        void InitDBContext();
+        Task<List<Mjob>> GetAllMailJob();        
         Task Insert(Mjob entity);
         Task Update(Mjob entity);
     }
     public class AppJobRepository : IAppJobRepository
     {
-        private readonly AppDBContext _DBContext;
+        private AppDBContext _DBContext;
         private DbSet<Mjob> entities;
         public AppJobRepository(AppDBContext DBContext)
         {
             _DBContext = DBContext;
+            entities = _DBContext.Set<Mjob>();
+        }
+        public void InitDBContext()
+        {
+            _DBContext = new AppDBContext();
             entities = _DBContext.Set<Mjob>();
         }
         public async Task<List<Mjob>> GetAllMailJob()
@@ -29,13 +35,13 @@ namespace AppDAL.DBRepository
                 .OrderBy(o => o.CreatedOn)
                 .ToListAsync();
 
-            return  oJob;
+            return oJob;
         }
-
+       
         public async Task Insert(Mjob entity)
         {
             if (entity == null) throw new ArgumentNullException("entity");
-                        
+
             entities.Add(entity);
             await _DBContext.SaveChangesAsync();
         }

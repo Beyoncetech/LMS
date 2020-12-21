@@ -11,6 +11,8 @@ namespace AppDAL.DBRepository
 {
     public interface IAppSettingRepository
     {
+        void InitDBContext();
+        List<Appsetting> GetSettingByKeySync(string Key);
         Task<List<Appsetting>> GetSettingByKey(string Key);        
         Task<int> InsertSetting(string Key, string Value);
         Task<int> UpdateSetting(Appsetting entity);
@@ -19,12 +21,23 @@ namespace AppDAL.DBRepository
     }
     public class AppSettingRepository : IAppSettingRepository
     {
-        private readonly AppDBContext _DBContext;
+        private AppDBContext _DBContext;
         private DbSet<Appsetting> entities;
         public AppSettingRepository(AppDBContext DBContext)
         {
             _DBContext = DBContext;
             entities = _DBContext.Set<Appsetting>();
+        }
+        public void InitDBContext()
+        {
+            _DBContext = new AppDBContext();
+        }
+        public List<Appsetting> GetSettingByKeySync(string Key)
+        {
+            var oSetting = _DBContext.Appsetting.Where(x => x.AppKey.Equals(Key))
+                .ToList();
+
+            return oSetting;
         }
         public async Task<List<Appsetting>> GetSettingByKey(string Key)
         {

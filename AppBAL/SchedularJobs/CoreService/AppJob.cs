@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 
-namespace AppUtility.AppSchedular
+namespace AppBAL.CoreJobService
 {
     public abstract class AppJob
     {
@@ -12,8 +13,9 @@ namespace AppUtility.AppSchedular
         /// Execute the Job itself, one ore repeatedly, depending on
         /// the job implementation.
         /// </summary>
-        public void ExecuteJob()
+        public async void ExecuteJob()
         {
+            OnBeforeJobExecute();
             if (IsRepeatable())
             {
                 // execute the job in intervals determined by the methd
@@ -23,7 +25,7 @@ namespace AppUtility.AppSchedular
                     try
                     {
                         WriteLog(0, String.Format("The Job \"{0}\" has been started successfully. [{1}]", GetName(), DateTime.Now.ToString("dd-MMM-yyyy HH:mm")));
-                        DoJob();
+                        await DoJob().ConfigureAwait(false);
                         WriteLog(0, String.Format("The Job \"{0}\" has been finished successfully. [{1}]", GetName(), DateTime.Now.ToString("dd-MMM-yyyy HH:mm")));
                     }
                     catch (Exception ex)
@@ -39,7 +41,7 @@ namespace AppUtility.AppSchedular
                 try
                 {
                     WriteLog(0, String.Format("The Job \"{0}\" has been started successfully. [{1}]", GetName(), DateTime.Now.ToString("dd-MMM-yyyy HH:mm")));
-                    DoJob();
+                    await DoJob().ConfigureAwait(false);
                     WriteLog(0, String.Format("The Job \"{0}\" has been finished successfully. [{1}]", GetName(), DateTime.Now.ToString("dd-MMM-yyyy HH:mm")));
                 }
                 catch (Exception ex)
@@ -101,7 +103,12 @@ namespace AppUtility.AppSchedular
         /// <summary>
         /// The job to be executed.
         /// </summary>
-        public abstract void DoJob();
+        public abstract Task DoJob();
+
+        /// <summary>
+        /// The pre init job to be executed.
+        /// </summary>
+        public abstract void OnBeforeJobExecute();
 
         /// <summary>
         /// Determines whether a Job is to be repeated after a

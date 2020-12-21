@@ -26,7 +26,7 @@ namespace BTWebAppFrameWorkCore.Controllers
     [Authorize(Policy = "AllowAuthUsers")]
     public class AccountController : BaseController
     {
-        private readonly IEmailService _EmailSender;
+        private readonly IEmailSender _EmailSender;
         private readonly IAppJobService _AppJobService;
         private readonly ILoginService _LoginService;
         private readonly IAppUserService _AppUserService;
@@ -34,7 +34,7 @@ namespace BTWebAppFrameWorkCore.Controllers
         private readonly IAppSettingService _AppSettingService;
         private readonly IAppJobService _JobService;
 
-        public AccountController(ILoginService LoginService, IEmailService EmailSender, AppSettingsConfiguration AppSettingsConfig,
+        public AccountController(ILoginService LoginService, IEmailSender EmailSender, AppSettingsConfiguration AppSettingsConfig,
             IAppCookiesAuthService AppCookiesAuth, IAppUserService AppUserService, IAppSettingService ObjAppSettingService,
             IAppJobService objAppJobService, IAppJobService JobService)
         {
@@ -442,7 +442,7 @@ namespace BTWebAppFrameWorkCore.Controllers
                     else
                     {
                         var oLoginUser = GetLoginUserInfo();
-                        await _JobService.AddNewUserCreateEmailJob(Convert.ToInt64(oLoginUser.ID), model.Name, model.Email, GetBaseService().GetAppRootPath());
+                        await _JobService.AddNewUserCreateEmailJob(Convert.ToInt64(oLoginUser.ID), model.Name, model.Email, GetAppRootUrl());
                         await GetBaseService().AddActivity(ActivityType.Create, model.BUserID, model.BUserName, "Save User", string.Format("Save new user : {0} info.", model.Name));
                         return Json(new { stat = true, msg = "Successfully saved user" });
                     }
@@ -485,6 +485,43 @@ namespace BTWebAppFrameWorkCore.Controllers
                        
             return PartialView("_HTMLTable", TempModel);
 
+        }
+        #endregion
+
+        #region App user reset section
+        //
+        // GET: /Account/Login
+        [AllowAnonymous]
+        public async Task<IActionResult> ResetUserPass(string id)
+        {
+            BaseViewModel VModel = null;
+            var model = new UserResetVM
+            {
+                UserResetContext = id,
+                Password = "",
+                ConfirmPassword = ""
+            };
+            VModel = await GetViewModel(model);            
+            return View(VModel);            
+        }
+
+        //
+        // POST: /Account/Login
+        [HttpPost]
+        [AllowAnonymous]
+        [ValidateAntiForgeryToken]
+        public async Task<JsonResult> ResetUserPass(UserResetVM model)
+        {            
+            if (ModelState.IsValid)
+            {
+                var result = await _AppUserService.ResetUserPassAsync(model).ConfigureAwait(false);
+
+                return Json(new { stat = result.Stat, msg = result.StatusMsg });
+            }
+            else
+            {
+                return Json(new { stat = false, msg = "Invalid Password reset data" });
+            }
         }
         #endregion
     }

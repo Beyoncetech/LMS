@@ -1,0 +1,110 @@
+﻿@using AppModel.ViewModel
+@model UserResetVM
+@{
+    ViewData["PageTitle"] = "ResetUserPass";
+    Layout = "~/Views/Shared/_LayoutAuth.cshtml";
+}
+
+<div class="hold-transition login-page">
+    <div class="login-box">
+        <div class="login-logo">
+            <!-- /.info-box -->
+            <div class="info-box mb-3 bg-info">
+                @*<span class="info-box-icon"><i class="far fa-comment"></i></span>*@
+
+                <div class="info-box-content">
+                    <span class="info-box-number">@Model.ProjectName</span>
+                    <span class="info-box-text" style="font-size:large">( Beyoncetech Solutions )</span>
+                </div>
+                <!-- /.info-box-content -->
+            </div>
+            @*<a href="beyoncetechsolutions.com"><b>Beyoncetech</b>Solutions</a>*@
+        </div>
+        <!-- /.login-logo -->
+        <div class="card">
+            <div class="card-body login-card-body">
+                <p class="login-box-msg">Reset Password</p>
+
+                <form id="frmResetPass" asp-area="" asp-action="ResetUserPass" asp-controller="Account" data-ajax="true" data-ajax-method="post" data-ajax-begin="onBeforeSubmit" data-ajax-success="onSuccess">
+                    <div style="padding-bottom:15px;">
+                        <div class="input-group mb-3" style="height:20px;">
+                            <input type="password" name="Password" asp-for="Password" class="form-control" placeholder="New Password" />
+                            <div class="input-group-append">
+                                <div class="input-group-text">
+                                    <span class="fas fa-lock"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <span asp-validation-for="Password" class="text-danger" style="font-size:small"></span>
+                    </div>
+                    <div style="padding-bottom:15px;">
+                        <div class="input-group mb-3" style="height:20px;">
+                            <input type="password" name="ConfirmPassword" asp-for="ConfirmPassword" class="form-control" placeholder="Confirm Password" />
+                            <div class="input-group-append">
+                                <div class="input-group-text">
+                                    <span class="fas fa-lock"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <span asp-validation-for="ConfirmPassword" class="text-danger" style="font-size:small"></span>
+                    </div>
+
+                    <div class="row">                        
+                        <!-- /.col -->
+                        <div class="col-12">
+                            @Html.HiddenFor(model => model.UserResetContext)
+                            <input type="submit" class="btn btn-primary btn-block" value="Reset Password" id="btnResetPass" />
+                        </div>
+                        <!-- /.col -->
+                    </div>
+                </form>
+                <p class="login-box-msg">
+                    <span id="ResetErrMsg" class="badge badge-light"></span>
+                </p>
+            </div>
+            <!-- /.login-card-body -->
+        </div>
+    </div>
+    <!-- /.login-box -->
+</div>
+@section Scripts {
+    <script src="~/lib/jquery-ajax-unobtrusive/jquery.unobtrusive-ajax.js"></script>
+    <script type="text/javascript">
+        $(function () {
+            //$('#btnResetPass').click(function (e) {
+            //    e.preventDefault();
+            //    var isFormValid = $('#frmResetPass').valid();
+            //    if (isFormValid) {
+            //        $('#frmResetPass').submit();
+            //    }
+            //});
+        });
+
+        function onBeforeSubmit() {
+            debugger;
+            ShowAppLoader();
+            //$('#ResetErrMsg').text('')
+        }
+
+        function onSuccess(result, textStatus, jqXHR) {
+            debugger;
+            HideAppLoader();
+            //alert(result.msg)
+            if (result.stat) {
+                $('#ResetErrMsg').html('<a href="/Account/Login">Click here for Login</a>');
+                toastr.success(result.msg)
+            } else {
+                toastr.error(result.msg)
+                //$('#ResetErrMsg').text('')
+            }
+
+        }
+
+        onFail = function (xhr) {
+            debugger;
+            alert(`Hi ${xhr.responseText}!`);
+            HideAppLoader();
+        };
+    </script>
+}
+
