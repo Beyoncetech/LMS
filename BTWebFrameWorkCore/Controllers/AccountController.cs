@@ -487,5 +487,42 @@ namespace BTWebAppFrameWorkCore.Controllers
 
         }
         #endregion
+
+        #region App user reset section
+        //
+        // GET: /Account/Login
+        [AllowAnonymous]
+        public async Task<IActionResult> ResetUserPass(string id)
+        {
+            BaseViewModel VModel = null;
+            var model = new UserResetVM
+            {
+                UserResetContext = id,
+                Password = "",
+                ConfirmPassword = ""
+            };
+            VModel = await GetViewModel(model);            
+            return View(VModel);            
+        }
+
+        //
+        // POST: /Account/Login
+        [HttpPost]
+        [AllowAnonymous]
+        [ValidateAntiForgeryToken]
+        public async Task<JsonResult> ResetUserPass(UserResetVM model)
+        {            
+            if (ModelState.IsValid)
+            {
+                var result = await _AppUserService.ResetUserPassAsync(model).ConfigureAwait(false);
+
+                return Json(new { stat = result.Stat, msg = result.StatusMsg });
+            }
+            else
+            {
+                return Json(new { stat = false, msg = "Invalid Password reset data" });
+            }
+        }
+        #endregion
     }
 }

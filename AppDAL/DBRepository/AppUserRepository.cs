@@ -17,6 +17,7 @@ namespace AppDAL.DBRepository
         Task<int> Insert(Appuser entity);
         Task<bool> FindOtherSameUserID(long ID, string UserID);
         Task<bool> Delete(long ID);
+        Task<Appuser> GetUserByPassResetContext(string PassResetContext);
     }
     public class AppUserRepository : IAppUserRepository
     {
@@ -83,6 +84,12 @@ namespace AppDAL.DBRepository
             else
                 return false;
 
+        }
+        public async Task<Appuser> GetUserByPassResetContext(string PassResetContext)
+        {
+            var oUser = await _DBContext.Appuser.Where(x => x.ResetPassContext.Equals(PassResetContext) && x.IsPassReset == 1).FirstOrDefaultAsync();
+
+            return oUser;
         }
     }
 }

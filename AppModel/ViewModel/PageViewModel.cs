@@ -95,4 +95,21 @@ namespace AppModel.ViewModel
         public string UserImgPath { get; set; }
         public FileUploadInfo AttachUserImage { get; set; }
     }
+
+    public class UserResetVM : BaseViewModel
+    {
+        [Required]
+        [Display(Name = "User Context")]
+        public string UserResetContext { get; set; }
+
+        [Required]
+        [Display(Name = "Password")]
+        public string Password { get; set; }
+
+        [Required]
+        [Display(Name = "Confirm Password")]
+        [Compare("Password", ErrorMessage = "Confirm Password does not matched")]
+        public string ConfirmPassword { get; set; }
+        public string ErrMsg { get; set; }
+    }
 }

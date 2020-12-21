@@ -21,6 +21,7 @@ namespace AppBAL.Sevices.Master
         Task<AppUserVM> GetAppUserByID(int Id);
         Task<CommonResponce> SaveAppUserAsync(AppUserVM oModel, string ResetContext, DateTime PasswordValidity);
         Task<CommonResponce> DeleteAppUser(long Id);
+        Task<CommonResponce> ResetUserPassAsync(UserResetVM oModel);
     }
     public class AppUserService : IAppUserService
     {
@@ -228,6 +229,48 @@ namespace AppBAL.Sevices.Master
             result.Stat = await _DBUserRepository.Delete(Id).ConfigureAwait(false);
             if (result.Stat)
                 result.StatusMsg = "Successfully deleted the user.";
+            return result;
+        }
+
+        public async Task<CommonResponce> ResetUserPassAsync(UserResetVM oModel)
+        {
+            CommonResponce result = new CommonResponce { Stat = false, StatusMsg = "" };
+            try
+            {
+                Appuser oUser = await _DBUserRepository.GetUserByPassResetContext(oModel.UserResetContext).ConfigureAwait(false);
+                if (oUser != null)
+                {
+                    if (oUser.ResetPassValidity < DateTime.Now)
+                    {
+                        result.StatusMsg = "Reset Password Link has expired";
+                    }
+                    else
+                    {
+                        if (oUser.IsActive == 1)
+                        {
+                            oUser.IsPassReset = 0;
+                            oUser.ResetPassContext = "";
+                            oUser.Password = _AppEncription.EncriptWithPrivateKey(oModel.Password);
+
+                            await _DBUserRepository.Update(oUser).ConfigureAwait(false);
+
+                            result.Stat = true;
+                            result.StatusMsg = "Successfully reset user Password";
+                        }
+                        else
+                            result.StatusMsg = "User not valid or expired";
+                    }
+                }
+                else
+                {
+                    result.StatusMsg = "Not a valid password reset link.";
+                }
+            }
+            catch (Exception)
+            {
+                result.StatusMsg = "Not a valid password reset link (ex).";
+            }
+                           
             return result;
         }
     }
