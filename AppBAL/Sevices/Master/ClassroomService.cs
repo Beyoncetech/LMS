@@ -5,12 +5,13 @@ using AppDAL.DBRepository;
 using System.Threading.Tasks;
 using AutoMapper;
 using AppDAL.DBModels;
+using AppModel.BusinessModel.Master;
 
 namespace AppBAL.Sevices.Master
 {
     public interface IClassroomService
     {
-        Task<CommonResponce> GetAllClassrooms();
+        Task<List<ClassroomBM>> GetAllClassrooms(int RowCount, string AppRootPath);
         Task<CommonResponce> GetClassroomByClassroomId(int ClassroomID);
         Task<CommonResponce> GetClassroomByRefID(string RefID);
         Task<CommonResponce> GetClassroomBySubjectID(int SubjectID);
@@ -30,12 +31,34 @@ namespace AppBAL.Sevices.Master
             _mapper = mapper;
             _commonRepository = CommonRepository;
         }
-        public async Task<CommonResponce> GetAllClassrooms()
+
+        public async Task<List<ClassroomBM>> GetAllClassrooms(int RowCount, string AppRootPath)
         {
-            var AllClassrooms = await _DBClassroomRepository.GetAllClassrooms();
-            CommonResponce result = new CommonResponce { Stat = true, StatusMsg = "", StatusObj = AllClassrooms };
+            List<ClassroomBM> result = new List<ClassroomBM>();
+            var oClassroom = await _DBClassroomRepository.GetAllClassrooms(RowCount).ConfigureAwait(false);
+
+            if (oClassroom != null && oClassroom.Count > 0)
+            {
+                foreach (var item in oClassroom)
+                {
+                    result.Add(new ClassroomBM
+                    {
+                        Id = item.Id,                        
+                        Name = item.Name,
+                        RefId = item.RefId,
+                        Description = item.Description,
+                        Scheduler = item.Scheduler,
+                        SubjectId = item.SubjectId,
+                        StandardId = item.StandardId,
+                        Action = item.Id.ToString(),
+                        CreatedOn = item.CreatedOn,
+                        CreatedBy = item.CreatedBy
+                    });
+                };
+            }
             return result;
         }
+
         public async Task<CommonResponce> GetClassroomByClassroomId(int ClassroomID)
         {
             bool isValid = true;

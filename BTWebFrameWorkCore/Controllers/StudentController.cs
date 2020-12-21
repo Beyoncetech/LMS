@@ -1,16 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
-using System.Text;
-using System.Threading.Tasks;
-using AppBAL.Sevices;
+﻿using AppBAL.Sevices;
+using AppBAL.Sevices.AppCore;
 using AppBAL.Sevices.Master;
 using AppModel;
 using AppModel.BusinessModel.Master;
 using AppModel.ViewModel;
 using Microsoft.AspNetCore.Mvc;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace BTWebAppFrameWorkCore.Controllers
 {
@@ -19,12 +18,14 @@ namespace BTWebAppFrameWorkCore.Controllers
         private readonly IStudentService _StudentService;
         private readonly IStandardMasterService _StandardMasterService;
         private readonly IAppUserService _AppUserService;
+        private readonly IAppJobService _JobService;
 
-        public StudentController(IStudentService StudentService, IStandardMasterService StandardMasterService, IAppUserService AppUserService)
+        public StudentController(IStudentService StudentService, IStandardMasterService StandardMasterService, IAppUserService AppUserService,IAppJobService JobService)
         {
             _StudentService = StudentService;
             _StandardMasterService = StandardMasterService;
             _AppUserService = AppUserService;
+            _JobService = JobService;
         }
         #region STUDENT LIST      
         public async Task<IActionResult> Students()
@@ -104,7 +105,7 @@ namespace BTWebAppFrameWorkCore.Controllers
                 DateTime PassValidity = DateTime.Now.AddDays(1); //validity for 1 day
                 result = await _AppUserService.SaveAppUserAsync(oAppUserVM, ResetContext, PassValidity).ConfigureAwait(false);
                 if (!result.Stat)// user addition failed
-                    return Json(new { stat = false, msg = " Failed to add student Login ID." });
+                    return Json(new { stat = false, msg =result.StatusMsg});
                 else
                 {
                     model.LoginUserId = result.StatusObj;
@@ -129,6 +130,7 @@ namespace BTWebAppFrameWorkCore.Controllers
                         }
                         var CurrentUserInfo = GetLoginUserInfo();// get current user
                         await GetBaseService().AddActivity(ActivityType.Update, CurrentUserInfo.UserID, CurrentUserInfo.UserName, "Student Profile", "Inserted Student profile");
+                        await _JobService.AddNewUserCreateEmailJob(Convert.ToInt64(CurrentUserInfo.ID), model.Name, model.Email, GetBaseService().GetAppRootPath());
                         return Json(new { stat = true, msg = rtnMsg.ToString(), rtnUrl = "/Student/Students" });
                     }
                     else

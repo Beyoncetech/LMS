@@ -9,6 +9,7 @@ using AppModel.ViewModel;
 using Microsoft.AspNetCore.Mvc;
 using System.Text;
 using System.IO;
+using AppBAL.Sevices.AppCore;
 
 namespace BTWebAppFrameWorkCore.Controllers
 {
@@ -16,10 +17,12 @@ namespace BTWebAppFrameWorkCore.Controllers
     {
         private readonly ITeacherService _TeacherService;
         private readonly IAppUserService _AppUserService;
-        public TeacherController(ITeacherService TeacherService,IAppUserService AppUserService)
+        private readonly IAppJobService _JobService;
+        public TeacherController(ITeacherService TeacherService,IAppUserService AppUserService,IAppJobService JobService)
         {
             _TeacherService = TeacherService;
             _AppUserService = AppUserService;
+            _JobService = JobService;
     }
 
         #region TEACHER LIST
@@ -95,10 +98,9 @@ namespace BTWebAppFrameWorkCore.Controllers
                 string ResetContext = Guid.NewGuid().ToString().Replace("-", "RP");
                 DateTime PassValidity = DateTime.Now.AddDays(1); //validity for 1 day
                 result = await _AppUserService.SaveAppUserAsync(oAppUserVM, ResetContext, PassValidity).ConfigureAwait(false);
-
                 if (result.Stat == false)
                 {
-                    return Json(new { stat = false, msg = "Failed to add Teacher Login ID." });
+                    return Json(new { stat = false, msg = result.StatusMsg });
                 }
                 else
                 {
@@ -122,9 +124,10 @@ namespace BTWebAppFrameWorkCore.Controllers
                                     model.BUserImgPath = model.TeacherImgPath; // update the Teacher avatar
                                 }
                             }
-                            var CurrentUserInfo = GetLoginUserInfo();
-                            await GetBaseService().AddActivity(ActivityType.Update, CurrentUserInfo.UserID, CurrentUserInfo.UserName, "Teacher Profile", "Inserted Teacher profile");
                         }
+                        var CurrentUserInfo = GetLoginUserInfo();
+                        await GetBaseService().AddActivity(ActivityType.Update, CurrentUserInfo.UserID, CurrentUserInfo.UserName, "Teacher Profile", "Inserted Teacher profile");
+                        await _JobService.AddNewUserCreateEmailJob(Convert.ToInt64(CurrentUserInfo.ID), model.Name, model.Email, GetBaseService().GetAppRootPath());
                         return Json(new { stat = true, msg = rtnMsg.ToString(), rtnUrl = "/Teacher/Teachers" });
                     }
                 }

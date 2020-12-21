@@ -1,0 +1,91 @@
+﻿@using AppModel.ViewModel
+@model ClassroomVM
+@{
+    ViewData["PageTitle"] = "Classrooms";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row" style="margin-bottom:7px;">
+    <div class="col-md-12">
+        <button class="btn btn-primary" onclick="AddNewPage()"><i class="fa fa-user-plus"></i> New Classroom</button>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-12">
+        <div id="ClassroomList" class="card card-primary" style="padding:10px;">
+            <!-- /.card-header -->
+            <!-- form start -->
+            @await Html.PartialAsync("_HTMLTable", Model.ClassroomInfo)
+        </div>
+        <!-- /.card -->
+    </div>
+</div>
+
+@section Scripts {
+    @*<script src="~/lib/jquery-ajax-unobtrusive/jquery.unobtrusive-ajax.js"></script>*@
+    <script type="text/javascript">
+
+        $(function () {
+            $("#appHtmlGrid1").DataTable({
+                "responsive": true,
+                "autoWidth": false,
+            });
+        });
+        function AddNewPage()
+        {
+            var url = "/Classroom/AddClassroom";
+            location.href = url;
+        }
+
+        function Action1Click(data) {
+           
+            var url = "/Classroom/UpdateClassroom?Id=" + data;            
+            location.href = url;                           
+        }
+        function Action2Click(data) {
+            ezBSAlert({
+                type: "confirm",
+                messageText: "Do you want to delete the Classroom ?",
+                alertType: "info"
+            }).done(function (flag) {
+                if (flag) {
+                    ShowAppLoader();
+                    var postParam = { SubjectId: data };
+                    AppCommonAjaxPost('/Classroom/DeleteClassroom', postParam, onDelSuccess, onDelFail);
+                }
+            });
+            //alert(data)
+        }
+
+        function onDelSuccess(result, textStatus, jqXHR) {
+            HideAppLoader();
+            //alert(result.msg)
+            if (result.stat) {
+                toastr.success(result.msg)
+                //refresh the user grid  
+                ShowAppLoader();
+                AppCommonAjaxPostPartial('/Classroom/ReloadClassrooms', null, onUserLoadSuccess, onUserLoadFail)
+            } else {
+                toastr.error(result.msg)
+            }
+        }
+
+        function onDelFail(xhr) {
+            toastr.error(xhr.responseText)
+            //alert(`Hi ${xhr.responseText}!`);
+            HideAppLoader();
+        };
+        function onUserLoadSuccess(result) {
+            $('#SubjectList').html(result);
+            $("#appHtmlGrid1").DataTable({
+                "responsive": true,
+                "autoWidth": false,
+            });
+            HideAppLoader();
+        }
+        function onUserLoadFail(result) {
+            HideAppLoader();
+            toastr.error('Something wrong while deleting Classroom.')
+        }
+    </script>
+}

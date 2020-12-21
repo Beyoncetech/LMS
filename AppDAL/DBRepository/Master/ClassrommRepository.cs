@@ -8,7 +8,7 @@ namespace AppDAL.DBRepository
 {
     public interface IClassroomRepository
     {
-        Task<List<Tblmclassroom>> GetAllClassrooms();
+        Task<List<Tblmclassroom>> GetAllClassrooms(int RowCount);
         Task<Tblmclassroom> GetClassroomByClassroomId(int ClassroomID);
         Task<Tblmclassroom> GetClassroomByRefID(string RefID);
         Task<List<Tblmclassroom>> GetClassroomBySubjectID(int SubjectID);
@@ -21,9 +21,9 @@ namespace AppDAL.DBRepository
         {
             _DBContext = DBContext;
         }
-        public async Task<List<Tblmclassroom>> GetAllClassrooms()
+        public async Task<List<Tblmclassroom>> GetAllClassrooms(int RowCount)
         {
-            var result = await _DBContext.Tblmclassroom.ToListAsync();
+            var result = await _DBContext.Tblmclassroom.OrderBy(o => o.Name).Take(RowCount).ToListAsync();
             return result;
         }
         public async  Task<Tblmclassroom> GetClassroomByClassroomId(int ClassroomID)
