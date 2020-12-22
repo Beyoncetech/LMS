@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using AppBAL.Sevices.AppCore;
 using AppBAL.Sevices.Login;
 using AppBAL.Sevices.Master;
+using AppDAL.DBModels;
 using AppModel;
 using AppModel.ViewModel;
 using AppUtility.AppEncription;
@@ -482,7 +483,7 @@ namespace BTWebAppFrameWorkCore.Controllers
 
             var TempModel = new AppGridModel<AppUserBM>();
             TempModel.Rows = result;
-                       
+
             return PartialView("_HTMLTable", TempModel);
 
         }
@@ -501,8 +502,8 @@ namespace BTWebAppFrameWorkCore.Controllers
                 Password = "",
                 ConfirmPassword = ""
             };
-            VModel = await GetViewModel(model);            
-            return View(VModel);            
+            VModel = await GetViewModel(model);
+            return View(VModel);
         }
 
         //
@@ -511,7 +512,7 @@ namespace BTWebAppFrameWorkCore.Controllers
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
         public async Task<JsonResult> ResetUserPass(UserResetVM model)
-        {            
+        {
             if (ModelState.IsValid)
             {
                 var result = await _AppUserService.ResetUserPassAsync(model).ConfigureAwait(false);
@@ -522,6 +523,24 @@ namespace BTWebAppFrameWorkCore.Controllers
             {
                 return Json(new { stat = false, msg = "Invalid Password reset data" });
             }
+        }
+
+        [HttpPost]
+        public async Task<JsonResult> ResetUserPassByAdmin(long id)
+        {
+            string ResetContext = Guid.NewGuid().ToString().Replace("-", "RP");
+            DateTime PassValidity = DateTime.Now.AddDays(1); //validity for 1 day
+            var result = await _AppUserService.ResetUserPassByAdminAsync(id, ResetContext, PassValidity).ConfigureAwait(false);
+
+            if (result.Stat)
+            {
+                var oLoginUser = GetLoginUserInfo();
+                Appuser oUser = (Appuser)result.StatusObj;
+                await _JobService.UserPassResetEmailJob(Convert.ToInt64(oLoginUser.ID), oUser.Name, oUser.Email, GetAppRootUrl());
+                return Json(new { stat = true, msg = "Successfully reset user password" });
+            }
+            else
+                return Json(new { stat = false, msg = result.StatusMsg });
         }
         #endregion
     }

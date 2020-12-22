@@ -22,6 +22,7 @@ namespace AppBAL.Sevices.Master
         Task<CommonResponce> SaveAppUserAsync(AppUserVM oModel, string ResetContext, DateTime PasswordValidity);
         Task<CommonResponce> DeleteAppUser(long Id);
         Task<CommonResponce> ResetUserPassAsync(UserResetVM oModel);
+        Task<CommonResponce> ResetUserPassByAdminAsync(long UID, string ResetContext, DateTime PasswordValidity);
     }
     public class AppUserService : IAppUserService
     {
@@ -271,6 +272,29 @@ namespace AppBAL.Sevices.Master
                 result.StatusMsg = "Not a valid password reset link (ex).";
             }
                            
+            return result;
+        }
+
+        public async Task<CommonResponce> ResetUserPassByAdminAsync(long UID, string ResetContext, DateTime PasswordValidity)
+        {
+            CommonResponce result = new CommonResponce { Stat = false, StatusMsg = "" };
+            Appuser oUser = await _DBUserRepository.GetUserByID(UID).ConfigureAwait(false);
+            if (oUser != null)
+            {                
+                oUser.IsPassReset = 1;
+                oUser.ResetPassContext = ResetContext;
+                oUser.ResetPassValidity = PasswordValidity;                
+
+                await _DBUserRepository.Update(oUser).ConfigureAwait(false);
+                result.Stat = true;
+                result.StatusMsg = "Successfully reset User password";
+                result.StatusObj = oUser;
+            }
+            else
+            {
+                result.StatusMsg = "Not a valid User";
+            }
+                
             return result;
         }
     }

@@ -55,6 +55,20 @@
                     });            
             //alert(data)
         }
+        function Action3Click(data) {            
+            ezBSAlert({
+                        type: "confirm",
+                        messageText: "Do you want to reset user password ?",
+                        alertType: "info"
+                    }).done(function (flag) {                        
+                        if (flag) {
+                            ShowAppLoader();
+                            var postParam = { id: data };
+                            AppCommonAjaxPost('/Account/ResetUserPassByAdmin', postParam, onResetSuccess, onResetFail);
+                        }
+                    });            
+            //alert(data)
+        }
 
         function onDelSuccess(result, textStatus, jqXHR) {           
             HideAppLoader();
@@ -85,5 +99,22 @@
             HideAppLoader();
             toastr.error('Something wrong while deleting user.')
         }
+
+        function onResetSuccess(result, textStatus, jqXHR) {           
+            HideAppLoader();
+            //alert(result.msg)
+            if (result.stat) {                
+                toastr.success(result.msg)                
+            } else {
+                toastr.error(result.msg)
+            }
+
+        }
+
+        function onResetFail(xhr) { 
+            toastr.error(xhr.responseText)
+            //alert(`Hi ${xhr.responseText}!`);
+            HideAppLoader();
+        };
     </script>
 }

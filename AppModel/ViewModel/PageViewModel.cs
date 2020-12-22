@@ -112,4 +112,13 @@ namespace AppModel.ViewModel
         public string ConfirmPassword { get; set; }
         public string ErrMsg { get; set; }
     }
+
+    public class AppErrorVM : BaseViewModel
+    {        
+        public string ErrorCode { get; set; }
+        public string ErrorMessage { get; set; }
+        public string ErrorDescription { get; set; }
+        public string TrackTrace { get; set; }
+        public string ErrorSource { get; set; }
+    }
 }

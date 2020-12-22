@@ -15,6 +15,7 @@ namespace AppBAL.Sevices.AppCore
     {
         Task AddJobOnQueue(AppJobBM oJob);
         Task AddNewUserCreateEmailJob(long UserID, string UserName, string UserEmail, string AppRoot);
+        Task UserPassResetEmailJob(long UserID, string UserName, string UserEmail, string AppRoot);
     }
     public class AppJobService : IAppJobService
     {
@@ -65,6 +66,32 @@ namespace AppBAL.Sevices.AppCore
                 Status = 0,
                 CreatedOn = DateTime.Now,
                 CreatedBy = UserID,                
+                ValidFrom = DateTime.Now,
+                ValidTo = DateTime.Now.AddDays(1)
+            };
+
+            await _DBRepository.Insert(DBJob).ConfigureAwait(false);
+        }
+
+        public async Task UserPassResetEmailJob(long UserID, string UserName, string UserEmail, string AppRoot)
+        {
+            string ResetContext = Guid.NewGuid().ToString().Replace("-", ""); //store the reset context ID
+            ScheduleEmailInfoBM result = new ScheduleEmailInfoBM();
+            result.To = new string[] { UserEmail };
+            result.Subject = string.Format("User: [{0}] login password has been reseted.", UserName);
+            string TempContext = string.Format("{0}/Account/ResetUserPass/{1}", AppRoot, ResetContext);
+            string CompLogoLink = string.Format("{0}/img/Comp_logo.png", AppRoot);
+            result.MailBody = _MailTemplate.UserPassResetTemplate(UserName, CompLogoLink, TempContext, "Beyoncetech Team", "1 day");
+
+            Mjob DBJob = new Mjob
+            {
+                Command = "ScheduleMail",
+                CommandData = result.ToXMLString(),
+                RefNo = Guid.NewGuid().ToString(),
+                Priority = "1",
+                Status = 0,
+                CreatedOn = DateTime.Now,
+                CreatedBy = UserID,
                 ValidFrom = DateTime.Now,
                 ValidTo = DateTime.Now.AddDays(1)
             };
