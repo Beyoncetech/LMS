@@ -58,9 +58,13 @@ namespace AppBAL.SchedularJobs
                             var MailInfo = item.CommandData.XMLStringToObject<ScheduleEmailInfoBM>();
 
                             var message = new EmailMessage(MailInfo.To, MailInfo.Subject, MailInfo.MailBody, true, null);
-                            await _EmailSender.SendEmailAsync(message);
+                            var Result = await _EmailSender.SendEmailAsync(message);
 
-                            item.Status = 1;
+                            if (Result == 1)
+                                item.Status = 1;
+                            else
+                                item.Status = -1;
+                            
                             item.FinishedOn = CurTimeStamp;                            
 
                             await _DBRepository.Update(item).ConfigureAwait(false);

@@ -14,7 +14,7 @@ namespace AppBAL.Sevices.AppCore
     {
         void InitDBContext();
         void SendEmail(EmailMessage message);
-        Task SendEmailAsync(EmailMessage message);
+        Task<int> SendEmailAsync(EmailMessage message);
         void SetEmailConfigFromDB();
         string GetLastError();
     }
@@ -73,8 +73,7 @@ namespace AppBAL.Sevices.AppCore
         }
 
         private void Send(MimeMessage mailMessage)
-        {
-            ErrMsg = string.Empty;
+        {            
             using (var client = new SmtpClient())
             {
                 try
@@ -99,9 +98,9 @@ namespace AppBAL.Sevices.AppCore
             }
         }
 
-        private async Task SendAsync(MimeMessage mailMessage)
+        private async Task<int> SendAsync(MimeMessage mailMessage)
         {
-            ErrMsg = string.Empty;
+            int Result = 0;
             using (var client = new SmtpClient())
             {
                 try
@@ -111,10 +110,12 @@ namespace AppBAL.Sevices.AppCore
                     await client.AuthenticateAsync(_emailConfig.UserName, _emailConfig.Password);
 
                     await client.SendAsync(mailMessage);
+                    Result = 1;
                 }
                 catch (Exception ex)
                 {
                     ErrMsg = ex.Message;
+                    Result = -1;
                     //log an error message or throw an exception, or both.
                     //throw;
                 }
@@ -124,6 +125,7 @@ namespace AppBAL.Sevices.AppCore
                     client.Dispose();
                 }
             }
+            return Result;
         }
 
         public void SendEmail(EmailMessage message)
@@ -133,11 +135,13 @@ namespace AppBAL.Sevices.AppCore
             Send(emailMessage);
         }
 
-        public async Task SendEmailAsync(EmailMessage message)
+        public async Task<int> SendEmailAsync(EmailMessage message)
         {
             var mailMessage = CreateEmailMessage(message);
 
-            await SendAsync(mailMessage);
+            var Result = await SendAsync(mailMessage);
+
+            return Result;
         }
 
         public string GetLastError()
