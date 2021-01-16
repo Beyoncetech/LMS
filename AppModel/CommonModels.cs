@@ -86,4 +86,11 @@ namespace AppModel
         public string UserPerm { get; set; }
         public string UserGender { get; set; }
     }
+
+    public class AppSelectListItem
+    {        
+        public string Value { get; set; }
+        public string Text { get; set; }        
+    }
+    
 }

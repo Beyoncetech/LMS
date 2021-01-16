@@ -25,7 +25,7 @@ namespace BTWebAppFrameWorkCore.Controllers
 
         public async Task<IActionResult> Index()
         {
-            throw new Exception("this is demo exception");
+            //throw new Exception("this is demo exception");
             CreateBreadCrumb(new[] {new { Name = "Home", ActionUrl = "#" } , 
                                     new { Name = "Dashboard", ActionUrl = "#" } });
             var VModel = await GetViewModel<CommonVM>();
@@ -80,6 +80,7 @@ namespace BTWebAppFrameWorkCore.Controllers
             var VModel = await GetViewModel<CommonVM>();
             return View(VModel);
         }
+                
 
         public IActionResult OurServices()
         {

@@ -1,0 +1,313 @@
+﻿@using AppModel.ViewModel
+@model ClassRoomDetailsVM
+@{
+    ViewData["PageTitle"] = "ClassRoom";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    List<SelectListItem> FrequencyTypes = new List<SelectListItem>
+{
+        new SelectListItem { Value = "daily", Text = "Daily" },
+        new SelectListItem { Value = "weekly", Text = "Weekly" },
+        new SelectListItem { Value = "monthly", Text = "Monthly"  }
+    };
+
+    List<SelectListItem> WeekNames = new List<SelectListItem>
+{
+        new SelectListItem { Value = "sun", Text = "Sunday" },
+        new SelectListItem { Value = "mon", Text = "Monday" },
+        new SelectListItem { Value = "tue", Text = "Tuesday"  },
+        new SelectListItem { Value = "wed", Text = "Wednesday"  },
+        new SelectListItem { Value = "thu", Text = "Thrusday"  },
+        new SelectListItem { Value = "fri", Text = "Friday"  },
+        new SelectListItem { Value = "sat", Text = "Saturday"  }
+    };
+
+    List<SelectListItem> MonthNames = new List<SelectListItem>
+{
+        new SelectListItem { Value = "jan", Text = "January" },
+        new SelectListItem { Value = "feb", Text = "February" },
+        new SelectListItem { Value = "mar", Text = "March"  },
+        new SelectListItem { Value = "apr", Text = "April"  },
+        new SelectListItem { Value = "may", Text = "May"  },
+        new SelectListItem { Value = "jun", Text = "Jun"  },
+        new SelectListItem { Value = "jul", Text = "July"  },
+        new SelectListItem { Value = "aug", Text = "August"  },
+        new SelectListItem { Value = "sep", Text = "September"  },
+        new SelectListItem { Value = "oct", Text = "October"  },
+        new SelectListItem { Value = "nov", Text = "November"  },
+        new SelectListItem { Value = "dec", Text = "December"  }
+    };
+}
+
+<div class="row">
+    <div class="col-md-12">
+        <!-- classroom EXAMPLE -->
+        <form id="frmClassRoom" asp-area="" asp-action="Classroom" asp-controller="Classroom" data-ajax="true" data-ajax-method="post" data-ajax-begin="onBeforeSubmit" data-ajax-success="onSuccess">
+            <div class="card card-default">
+                <div class="card-header">
+                    <h3 class="card-title">Class Room Details</h3>
+
+                    <div class="card-tools">
+                        <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i></button>
+                        @*<button type="button" class="btn btn-tool" data-card-widget="remove"><i class="fas fa-times"></i></button>*@
+                    </div>
+                </div>
+                <!-- /.card-header -->
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Reference ID</label>
+                                <input type="text" name="RefId" asp-for="RefId" class="form-control" placeholder="Reference Number" />
+                                <span asp-validation-for="RefId" class="text-danger" style="font-size:small"></span>
+                            </div>
+                            <div class="form-group">
+                                <label>Classroom Name</label>
+                                <input type="text" name="Name" asp-for="Name" class="form-control" placeholder="Class Room Name" />
+                                <span asp-validation-for="Name" class="text-danger" style="font-size:small"></span>
+                            </div>
+                            <div class="form-group">
+                                <label>Description</label>
+                                <input type="text" name="Description" asp-for="Description" class="form-control" placeholder="Description" />
+                                <span asp-validation-for="Description" class="text-danger" style="font-size:small"></span>
+                            </div>
+                            <div class="form-group">
+                                <label>Subject</label>
+                                <select name="SubjectId" asp-for="SubjectId" asp-items="@(new SelectList(Model.Subjects, "Value", "Text"))" class="form-control"></select>
+                                <span asp-validation-for="SubjectId" class="text-danger" style="font-size:small"></span>
+                            </div>
+                            <div class="form-group">
+                                <label>Standard</label>
+                                <select name="StandardId" asp-for="StandardId" asp-items="@(new SelectList(Model.Standards, "Value", "Text"))" class="form-control"></select>
+                                <span asp-validation-for="StandardId" class="text-danger" style="font-size:small"></span>
+                            </div>
+                            <div class="form-group">
+                                <label>Activate Classroom before</label>
+                                <input type="text" name="ClassActivationThreshold" asp-for="ClassActivationThreshold" class="form-control" placeholder="Activation threshold time in minutes" />
+                                <span asp-validation-for="ClassActivationThreshold" class="text-danger" style="font-size:small"></span>
+                            </div>
+                            <div class="card card-outline card-primary">
+                                <div class="card-header">
+                                    <h4 class="card-title">Class schedule Pattern</h4>
+                                </div>
+                                <div class="card-body">
+                                    <div class="form-group">
+                                        <label>Frequency</label>
+                                        <select id="Frequency_Type" name="Scheduler.FrequencyType" asp-for="Scheduler.FrequencyType" asp-items="@FrequencyTypes" class="form-control"></select>
+                                        <span asp-validation-for="Scheduler.FrequencyType" class="text-danger" style="font-size:small"></span>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Days of Week</label>
+                                        <select id="days_Of_Week" class="select2bs4" multiple="multiple" data-placeholder="Select week days" name="Scheduler.DaysOFWeek" asp-for="Scheduler.DaysOFWeek" asp-items="@WeekNames" style="width: 100%;"></select>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-2">
+                                            <div class="form-group">
+                                                <label>Day of Month</label>
+                                                <input id="day_Of_Month" type="text" name="Scheduler.Day" asp-for="Scheduler.Day" class="form-control" placeholder="Day of Month" />
+                                                <span asp-validation-for="Scheduler.Day" class="text-danger" style="font-size:small"></span>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-10">
+                                            <div class="form-group">
+                                                <label>Month of Year</label>
+                                                <select id="month_Names" class="select2bs4" multiple="multiple" data-placeholder="Select month" name="Scheduler.MonthsName" asp-for="Scheduler.MonthsName" asp-items="@MonthNames" style="width: 100%;"></select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card-header">
+                                    <h4 class="card-title">Class schedule Range</h4>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label>Start Time</label>
+                                                <div class="input-group date" id="starttimepicker" data-target-input="nearest">
+                                                    <input type="text" name="Scheduler.StartTime" asp-for="Scheduler.StartTime" class="form-control datetimepicker-input" data-target="#starttimepicker" />
+                                                    <div class="input-group-append" data-target="#starttimepicker" data-toggle="datetimepicker">
+                                                        <div class="input-group-text"><i class="far fa-clock"></i></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label>Start Date</label>
+                                                <div class="input-group date" id="Start_dt" data-target-input="nearest">
+                                                    <input type="text" name="Scheduler.StartDate" asp-for="Scheduler.StartDate" class="form-control datetimepicker-input" data-target="#Start_dt" />
+                                                    <div class="input-group-append" data-target="#Start_dt" data-toggle="datetimepicker">
+                                                        <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label>Start Time</label>
+                                                <div class="input-group date" id="endtimepicker" data-target-input="nearest">
+                                                    <input type="text" name="Scheduler.EndTime" asp-for="Scheduler.EndTime" class="form-control datetimepicker-input" data-target="#endtimepicker" />
+                                                    <div class="input-group-append" data-target="#endtimepicker" data-toggle="datetimepicker">
+                                                        <div class="input-group-text"><i class="far fa-clock"></i></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label>End Date</label>
+                                                <div class="input-group date" id="end_dt" data-target-input="nearest">
+                                                    <input type="text" name="Scheduler.EndDate" asp-for="Scheduler.EndDate" class="form-control datetimepicker-input" data-target="#end_dt" />
+                                                    <div class="input-group-append" data-target="#end_dt" data-toggle="datetimepicker">
+                                                        <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- /.col -->
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Multiple</label>
+                                <select class="select2bs4" multiple="multiple" data-placeholder="Select a State"
+                                        style="width: 100%;">
+
+                                    <option>Alaska</option>
+                                    <option>California</option>
+                                    <option>Delaware</option>
+                                    <option>Tennessee</option>
+                                    <option>Texas</option>
+                                    <option>Washington</option>
+                                </select>
+                            </div>
+                            <!-- /.form-group -->
+                            <div class="form-group">
+                                <label>Disabled Result</label>
+                                <select class="form-control select2bs4" style="width: 100%;">
+                                    <option selected="selected">Alabama</option>
+                                    <option>Alaska</option>
+                                    <option disabled="disabled">California (disabled)</option>
+                                    <option>Delaware</option>
+                                    <option>Tennessee</option>
+                                    <option>Texas</option>
+                                    <option>Washington</option>
+                                </select>
+                            </div>
+                            <!-- /.form-group -->
+                        </div>
+                        <!-- /.col -->
+                    </div>
+                    <!-- /.row -->
+                </div>
+                <!-- /.card-body -->
+                <div class="card-footer">
+                    <span onclick="location.href='@Url.Action("AppUsers", "Account")'" class="btn btn-primary"><i class="fa fa-arrow-left"></i> Back</span>
+                    <input type="submit" class="btn btn-success float-right" value="Save" id="btnClassroomSave" />
+                </div>
+            </div>
+            <!-- /.card -->
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @*<script src="~/lib/jquery-ajax-unobtrusive/jquery.unobtrusive-ajax.js"></script>*@
+    <script type="text/javascript">
+
+        $(function () {
+            //Initialize Select2 Elements
+            $('.select2bs4').select2({
+                theme: 'bootstrap4'
+            })
+
+            $('#Start_dt').datetimepicker({
+                format: 'DD/MM/YYYY'
+            });
+
+            $('#end_dt').datetimepicker({
+                format: 'DD/MM/YYYY'
+            });
+
+            //Timepicker
+            $('#starttimepicker').datetimepicker({
+                format: 'LT'
+            });
+            $('#endtimepicker').datetimepicker({
+                format: 'LT'
+            });
+
+            $('#Frequency_Type').on('change', function () {
+                //alert(this.value);
+                EnableDisablePatternControl(this.value);
+            });
+
+            var FrqType = $('#Frequency_Type').find(":selected").val();
+            EnableDisablePatternControl(FrqType);
+
+
+            $('#btnClassroomSave').click(function (e) {
+                e.preventDefault();
+                var isFormValid = $('#frmClassRoom').valid();
+                if (isFormValid) {
+                    ezBSAlert({
+                        type: "confirm",
+                        messageText: "Do you want to save the classroom details ?",
+                        alertType: "info"
+                    }).done(function (flag) {
+                        if (flag) {
+                            $('#frmClassRoom').submit();
+                        }
+                    });
+                }
+            });
+        });
+
+        function EnableDisablePatternControl(frqType) {
+            switch (frqType) {
+                case 'daily':
+                    $('#days_Of_Week').prop('disabled', true);
+                    $('#day_Of_Month').prop('disabled', true);
+                    $('#month_Names').prop('disabled', true);
+                    break;
+                case 'weekly':
+                    $('#days_Of_Week').prop('disabled', false);
+                    $('#day_Of_Month').prop('disabled', true);
+                    $('#month_Names').prop('disabled', true);
+                    break;
+                case 'monthly':
+                    $('#days_Of_Week').prop('disabled', true);
+                    $('#day_Of_Month').prop('disabled', false);
+                    $('#month_Names').prop('disabled', false);
+                    break;
+                default:
+            }
+        }
+
+        function onBeforeSubmit() {
+            debugger;
+            ShowAppLoader();
+        }
+
+        function onSuccess(result, textStatus, jqXHR) {
+            debugger;
+            HideAppLoader();
+            //alert(result.msg)
+            if (result.stat) {
+                toastr.success(result.msg)
+                setTimeout(function () { window.location.href = "/Account/AppUsers"; }, 1000);
+            } else {
+                toastr.error(result.msg)
+            }
+
+        }
+
+        onFail = function (xhr) {
+            debugger;
+            alert(`Hi ${xhr.responseText}!`);
+            HideAppLoader();
+        };
+
+
+    </script>
+}
+

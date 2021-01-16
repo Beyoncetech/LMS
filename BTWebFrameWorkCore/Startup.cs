@@ -171,6 +171,7 @@ namespace BTWebAppFrameWorkCore
             services.AddScoped<IStandardMasterService, StandardMasterService>();
             services.AddScoped<ITeacherService, TeacherService>();
             services.AddScoped<ISubjectService, SubjectService>();
+            services.AddScoped<IClassroomService, ClassroomService>();
             #endregion
 
 
@@ -184,6 +185,7 @@ namespace BTWebAppFrameWorkCore
             services.AddScoped<IStandardMasterRepository, StandardMasterRepository>();
             services.AddScoped<ITeacherRepository, TeacherRepository>();
             services.AddScoped<ISubjectRepository, SubjectRepository>();
+            services.AddScoped<IClassroomRepository, ClassroomRepository>();
             #endregion
 
             #region Other Services

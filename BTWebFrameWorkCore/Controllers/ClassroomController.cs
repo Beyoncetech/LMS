@@ -7,6 +7,7 @@ using AppModel;
 using AppModel.BusinessModel.Master;
 using AppModel.ViewModel;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace BTWebAppFrameWorkCore.Controllers
 {
@@ -34,6 +35,39 @@ namespace BTWebAppFrameWorkCore.Controllers
             VModel = await GetViewModel(TempVModel);
 
             return View("~/Views/Master/Classrooms.cshtml", VModel);
+        }
+        #endregion LIST
+
+        #region classroom details
+        public async Task<IActionResult> ClassRoom(int id = 0)
+        {
+            CreateBreadCrumb(new[] {new { Name = "Home", ActionUrl = "#" },
+                                    new { Name = "Classroom", ActionUrl = "/Classroom/Classroom" } });
+
+            BaseViewModel VModel = null;
+
+            //var result = await _ClassroomService.GetAllClassrooms(500, GetBaseService().GetAppRootPath());
+
+            var TempVModel = new ClassRoomDetailsVM();
+            // get value from service layer
+            TempVModel.Subjects = new List<AppSelectListItem>
+            {
+                new AppSelectListItem { Value = "1", Text = "Math" },
+                new AppSelectListItem { Value = "2", Text = "Hindi" },
+                new AppSelectListItem { Value = "3", Text = "Biology"  },
+            };
+
+            TempVModel.Standards = new List<AppSelectListItem>
+            {
+                new AppSelectListItem { Value = "1", Text = "Class V" },
+                new AppSelectListItem { Value = "2", Text = "Class VI" },
+                new AppSelectListItem { Value = "3", Text = "XII"  },
+            };
+            TempVModel.Scheduler = new ClassSchedule();
+
+            VModel = await GetViewModel(TempVModel);
+
+            return View(VModel);
         }
         #endregion LIST
     }

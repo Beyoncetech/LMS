@@ -121,4 +121,5 @@ namespace AppModel.ViewModel
         public string TrackTrace { get; set; }
         public string ErrorSource { get; set; }
     }
+        
 }

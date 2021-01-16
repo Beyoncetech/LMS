@@ -14,10 +14,10 @@ namespace AppDAL.DBRepository
         Task<List<Tblmclassroom>> GetClassroomBySubjectID(int SubjectID);
         Task<List<Tblmclassroom>> GetClassroomByStandardID(int StandardID);
     }
-    public class ClassrommRepository:IClassroomRepository
+    public class ClassroomRepository:IClassroomRepository
     {
         private readonly AppDBContext _DBContext;
-        public ClassrommRepository(AppDBContext DBContext)
+        public ClassroomRepository(AppDBContext DBContext)
         {
             _DBContext = DBContext;
         }
