@@ -6,7 +6,7 @@ using System.Text;
 
 namespace AppModel.ViewModel
 {
-   public class ClassroomVM:BaseViewModel
+    public class ClassroomVM : BaseViewModel
     {
         public AppGridModel<ClassroomBM> ClassroomInfo { get; set; }
     }
@@ -17,29 +17,53 @@ namespace AppModel.ViewModel
         [Required(ErrorMessage = "Class reference Id is required")]
         public string RefId { get; set; }
         [Required]
-        public string Name { get; set; }        
+        public string Name { get; set; }
         public string Description { get; set; }
         [Required(ErrorMessage = "Select a Class subject is required")]
         public int SubjectId { get; set; }
         [Required(ErrorMessage = "Select a Class standard is required")]
-        public int StandardId { get; set; }        
+        public int StandardId { get; set; }
         public int? ClassActivationThreshold { get; set; }
         [Required(ErrorMessage = "Select a time schedule for the class")]
         public ClassSchedule Scheduler { get; set; }
 
         [Required(ErrorMessage = "Select a Teacher for Clas room")]
         public List<ClassTeacher> Teachers { get; set; }
+        public List<ClassTeacher> AllTeachers { get; set; }
 
         [Required(ErrorMessage = "Select student for Clas room")]
         public List<ClassStudent> Students { get; set; }
+        public List<ClassStudent> AllStudents { get; set; }
 
         public List<AppSelectListItem> Subjects { get; set; }
         public List<AppSelectListItem> Standards { get; set; }
+
+        // custom properties
+        public string[] TeacherSearch
+        {
+            get
+            {
+                if(AllTeachers != null && AllTeachers.Count > 0)
+                {
+                    string[] result = new string[AllTeachers.Count];
+                    for (int i = 0; i < AllTeachers.Count; i++)
+                    {
+                        result[i] = string.Format("{0} [{1}]",  AllTeachers[i].Name, AllTeachers[i].Id);
+                    }
+                    return result;
+                }
+                else
+                {
+                    string[] result = new string[1] {"No teacher data found"};
+                    return result;
+                }
+            }
+        }
     }
 
     public class ClassTeacher
     {
-        public int Id { get; set; }        
+        public string Id { get; set; }
         public string Name { get; set; }
         public string Quification { get; set; }
         public string Avatar { get; set; }
@@ -47,7 +71,7 @@ namespace AppModel.ViewModel
 
     public class ClassStudent
     {
-        public int Id { get; set; }
+        public string Id { get; set; }
         public string Name { get; set; }
         public string Standard { get; set; }
         public string Avatar { get; set; }

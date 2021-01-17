@@ -15,7 +15,7 @@ namespace AppBAL.Sevices.Master
     {
         Task<List<StudentBM>> GetAllStudents(int RowCount, string AppRootPath);        
         Task<CommonResponce> GetStudentByStudentId(int StudentID);
-        Task<CommonResponce> GetStudentByRegNo(int RegNo);
+        Task<CommonResponce> GetStudentByRegNo(string RegNo);
         Task<CommonResponce> GetStudentByEmailID(string EmailID);
         Task<CommonResponce> CheckDataValidation(StudentProfileVM StudentToInsert, bool IsAdd);
         Task<CommonResponce> InsertStudentProfile(StudentProfileVM StudentToInsert);
@@ -79,7 +79,7 @@ namespace AppBAL.Sevices.Master
             CommonResponce result = new CommonResponce { Stat = isValid, StatusMsg = (isValid ? "" : "Invalid Student Id"), StatusObj = StudentProfile };
             return result;           
         }
-        public async Task<CommonResponce> GetStudentByRegNo(int RegNo)
+        public async Task<CommonResponce> GetStudentByRegNo(string RegNo)
         {
             bool isValid = true;
             var oStudent = await _DBStudentRepository.GetStudentByRegNo(RegNo);

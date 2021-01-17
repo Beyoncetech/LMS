@@ -64,7 +64,20 @@ namespace BTWebAppFrameWorkCore.Controllers
                 new AppSelectListItem { Value = "3", Text = "XII"  },
             };
             TempVModel.Scheduler = new ClassSchedule();
-
+            TempVModel.AllTeachers = new List<ClassTeacher>
+            {
+                new ClassTeacher {Id = "111222", Name = "Rohit Sign", Quification = "M. Sc (CS)", Avatar = string.Format("~/AppFileRepo/UserAvatar/{0}.{1}?r={2}", "dd", "jpg", DateTime.Now.Ticks.ToString())},
+                new ClassTeacher {Id = "44445555", Name = "Kunal Sarma", Quification = "B. Sc (CS)", Avatar = string.Format("~/AppFileRepo/UserAvatar/{0}.{1}?r={2}", "dd", "jpg", DateTime.Now.Ticks.ToString())},
+                new ClassTeacher {Id = "777888", Name = "Kamal Das", Quification = "B com", Avatar = string.Format("~/AppFileRepo/UserAvatar/{0}.{1}?r={2}", "dd", "jpg", DateTime.Now.Ticks.ToString())},
+                new ClassTeacher {Id = "6666555", Name = "Molani Saw", Quification = "Math", Avatar = string.Format("~/AppFileRepo/UserAvatar/{0}.{1}?r={2}", "dd", "jpg", DateTime.Now.Ticks.ToString())},
+                new ClassTeacher {Id = "454545", Name = "Kanchan Paul", Quification = "English graduate", Avatar = string.Format("~/AppFileRepo/UserAvatar/{0}.{1}?r={2}", "dd", "jpg", DateTime.Now.Ticks.ToString())}
+            };
+            TempVModel.Teachers = new List<ClassTeacher>
+            {
+                new ClassTeacher {Id = "111222", Name = "Rohit Sign", Quification = "M. Sc (CS)", Avatar = string.Format("~/AppFileRepo/UserAvatar/{0}.{1}?r={2}", "dd", "jpg", DateTime.Now.Ticks.ToString())},                
+                new ClassTeacher {Id = "454545", Name = "Kanchan Paul", Quification = "English graduate", Avatar = string.Format("~/AppFileRepo/UserAvatar/{0}.{1}?r={2}", "dd", "jpg", DateTime.Now.Ticks.ToString())}
+            };
+            // end of service lyer
             VModel = await GetViewModel(TempVModel);
 
             return View(VModel);

@@ -300,10 +300,7 @@ namespace AppDAL.DBModels
                     .HasColumnName("ID")
                     .HasColumnType("int(11)");
 
-                entity.Property(e => e.CreatedBy)
-                    .HasColumnType("varchar(255)")
-                    .HasCharSet("latin1")
-                    .HasCollation("latin1_swedish_ci");
+                entity.Property(e => e.CreatedBy).HasColumnType("int(11)");
 
                 entity.Property(e => e.CreatedOn).HasColumnType("date");
 
@@ -344,6 +341,8 @@ namespace AppDAL.DBModels
                     .HasCharSet("latin1")
                     .HasCollation("latin1_swedish_ci");
 
+                entity.Property(e => e.LoginUserId).HasColumnType("bigint(20)");
+
                 entity.Property(e => e.Name)
                     .IsRequired()
                     .HasColumnType("varchar(50)")
@@ -351,7 +350,11 @@ namespace AppDAL.DBModels
                     .HasCharSet("latin1")
                     .HasCollation("latin1_swedish_ci");
 
-                entity.Property(e => e.RegNo).HasColumnType("int(11)");
+                entity.Property(e => e.RegNo)
+                    .IsRequired()
+                    .HasColumnType("varchar(25)")
+                    .HasCharSet("latin1")
+                    .HasCollation("latin1_swedish_ci");
 
                 entity.Property(e => e.StandardId)
                     .HasColumnName("StandardID")
@@ -414,9 +417,18 @@ namespace AppDAL.DBModels
                     .HasCharSet("latin1")
                     .HasCollation("latin1_swedish_ci");
 
+                entity.Property(e => e.LoginUserId).HasColumnType("bigint(20)");
+
                 entity.Property(e => e.Name)
                     .IsRequired()
                     .HasColumnType("varchar(50)")
+                    .HasDefaultValueSql("''")
+                    .HasCharSet("latin1")
+                    .HasCollation("latin1_swedish_ci");
+
+                entity.Property(e => e.RegNo)
+                    .IsRequired()
+                    .HasColumnType("varchar(25)")
                     .HasDefaultValueSql("''")
                     .HasCharSet("latin1")
                     .HasCollation("latin1_swedish_ci");

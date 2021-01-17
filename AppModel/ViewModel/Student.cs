@@ -15,9 +15,8 @@ namespace AppModel.ViewModel
         public int Id { get; set; }
         [Required(ErrorMessage = "Student Name cannot be blank")]
         public string Name { get; set; }
-        [Required(ErrorMessage = "Registration no. cannot be blank")]
-        [Range(1,int.MaxValue)]
-        public int RegNo { get; set; }
+        [Required(ErrorMessage = "Registration no. cannot be blank")]        
+        public string RegNo { get; set; }
         [Required(ErrorMessage = "Login Id cannot be blank")]
         public string LoginId { get; set; } // student user id for log in   
         public long LoginUserId { get; set; }

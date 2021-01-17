@@ -11,7 +11,7 @@ namespace AppModel.BusinessModel.Master
         [GridColumn(ColumnOrder = 1, HeaderText = "Name")]
         public string Name { get; set; }
         [GridColumn(ColumnOrder = 2, HeaderText = "Reg. No")]
-        public Int32 RegNo { get; set; }
+        public string RegNo { get; set; }
         [GridColumn(ColumnOrder = 3, HeaderText = "Address")]
         public string Address { get; set; }
         [GridColumn(ColumnOrder = 4, HeaderText = "Contact No")]

@@ -12,7 +12,7 @@ namespace AppDAL.DBRepository
     {
         Task<List<Tblmstudent>> GetAllStudents(int RowCount);
         Task<Tblmstudent> GetStudentByStudentId(int StudentID);
-        Task<Tblmstudent> GetStudentByRegNo(int RegNo);
+        Task<Tblmstudent> GetStudentByRegNo(string RegNo);
         Task<Tblmstudent> GetStudentByEmailID(string EmailID);        
     }
     public class StudentRepository:IStudentRepository
@@ -33,7 +33,7 @@ namespace AppDAL.DBRepository
             var oStudent = await _DBContext.Tblmstudent.Where(s => s.Id.Equals(StudentID)).FirstOrDefaultAsync();
             return oStudent;
         }
-        public async Task<Tblmstudent> GetStudentByRegNo(int RegNo)
+        public async Task<Tblmstudent> GetStudentByRegNo(string RegNo)
         {
             var oStudent = await _DBContext.Tblmstudent.Where(s => s.RegNo.Equals(RegNo)).FirstOrDefaultAsync();
             return oStudent;
