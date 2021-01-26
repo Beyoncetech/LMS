@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Text;
 
 namespace AppModel.ViewModel
@@ -27,18 +28,61 @@ namespace AppModel.ViewModel
         [Required(ErrorMessage = "Select a time schedule for the class")]
         public ClassSchedule Scheduler { get; set; }
 
-        [Required(ErrorMessage = "Select a Teacher for Clas room")]
-        public List<ClassTeacher> Teachers { get; set; }
-        public List<ClassTeacher> AllTeachers { get; set; }
+        [Required(ErrorMessage = "Select a Teacher for Clas room")]        
+        public string[] AsignTeacher { get; set; }
+        public List<ClassMemberInfo> AllTeachers { get; set; }
 
-        [Required(ErrorMessage = "Select student for Clas room")]
-        public List<ClassStudent> Students { get; set; }
-        public List<ClassStudent> AllStudents { get; set; }
+        [Required(ErrorMessage = "Select student for Clas room")]        
+        public string[] AsignStudent { get; set; }
+        public List<ClassMemberInfo> AllStudents { get; set; }
 
         public List<AppSelectListItem> Subjects { get; set; }
         public List<AppSelectListItem> Standards { get; set; }
 
+        public string AutoCompleteSearchText { get; set; }
+        public string TempClassRefId { get; set; }
+
         // custom properties
+        public List<ClassMemberInfo> AsignStudentInfo
+        {
+            get
+            {
+                List<ClassMemberInfo> result = new List<ClassMemberInfo>();
+                if (AllStudents != null && AllStudents.Count > 0)
+                {
+                    if (AsignStudent != null)
+                    {
+                        for (int i = 0; i < AsignStudent.Length; i++)
+                        {
+                            var TempTeacherInfo = AllStudents.Where(x => x.RegNo.Equals(AsignStudent[i])).FirstOrDefault();
+                            if (TempTeacherInfo != null)
+                                result.Add(TempTeacherInfo);
+                        }
+                    }
+                }
+                return result;
+            }
+        }
+        public List<ClassMemberInfo> AsignTeacherInfo
+        {
+            get
+            {
+                List<ClassMemberInfo> result = new List<ClassMemberInfo>();
+                if (AllTeachers != null && AllTeachers.Count > 0)
+                {                    
+                    if (AsignTeacher != null)
+                    {
+                        for (int i = 0; i < AsignTeacher.Length; i++)
+                        {
+                            var TempTeacherInfo = AllTeachers.Where(x => x.RegNo.Equals(AsignTeacher[i])).FirstOrDefault();
+                            if (TempTeacherInfo != null)
+                                result.Add(TempTeacherInfo);                            
+                        }
+                    }                    
+                }
+                return result;
+            }
+        }
         public string[] TeacherSearch
         {
             get
@@ -48,7 +92,7 @@ namespace AppModel.ViewModel
                     string[] result = new string[AllTeachers.Count];
                     for (int i = 0; i < AllTeachers.Count; i++)
                     {
-                        result[i] = string.Format("{0} [{1}]",  AllTeachers[i].Name, AllTeachers[i].Id);
+                        result[i] = string.Format("{0} [{1}]",  AllTeachers[i].Name, AllTeachers[i].RegNo);
                     }
                     return result;
                 }
@@ -59,24 +103,38 @@ namespace AppModel.ViewModel
                 }
             }
         }
+        public string[] StudentSearch
+        {
+            get
+            {
+                if (AllStudents != null && AllStudents.Count > 0)
+                {
+                    string[] result = new string[AllStudents.Count];
+                    for (int i = 0; i < AllStudents.Count; i++)
+                    {
+                        result[i] = string.Format("{0} [{1}]", AllStudents[i].Name, AllStudents[i].RegNo);
+                    }
+                    return result;
+                }
+                else
+                {
+                    string[] result = new string[1] { "No student data found" };
+                    return result;
+                }
+            }
+        }
     }
 
-    public class ClassTeacher
+    public class ClassMemberInfo
     {
-        public string Id { get; set; }
+        public int Id { get; set; }
+        public string RegNo { get; set; }
         public string Name { get; set; }
-        public string Quification { get; set; }
+        public string Description { get; set; }
         public string Avatar { get; set; }
     }
 
-    public class ClassStudent
-    {
-        public string Id { get; set; }
-        public string Name { get; set; }
-        public string Standard { get; set; }
-        public string Avatar { get; set; }
-    }
-
+    
     public class ClassSchedule
     {
         // pattern properties

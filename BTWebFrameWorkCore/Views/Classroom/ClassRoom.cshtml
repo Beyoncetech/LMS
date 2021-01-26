@@ -176,7 +176,7 @@
                             <!-- PRODUCT LIST -->
                             <div class="card">
                                 <div class="card-header">
-                                    <h3 class="card-title">Classroom Teachers</h3>
+                                    <h3 class="card-title">Assigned Teachers</h3>
 
                                     <div class="card-tools">
                                         <button type="button" class="btn btn-tool" data-card-widget="collapse">
@@ -184,8 +184,8 @@
                                         </button>
                                     </div>
                                 </div>
-                                <div class="card-body p-0" style="max-height:200px;overflow-y:scroll;">
-                                    @await Html.PartialAsync("_PartialClassRoomTeacher", Model.Teachers)
+                                <div id="assignTeacherList" class="card-body p-0" style="max-height:200px;overflow-y:scroll;">
+                                    @await Html.PartialAsync("_PartialClassRoomTeacher", Model.AsignTeacherInfo)
                                 </div>
                                 <div class="card-footer text-center">
                                     @*<a href="javascript:void(0)" class="uppercase">View All Products</a>*@
@@ -267,7 +267,7 @@
             //debugger;
             var teacherSearch = @Html.Raw(Json.Serialize(Model.TeacherSearch));
             /*initiate the autocomplete function on the "myInput" element, and pass along the countries array as possible autocomplete values:*/
-            appAutocomplete(document.getElementById("teacherAutocomplete"), teacherSearch, onAutoCompleteItemSelect);
+            appAutocomplete(document.getElementById("teacherAutocomplete"), teacherSearch, onTeacherAutoCompleteItemSelect);
 
         });
 
@@ -316,10 +316,38 @@
             HideAppLoader();
         };
 
-        function onAutoCompleteItemSelect(inpValue) {
-            alert(inpValue);
+        function onTeacherAutoCompleteItemSelect(inpValue) {           
+            ShowAppLoader();
+            var tempModel = @Json.Serialize(Model)
+            tempModel.AutoCompleteSearchText = inpValue;
+            //alert(tempModel.Description);
+            @*var tempModelParam = @Html.Raw(tempModel);*@            
+            AppCommonAjaxPostWithJsonParamPartial('/Classroom/AddClassRoomTeacher', JSON.stringify(tempModel), onAsignTeacherAddSuccess, onAsignTeacherAddFail)
+            
         }
-
+        function onAsignTeacherAddSuccess(result) {
+            $('#assignTeacherList').html(result);            
+            HideAppLoader();
+        }
+        function onAsignTeacherAddFail(result) {
+            HideAppLoader();
+            toastr.error('Something wrong while addind teacher.')
+        }
+        function onDeleteAssignTeacher(regNo) {           
+            ShowAppLoader();
+            var tempModel = @Json.Serialize(Model)
+            tempModel.AutoCompleteSearchText = regNo;
+            
+            AppCommonAjaxPostWithJsonParamPartial('/Classroom/DeleteClassRoomTeacher', JSON.stringify(tempModel), onAsignTeacherDelSuccess, onAsignTeacherDelFail)            
+        }
+        function onAsignTeacherDelSuccess(result) {
+            $('#assignTeacherList').html(result);            
+            HideAppLoader();
+        }
+        function onAsignTeacherDelFail(result) {
+            HideAppLoader();
+            toastr.error('Something wrong while delete teacher.')
+        }
     </script>
 
 }

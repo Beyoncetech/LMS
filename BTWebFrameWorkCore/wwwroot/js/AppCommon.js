@@ -126,3 +126,23 @@ function AppCommonAjaxPostPartial(actionUrl, dataModel, onSuccess, onError) {
         }
     });
 }
+
+function AppCommonAjaxPostWithJsonParamPartial(actionUrl, dataModel, onSuccess, onError) {
+    $.ajax({
+        url: actionUrl,
+        type: 'POST',
+        dataType: 'html',
+        contentType: 'application/json; charset=utf-8',
+        data: dataModel,
+        success: function (result) {
+            if (onSuccess !== undefined) {
+                onSuccess(result);
+            }
+        },
+        error: function (result) {
+            if (onError !== undefined) {
+                onError(result);
+            }
+        }
+    });
+}

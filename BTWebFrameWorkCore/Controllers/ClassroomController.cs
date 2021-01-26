@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using AppBAL.Sevices.Master;
 using AppModel;
@@ -50,6 +51,7 @@ namespace BTWebAppFrameWorkCore.Controllers
 
             var TempVModel = new ClassRoomDetailsVM();
             // get value from service layer
+            TempVModel.TempClassRefId = Guid.NewGuid().ToString().Replace('-', 'X'); //this is required for add teacher student dynamically
             TempVModel.Subjects = new List<AppSelectListItem>
             {
                 new AppSelectListItem { Value = "1", Text = "Math" },
@@ -64,24 +66,79 @@ namespace BTWebAppFrameWorkCore.Controllers
                 new AppSelectListItem { Value = "3", Text = "XII"  },
             };
             TempVModel.Scheduler = new ClassSchedule();
-            TempVModel.AllTeachers = new List<ClassTeacher>
+            TempVModel.AllTeachers = new List<ClassMemberInfo>
             {
-                new ClassTeacher {Id = "111222", Name = "Rohit Sign", Quification = "M. Sc (CS)", Avatar = string.Format("~/AppFileRepo/UserAvatar/{0}.{1}?r={2}", "dd", "jpg", DateTime.Now.Ticks.ToString())},
-                new ClassTeacher {Id = "44445555", Name = "Kunal Sarma", Quification = "B. Sc (CS)", Avatar = string.Format("~/AppFileRepo/UserAvatar/{0}.{1}?r={2}", "dd", "jpg", DateTime.Now.Ticks.ToString())},
-                new ClassTeacher {Id = "777888", Name = "Kamal Das", Quification = "B com", Avatar = string.Format("~/AppFileRepo/UserAvatar/{0}.{1}?r={2}", "dd", "jpg", DateTime.Now.Ticks.ToString())},
-                new ClassTeacher {Id = "6666555", Name = "Molani Saw", Quification = "Math", Avatar = string.Format("~/AppFileRepo/UserAvatar/{0}.{1}?r={2}", "dd", "jpg", DateTime.Now.Ticks.ToString())},
-                new ClassTeacher {Id = "454545", Name = "Kanchan Paul", Quification = "English graduate", Avatar = string.Format("~/AppFileRepo/UserAvatar/{0}.{1}?r={2}", "dd", "jpg", DateTime.Now.Ticks.ToString())}
+                new ClassMemberInfo {Id = 1, RegNo = "111222", Name = "Rohit Sign", Description = "M. Sc (CS)", Avatar = string.Format("~/AppFileRepo/UserAvatar/{0}.{1}?r={2}", "dd", "jpg", DateTime.Now.Ticks.ToString())},
+                new ClassMemberInfo {Id = 2, RegNo = "44445555", Name = "Kunal Sarma", Description = "B. Sc (CS)", Avatar = string.Format("~/AppFileRepo/UserAvatar/{0}.{1}?r={2}", "dd", "jpg", DateTime.Now.Ticks.ToString())},
+                new ClassMemberInfo {Id = 3, RegNo = "777888", Name = "Kamal Das", Description = "B com", Avatar = string.Format("~/AppFileRepo/UserAvatar/{0}.{1}?r={2}", "dd", "jpg", DateTime.Now.Ticks.ToString())},
+                new ClassMemberInfo {Id = 4, RegNo = "6666555", Name = "Molani Saw", Description = "Math", Avatar = string.Format("~/AppFileRepo/UserAvatar/{0}.{1}?r={2}", "dd", "jpg", DateTime.Now.Ticks.ToString())},
+                new ClassMemberInfo {Id = 5, RegNo = "454545", Name = "Kanchan Paul", Description = "English graduate", Avatar = string.Format("~/AppFileRepo/UserAvatar/{0}.{1}?r={2}", "dd", "jpg", DateTime.Now.Ticks.ToString())}
             };
-            TempVModel.Teachers = new List<ClassTeacher>
-            {
-                new ClassTeacher {Id = "111222", Name = "Rohit Sign", Quification = "M. Sc (CS)", Avatar = string.Format("~/AppFileRepo/UserAvatar/{0}.{1}?r={2}", "dd", "jpg", DateTime.Now.Ticks.ToString())},                
-                new ClassTeacher {Id = "454545", Name = "Kanchan Paul", Quification = "English graduate", Avatar = string.Format("~/AppFileRepo/UserAvatar/{0}.{1}?r={2}", "dd", "jpg", DateTime.Now.Ticks.ToString())}
-            };
+            TempVModel.AsignTeacher = new string[2] { "44445555", "6666555" };
+            //TempVModel.Teachers = new List<ClassMemberInfo>
+            //{
+            //    new ClassMemberInfo {Id = 2, RegNo = "44445555", Name = "Kunal Sarma", Description = "B. Sc (CS)", Avatar = string.Format("~/AppFileRepo/UserAvatar/{0}.{1}?r={2}", "dd", "jpg", DateTime.Now.Ticks.ToString())},
+            //    new ClassMemberInfo {Id = 4, RegNo = "6666555", Name = "Molani Saw", Description = "Math", Avatar = string.Format("~/AppFileRepo/UserAvatar/{0}.{1}?r={2}", "dd", "jpg", DateTime.Now.Ticks.ToString())}
+            //};
             // end of service lyer
             VModel = await GetViewModel(TempVModel);
 
             return View(VModel);
         }
-        #endregion LIST
+        [HttpPost]
+        public async Task<IActionResult> AddClassRoomTeacher([FromBody] ClassRoomDetailsVM model)
+        {
+            await Task.Delay(5).ConfigureAwait(false);
+            string TempTeacherAsignList = string.Empty;
+            string TempTeacherKey = string.Format("{0}_{1}", model.TempClassRefId, "ClassTeacher");
+            if (TempData.ContainsKey(TempTeacherKey))
+            {
+                TempTeacherAsignList = TempData[TempTeacherKey].ToString();
+            }
+            else
+            {
+                TempTeacherAsignList = String.Join(",", model.AsignTeacher);
+            }
+            string pattern = @"(?<=\[)(.*?)(?=\])";
+            Match output = Regex.Match(model.AutoCompleteSearchText, pattern, RegexOptions.Singleline | RegexOptions.IgnoreCase);
+            if (output.Success)
+            {
+                if (!TempTeacherAsignList.Contains(output.Value))
+                    TempTeacherAsignList = TempTeacherAsignList + "," + output.Value;
+            }
+            TempData[TempTeacherKey] = TempTeacherAsignList;
+            model.AsignTeacher = TempTeacherAsignList.Split(',');
+            return PartialView("_PartialClassRoomTeacher", model.AsignTeacherInfo);
+
+        }
+        [HttpPost]
+        public async Task<IActionResult>DeleteClassRoomTeacher([FromBody] ClassRoomDetailsVM model)
+        {
+            await Task.Delay(5).ConfigureAwait(false);
+            string TempTeacherAsignList = string.Empty;
+            string TempTeacherKey = string.Format("{0}_{1}", model.TempClassRefId, "ClassTeacher");
+            if (TempData.ContainsKey(TempTeacherKey))
+            {
+                TempTeacherAsignList = TempData[TempTeacherKey].ToString();
+            }
+            else
+            {
+                TempTeacherAsignList = String.Join(",", model.AsignTeacher);
+            }
+            if (TempTeacherAsignList.Contains(model.AutoCompleteSearchText))
+            {
+                var tempRegNos = TempTeacherAsignList.Split(',');
+                var listRegNos = new List<string>(tempRegNos);
+                listRegNos.Remove(model.AutoCompleteSearchText);
+                tempRegNos = listRegNos.ToArray();
+                TempTeacherAsignList = String.Join(",", tempRegNos);
+            }
+            
+            TempData[TempTeacherKey] = TempTeacherAsignList;
+            model.AsignTeacher = TempTeacherAsignList.Split(',');
+            return PartialView("_PartialClassRoomTeacher", model.AsignTeacherInfo);
+
+        }
+        #endregion
     }
 }
