@@ -47,11 +47,21 @@ namespace BTWebAppFrameWorkCore.Controllers
 
             BaseViewModel VModel = null;
 
-            //var result = await _ClassroomService.GetAllClassrooms(500, GetBaseService().GetAppRootPath());
-
             var TempVModel = new ClassRoomDetailsVM();
-            // get value from service layer
-            TempVModel.TempClassRefId = Guid.NewGuid().ToString().Replace('-', 'X'); //this is required for add teacher student dynamically
+            //set class ref id and remove tempdata if exist
+            var tempLoginUser = GetLoginUserInfo();
+            if (tempLoginUser != null)            
+                TempVModel.TempClassRefId = tempLoginUser.UserID;
+            
+            string TempTeacherKey = string.Format("{0}_{1}", TempVModel.TempClassRefId, "ClassTeacher");
+            if (TempData.ContainsKey(TempTeacherKey))            
+                TempData.Remove(TempTeacherKey);
+            
+            TempTeacherKey = string.Format("{0}_{1}", TempVModel.TempClassRefId, "ClassStudent");
+            if (TempData.ContainsKey(TempTeacherKey))            
+                TempData.Remove(TempTeacherKey);            
+            //end of class ref id and remove tempdata if exist
+            // get value from service layer            
             TempVModel.Subjects = new List<AppSelectListItem>
             {
                 new AppSelectListItem { Value = "1", Text = "Math" },
@@ -74,16 +84,58 @@ namespace BTWebAppFrameWorkCore.Controllers
                 new ClassMemberInfo {Id = 4, RegNo = "6666555", Name = "Molani Saw", Description = "Math", Avatar = string.Format("~/AppFileRepo/UserAvatar/{0}.{1}?r={2}", "dd", "jpg", DateTime.Now.Ticks.ToString())},
                 new ClassMemberInfo {Id = 5, RegNo = "454545", Name = "Kanchan Paul", Description = "English graduate", Avatar = string.Format("~/AppFileRepo/UserAvatar/{0}.{1}?r={2}", "dd", "jpg", DateTime.Now.Ticks.ToString())}
             };
-            TempVModel.AsignTeacher = new string[2] { "44445555", "6666555" };
-            //TempVModel.Teachers = new List<ClassMemberInfo>
-            //{
-            //    new ClassMemberInfo {Id = 2, RegNo = "44445555", Name = "Kunal Sarma", Description = "B. Sc (CS)", Avatar = string.Format("~/AppFileRepo/UserAvatar/{0}.{1}?r={2}", "dd", "jpg", DateTime.Now.Ticks.ToString())},
-            //    new ClassMemberInfo {Id = 4, RegNo = "6666555", Name = "Molani Saw", Description = "Math", Avatar = string.Format("~/AppFileRepo/UserAvatar/{0}.{1}?r={2}", "dd", "jpg", DateTime.Now.Ticks.ToString())}
-            //};
+            TempVModel.AsignTeacher = new string[1] { "44445555" };
+            TempVModel.AllStudents = new List<ClassMemberInfo>
+            {
+                new ClassMemberInfo {Id = 1, RegNo = "1144", Name = "Ripan paul", Description = "M. Sc (V Sem)", Avatar = string.Format("~/AppFileRepo/UserAvatar/{0}.{1}?r={2}", "dd", "jpg", DateTime.Now.Ticks.ToString())},
+                new ClassMemberInfo {Id = 2, RegNo = "6655", Name = "Sunil saw", Description = "B. Sc (1st sem)", Avatar = string.Format("~/AppFileRepo/UserAvatar/{0}.{1}?r={2}", "dd", "jpg", DateTime.Now.Ticks.ToString())},
+                new ClassMemberInfo {Id = 3, RegNo = "8899", Name = "Mani Das", Description = "B com Pass", Avatar = string.Format("~/AppFileRepo/UserAvatar/{0}.{1}?r={2}", "dd", "jpg", DateTime.Now.Ticks.ToString())},
+                new ClassMemberInfo {Id = 4, RegNo = "7744", Name = "Prasanta saha", Description = "Math pass", Avatar = string.Format("~/AppFileRepo/UserAvatar/{0}.{1}?r={2}", "dd", "jpg", DateTime.Now.Ticks.ToString())},
+                new ClassMemberInfo {Id = 5, RegNo = "5656", Name = "Pallav Paul", Description = "English graduate", Avatar = string.Format("~/AppFileRepo/UserAvatar/{0}.{1}?r={2}", "dd", "jpg", DateTime.Now.Ticks.ToString())}
+            };
+            TempVModel.AsignStudent = new string[2] { "6655", "7744" };
             // end of service lyer
             VModel = await GetViewModel(TempVModel);
-
+            
             return View(VModel);
+        }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<JsonResult> ClassRoom(ClassRoomDetailsVM model)
+        {
+            if (ModelState.IsValid)
+            {
+                string TempMemberAsignList = string.Empty;
+                string TempAsignKey = string.Format("{0}_{1}", model.TempClassRefId, "ClassTeacher");
+                if (TempData.ContainsKey(TempAsignKey))
+                {
+                    TempMemberAsignList = TempData[TempAsignKey].ToString();
+                    model.AsignTeacher = TempMemberAsignList.Split(',');
+                }
+                TempAsignKey = string.Format("{0}_{1}", model.TempClassRefId, "ClassStudent");
+                if (TempData.ContainsKey(TempAsignKey))
+                {
+                    TempMemberAsignList = TempData[TempAsignKey].ToString();
+                    model.AsignStudent = TempMemberAsignList.Split(',');
+                }
+
+                // write the class save service
+                await Task.Delay(5).ConfigureAwait(false);
+                if (model.Id > 0)
+                {
+                    // write update logic
+                    return Json(new { stat = true, msg = "Successfully updated Classroom" });
+                }
+                else
+                {
+                    // write save logic
+                    return Json(new { stat = true, msg = "Successfully save Classroom" });
+                }                                
+            }
+            else
+            {
+                return Json(new { stat = false, msg = "Invalid Classroom data" });
+            }
         }
         [HttpPost]
         public async Task<IActionResult> AddClassRoomTeacher([FromBody] ClassRoomDetailsVM model)
@@ -137,6 +189,61 @@ namespace BTWebAppFrameWorkCore.Controllers
             TempData[TempTeacherKey] = TempTeacherAsignList;
             model.AsignTeacher = TempTeacherAsignList.Split(',');
             return PartialView("_PartialClassRoomTeacher", model.AsignTeacherInfo);
+
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> AddClassRoomStudent([FromBody] ClassRoomDetailsVM model)
+        {
+            await Task.Delay(5).ConfigureAwait(false);
+            string TempStudentAsignList = string.Empty;
+            string TempStudentKey = string.Format("{0}_{1}", model.TempClassRefId, "ClassStudent");
+            if (TempData.ContainsKey(TempStudentKey))
+            {
+                TempStudentAsignList = TempData[TempStudentKey].ToString();
+            }
+            else
+            {
+                TempStudentAsignList = String.Join(",", model.AsignStudent);
+            }
+            string pattern = @"(?<=\[)(.*?)(?=\])";
+            Match output = Regex.Match(model.AutoCompleteSearchText, pattern, RegexOptions.Singleline | RegexOptions.IgnoreCase);
+            if (output.Success)
+            {
+                if (!TempStudentAsignList.Contains(output.Value))
+                    TempStudentAsignList = TempStudentAsignList + "," + output.Value;
+            }
+            TempData[TempStudentKey] = TempStudentAsignList;
+            model.AsignStudent = TempStudentAsignList.Split(',');
+            return PartialView("_PartialClassRoomStudent", model.AsignStudentInfo);
+
+        }
+        [HttpPost]
+        public async Task<IActionResult> DeleteClassRoomStudent([FromBody] ClassRoomDetailsVM model)
+        {
+            await Task.Delay(5).ConfigureAwait(false);
+            string TempStudentAsignList = string.Empty;
+            string TempStudentKey = string.Format("{0}_{1}", model.TempClassRefId, "ClassStudent");
+            if (TempData.ContainsKey(TempStudentKey))
+            {
+                TempStudentAsignList = TempData[TempStudentKey].ToString();
+            }
+            else
+            {
+                TempStudentAsignList = String.Join(",", model.AsignStudent);
+            }
+            if (TempStudentAsignList.Contains(model.AutoCompleteSearchText))
+            {
+                var tempRegNos = TempStudentAsignList.Split(',');
+                var listRegNos = new List<string>(tempRegNos);
+                listRegNos.Remove(model.AutoCompleteSearchText);
+                tempRegNos = listRegNos.ToArray();
+                TempStudentAsignList = String.Join(",", tempRegNos);
+            }
+
+            TempData[TempStudentKey] = TempStudentAsignList;
+            model.AsignStudent = TempStudentAsignList.Split(',');
+            return PartialView("_PartialClassRoomStudent", model.AsignStudentInfo);
 
         }
         #endregion

@@ -27,12 +27,10 @@ namespace AppModel.ViewModel
         public int? ClassActivationThreshold { get; set; }
         [Required(ErrorMessage = "Select a time schedule for the class")]
         public ClassSchedule Scheduler { get; set; }
-
-        [Required(ErrorMessage = "Select a Teacher for Clas room")]        
+                        
         public string[] AsignTeacher { get; set; }
         public List<ClassMemberInfo> AllTeachers { get; set; }
-
-        [Required(ErrorMessage = "Select student for Clas room")]        
+                        
         public string[] AsignStudent { get; set; }
         public List<ClassMemberInfo> AllStudents { get; set; }
 
