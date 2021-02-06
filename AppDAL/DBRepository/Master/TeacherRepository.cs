@@ -9,7 +9,8 @@ namespace AppDAL.DBRepository
     public interface ITeacherRepository
     {
         Task<List<Tblmteacher>> GetAllTeachers(int RowCount);
-        Task<Tblmteacher> GetTeacherByTeacherId(int TeacherID);        
+        Task<Tblmteacher> GetTeacherByTeacherId(int TeacherID);
+        Task<Tblmteacher> GetTeacherByRegNo(string RegNo);
         Task<Tblmteacher> GetTeacherByEmailID(string EmailID);
     }
     public class TeacherRepository:ITeacherRepository
@@ -28,6 +29,12 @@ namespace AppDAL.DBRepository
         public async Task<Tblmteacher> GetTeacherByTeacherId(int TeacherID)
         {
             var oTeacher = await _DBContext.Tblmteacher.Where(s => s.Id.Equals(TeacherID)).FirstOrDefaultAsync();
+            return oTeacher;
+        }
+
+        public async Task<Tblmteacher> GetTeacherByRegNo(string RegNo)
+        {
+            var oTeacher = await _DBContext.Tblmteacher.Where(s => s.RegNo.Equals(RegNo)).FirstOrDefaultAsync();
             return oTeacher;
         }
         public async Task<Tblmteacher> GetTeacherByEmailID(string EmailID)

@@ -47,6 +47,7 @@ namespace AppBAL.Sevices.Master
                     {
                         Id = item.Id,
                         UserAvatar = _AppDirectoryFileService.GetAppUserAvatarPath(AppRootPath, item.Id.ToString(), "M"),
+                        RegNo=item.RegNo,
                         Name = item.Name,                        
                         Address = item.Address,
                         ContactNo = item.ContactNo,
@@ -94,9 +95,15 @@ namespace AppBAL.Sevices.Master
             Tblmteacher oTeacher = null;
             if (IsAdd)  // check validation while adding a new teacher
             {
-                oTeacher = await _DBTeacherRepository.GetTeacherByEmailID(TeacherToInsert.Email).ConfigureAwait(false);
+                oTeacher = await _DBTeacherRepository.GetTeacherByRegNo(TeacherToInsert.RegNo).ConfigureAwait(false);
                 if (oTeacher != null)
-                { result.Stat = false; result.StatusMsg = "Email Id already in use"; }                
+                { result.Stat = false; result.StatusMsg = "Registration No already in use"; }
+                else
+                {
+                    oTeacher = await _DBTeacherRepository.GetTeacherByEmailID(TeacherToInsert.Email).ConfigureAwait(false);
+                    if (oTeacher != null)
+                    { result.Stat = false; result.StatusMsg = "Email Id already in use"; }
+                }
             }
             else//check validation while updating a teacher profile
             {
@@ -105,6 +112,21 @@ namespace AppBAL.Sevices.Master
                 {
                     if (oTeacher.Id != TeacherToInsert.Id)// different teacher with same email id
                         result.Stat = false; result.StatusMsg = "Email Id already in use";
+                }
+                oTeacher = await _DBTeacherRepository.GetTeacherByRegNo(TeacherToInsert.RegNo).ConfigureAwait(false);
+                if (oTeacher != null)  // got result
+                {
+                    if (TeacherToInsert.Id != oTeacher.Id)  // different teacher with same reg no
+                    { result.Stat = false; result.StatusMsg = "Registration No already in use"; }
+                    else // same teacher found check duplicate email id
+                    {
+                        oTeacher = await _DBTeacherRepository.GetTeacherByEmailID(TeacherToInsert.Email);
+                        if (oTeacher != null)
+                        {
+                            if (TeacherToInsert.Id != oTeacher.Id)  // different teacher with same email id
+                                result.Stat = false; result.StatusMsg = "Email Id already in use";
+                        }
+                    }
                 }
             }
             return result;
@@ -117,7 +139,8 @@ namespace AppBAL.Sevices.Master
             try
             {
                 Tblmteacher oTeacher = new Tblmteacher
-                {                    
+                {       
+                    RegNo=TeacherToInsert.RegNo,
                     Name = TeacherToInsert.Name,
                     Address = TeacherToInsert.Address,
                     Email = TeacherToInsert.Email,
@@ -143,6 +166,7 @@ namespace AppBAL.Sevices.Master
                 var oTeacher = await _DBTeacherRepository.GetTeacherByTeacherId(TeacherToUpdate.Id).ConfigureAwait(false);
                 if (oTeacher != null)
                 {
+                    oTeacher.RegNo = TeacherToUpdate.RegNo;
                     oTeacher.Name = TeacherToUpdate.Name;
                     oTeacher.Address = TeacherToUpdate.Address;
                     oTeacher.Email = TeacherToUpdate.Email;                    

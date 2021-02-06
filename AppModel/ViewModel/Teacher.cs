@@ -10,6 +10,8 @@ namespace AppModel.ViewModel
     public class TeacherProfileVM:BaseViewModel
     {
         public int Id { get; set; }
+        [Required(ErrorMessage = "Registration no. cannot be blank")]
+        public string RegNo { get; set; }
         [Required(ErrorMessage ="Name cannot be blank")]
         public string Name { get; set; }
         public string Address { get; set; }

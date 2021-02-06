@@ -5,6 +5,7 @@ namespace AppModel
     public class Teacher
     {
         public int Id { get; set; }
+        public string RegNo { get; set; }
         public string Name { get; set; }
         public string LoginId { get; set; }
         public long? LoginUserId { get; set; }

@@ -88,7 +88,7 @@ namespace BTWebAppFrameWorkCore.Controllers
                 if (result.Stat)// login id exists
                     return Json(new { stat = false, msg = "Login Id already in use" });
 
-                AppUserVM oAppUserVM = new AppUserVM(); // add an user in the user table for teacher
+                AppUserVM oAppUserVM = new AppUserVM(); // add an user in the user table for teacher                
                 oAppUserVM.Name = model.Name;
                 oAppUserVM.UserId = model.LoginId;
                 oAppUserVM.UserType = "A";// admin
@@ -117,10 +117,10 @@ namespace BTWebAppFrameWorkCore.Controllers
                             string TeacherImgPath = Path.Combine(GetBaseService().GetAppRootPath(), "AppFileRepo\\TeacherAvatar");
                             if (GetBaseService().DirectoryFileService.CreateDirectoryIfNotExist(TeacherImgPath))
                             {
-                                //TeacherImgPath = string.Format("{0}\\{1}.{2}", TeacherImgPath, model.RegNo, "jpg");
+                                TeacherImgPath = string.Format("{0}\\{1}.{2}", TeacherImgPath, model.RegNo, "jpg");
                                 if (GetBaseService().DirectoryFileService.CreateFileFromBase64String(model.AttachTeacherImage.FileContentsBase64, TeacherImgPath))
                                 {
-                                    //   model.TeacherImgPath = string.Format("~/AppFileRepo/TeacherAvatar/{0}.{1}?r={2}", model.RegNo, "jpg", DateTime.Now.Ticks.ToString());
+                                    model.TeacherImgPath = string.Format("~/AppFileRepo/TeacherAvatar/{0}.{1}?r={2}", model.RegNo, "jpg", DateTime.Now.Ticks.ToString());
                                     model.BUserImgPath = model.TeacherImgPath; // update the Teacher avatar
                                 }
                             }
@@ -151,6 +151,7 @@ namespace BTWebAppFrameWorkCore.Controllers
                 var TempVModel = new TeacherProfileVM
                 {
                     Id = TeacherInfo.Id,
+                    RegNo=TeacherInfo.RegNo,
                     Name = TeacherInfo.Name,
                     Address = TeacherInfo.Address,
                     ContactNo = TeacherInfo.ContactNo,
