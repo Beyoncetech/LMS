@@ -18,6 +18,7 @@ namespace AppModel.ViewModel
     public class DashboardVM : BaseViewModel
     {
         public Dictionary<string, string> DashboardData { get; set; }
+        public dynamic DashboardDataObj { get; set; }
     }
 
     public class CommonVM : BaseViewModel
@@ -121,5 +122,10 @@ namespace AppModel.ViewModel
         public string TrackTrace { get; set; }
         public string ErrorSource { get; set; }
     }
-        
+
+    public class AppStatusCodeErrorVM : BaseViewModel
+    {
+        public string ErrorCode { get; set; }        
+    }
+
 }

@@ -49,5 +49,16 @@ namespace BTWebAppFrameWorkCore.Controllers
             await Task.Delay(10).ConfigureAwait(false);
             return Json(new { stat = false, msg = "This feature is not activated." });
         }
+
+        [Route("/AppError/HandleStatusCodeErrors/{code:int}")]
+        public async Task<IActionResult> HandleStatusCodeErrors(int code)
+        {
+            var model = new AppStatusCodeErrorVM();
+            
+            model.ErrorCode = code.ToString();
+           
+            var VModel = await GetViewModel(model);
+            return View(VModel);
+        }
     }
 }

@@ -21,6 +21,10 @@
     <ProjectReference Include="..\AppUtility\AppUtility.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="wwwroot\assets\img\AppLogo\" />
+  </ItemGroup>
+
 
 
 </Project>

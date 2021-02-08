@@ -150,4 +150,17 @@ namespace AppModel.ViewModel
         public string StartTime { get; set; }
         public string EndTime { get; set; }
     }
+
+    public class ClassRoomDashboardInfo
+    {
+        public long ClassId { get; set; }
+        public string ClassRefId { get; set; }
+        public string ClassName { get; set; }
+        public string ClassTeacherName { get; set; }       
+        public string TotalClassStudents { get; set; }
+        public string ClassTime { get; set; }
+        public string NextClass { get; set; }
+        public string RecurringType { get; set; }
+        public string Frequency { get; set; }
+    }
 }

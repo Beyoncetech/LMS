@@ -137,7 +137,102 @@ namespace BTWebAppFrameWorkCore.Controllers
         {
             CreateBreadCrumb(new[] {new { Name = "Home", ActionUrl = "#" },
                                     new { Name = "Dashboard", ActionUrl = "/Account/Dashboard" } });
-            var VModel = await GetViewModel<DashboardVM>();
+            BaseViewModel VModel = null;
+            //var VModel = await GetViewModel<DashboardVM>();
+            var TempVModel = new DashboardVM();
+            //** get dashboard data from service later            
+            var CurrentUserInfo = GetLoginUserInfo();
+            switch (CurrentUserInfo.UserType)
+            {
+                case "A":
+
+                    break;
+                case "S":
+                    List<ClassRoomDashboardInfo> MyClasses = new List<ClassRoomDashboardInfo>();
+                    MyClasses.Add(new ClassRoomDashboardInfo
+                    {
+                        ClassId = 1,
+                        ClassRefId = "BSC4",
+                        ClassName = "B. Sc (1st Sem)",
+                        ClassTeacherName = "Parimal Karmakar",
+                        Frequency = "Daily",
+                        TotalClassStudents = "25",
+                        ClassTime = "3 PM to 5 PM",
+                        NextClass = "Wednesday 24th Feb 2021",
+                        RecurringType = "D"
+                    });
+                    MyClasses.Add(new ClassRoomDashboardInfo
+                    {
+                        ClassId = 2,
+                        ClassRefId = "BC4",
+                        ClassName = "BCOM (1st Sem)",
+                        ClassTeacherName = "Partamita Saha",
+                        Frequency = "Weekly [Mon, Tue]",
+                        TotalClassStudents = "30",
+                        ClassTime = "10 AM to 12 PM",
+                        NextClass = "Friday 24th Feb 2021",
+                        RecurringType = "W"
+                    });
+                    MyClasses.Add(new ClassRoomDashboardInfo
+                    {
+                        ClassId = 3,
+                        ClassRefId = "BSC2",
+                        ClassName = "B. Sc (2st Sem)",
+                        ClassTeacherName = "Parimal Karmakar",
+                        Frequency = "Daily",
+                        TotalClassStudents = "25",
+                        ClassTime = "3 PM to 5 PM",
+                        NextClass = "Wednesday 24th Feb 2021",
+                        RecurringType = "D"
+                    });
+                    MyClasses.Add(new ClassRoomDashboardInfo
+                    {
+                        ClassId = 4,
+                        ClassRefId = "BC1",
+                        ClassName = "BCOM (4th Sem)",
+                        ClassTeacherName = "Sonali Guha",
+                        Frequency = "Monthly on 25th",
+                        TotalClassStudents = "15",
+                        ClassTime = "3 PM to 5 PM",
+                        NextClass = "Saturdat 15th Feb 2021",
+                        RecurringType = "M"
+                    });
+                    TempVModel.DashboardDataObj = MyClasses;
+                    break;
+                case "U":
+                    List<ClassRoomDashboardInfo> StudentMyClasses = new List<ClassRoomDashboardInfo>();
+                    StudentMyClasses.Add(new ClassRoomDashboardInfo
+                    {
+                        ClassId = 1,
+                        ClassRefId = "BSC4",
+                        ClassName = "B. Sc (1st Sem)",
+                        ClassTeacherName = "Parimal Karmakar",
+                        Frequency = "Weekly [Sat, Tue, Wed]",
+                        TotalClassStudents = "25",
+                        ClassTime = "3 PM to 5 PM",
+                        NextClass = "Wednesday 24th Feb 2021",
+                        RecurringType = "W"
+                    });
+                    StudentMyClasses.Add(new ClassRoomDashboardInfo
+                    {
+                        ClassId = 2,
+                        ClassRefId = "BC4",
+                        ClassName = "BCOM (1st Sem)",
+                        ClassTeacherName = "Partamita Saha",
+                        Frequency = "Daily",
+                        TotalClassStudents = "30",
+                        ClassTime = "10 AM to 12 PM",
+                        NextClass = "Friday 24th Feb 2021",
+                        RecurringType = "D"
+                    });
+                    TempVModel.DashboardDataObj = StudentMyClasses;
+                    break;
+                default:
+                    break;
+            }
+
+            //*****************************
+            VModel = await GetViewModel(TempVModel);
             return View(VModel);
         }
 
