@@ -1,0 +1,110 @@
+﻿@using AppBAL.Sevices.Authentication
+@inject ISiteMapService MenuService
+<nav class="mt-2">
+    <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+        <!-- Add icons to the links using the .nav-icon class
+    with font-awesome or any other icon font library -->
+        @foreach (var item in MenuService.GetTopLevelMainMenu())
+        {          
+            if (item.Group.Equals("") && item.Parent.Equals(""))
+            {
+                <li class="nav-item">
+                    <a href="@item.ActionUrl" class="nav-link">
+                        @if (!item.IconLeft.Equals(""))
+                        {
+                            <i class="@item.IconLeft"></i>
+                        }
+                        <p>
+                            @item.Name
+                            @if (!item.BadgeText.Equals(""))
+                            {
+                                <span class="badge badge-info right">@item.BadgeText</span>
+                            }
+                        </p>
+                    </a>
+                </li>
+            }
+            else if (item.Group.Equals("") && !item.Parent.Equals(""))
+            {
+                <li class="nav-item has-treeview">
+                    <a href="#" class="nav-link">
+                        <i class="nav-icon fas fa-copy"></i>
+                        <p>
+                            @item.Parent
+                            <i class="fas fa-angle-left right"></i>
+                            @if (!item.BadgeText.Equals(""))
+                            {
+                                <span class="badge badge-info right">@item.BadgeText</span>
+                            }
+                        </p>
+                    </a>
+                    <ul class="nav nav-treeview">
+                        @foreach (var Childitem in MenuService.GetChildMainMenu(item.Group, item.Parent))
+                        {
+                            <li class="nav-item">
+                                <a href="@Childitem.ActionUrl" class="nav-link">
+                                    @if (!Childitem.IconLeft.Equals(""))
+                                    {
+                                        <i class="@Childitem.IconLeft"></i>
+                                    }
+                                    <p>@Childitem.Name</p>
+                                </a>
+                            </li>
+                        }
+                    </ul>
+                </li>
+            }
+            else
+            {
+                <li class="nav-header">@item.Group</li>
+                @foreach (var ChildParentitem in MenuService.GetChildMainMenuOfGroup(item.Group))
+                {
+                    if (ChildParentitem.Parent.Equals(""))
+                    {
+                        <li class="nav-item">
+                            <a href="@ChildParentitem.ActionUrl" class="nav-link">
+                                @if (!ChildParentitem.IconLeft.Equals(""))
+                                {
+                                    <i class="@ChildParentitem.IconLeft"></i>
+                                }
+                                <p>
+                                    @ChildParentitem.Name                                    
+                                </p>
+                            </a>
+                        </li>
+                    }
+                    else
+                    {
+                        <li class="nav-item has-treeview">
+                            <a href="#" class="nav-link">
+                                <i class="nav-icon fas fa-copy"></i>
+                                <p>
+                                    @ChildParentitem.Parent
+                                    <i class="fas fa-angle-left right"></i>
+                                    @if (!ChildParentitem.BadgeText.Equals(""))
+                                    {
+                                        <span class="badge badge-info right">@ChildParentitem.BadgeText</span>
+                                    }
+                                </p>
+                            </a>
+                            <ul class="nav nav-treeview">
+                                @foreach (var Childitem in MenuService.GetChildMainMenu(ChildParentitem.Group, ChildParentitem.Parent))
+                                {
+                                    <li class="nav-item">
+                                        <a href="@Childitem.ActionUrl" class="nav-link">
+                                            @if (!Childitem.IconLeft.Equals(""))
+                                            {
+                                                <i class="@Childitem.IconLeft"></i>
+                                            }
+                                            <p>@Childitem.Name</p>
+                                        </a>
+                                    </li>
+                                }
+                            </ul>
+                        </li>
+                    }
+                }
+            }
+        }       
+    </ul>
+</nav>

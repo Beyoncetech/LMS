@@ -24,7 +24,7 @@ namespace AppModel
         public int MenuOrder { get; set; }
 
         public string IconLeft { get; set; }
-        public string IconRight { get; set; }
+        public string BadgeText { get; set; }
     }
 
     public class AppSettingsConfiguration
