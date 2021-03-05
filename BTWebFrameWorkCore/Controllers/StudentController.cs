@@ -53,7 +53,7 @@ namespace BTWebAppFrameWorkCore.Controllers
         {
             CreateBreadCrumb(new[] {new { Name = "Home", ActionUrl = "#" },
                                     new { Name = "Student", ActionUrl = "/Student/StudentProfile" } });
-            List<StandardMasterBM> oAllStandards = await _StandardMasterService.GetAllStandards(500, GetBaseService().GetAppRootPath()); // get all standards
+            List<StandardMasterBM> oAllStandards = await _StandardMasterService.GetAllStandards(500); // get all standards
             BaseViewModel VModel = null;
             var TempVModel = new StudentProfileVM();
             TempVModel.AllStandards.AddRange(oAllStandards); // populate the list
@@ -152,7 +152,7 @@ namespace BTWebAppFrameWorkCore.Controllers
             CommonResponce CR = await _StudentService.GetStudentByStudentId(StudentID);
             if (CR.Stat)
             {
-                List<StandardMasterBM> oAllStandards = await _StandardMasterService.GetAllStandards(500, GetBaseService().GetAppRootPath());
+                List<StandardMasterBM> oAllStandards = await _StandardMasterService.GetAllStandards(500);
                 Student StudentInfo = (Student)CR.StatusObj;
                 //*****get user avtar************
 

@@ -26,7 +26,7 @@ namespace BTWebAppFrameWorkCore.Controllers
 
             BaseViewModel VModel = null;
 
-            var result = await _SubjectService.GetAllSubjects(500, GetBaseService().GetAppRootPath());
+            var result = await _SubjectService.GetAllSubjects(500);
 
             var TempVModel = new SubjectVM();
             TempVModel.SubjectInfo = new AppGridModel<SubjectBM>();
@@ -156,7 +156,7 @@ namespace BTWebAppFrameWorkCore.Controllers
         [HttpPost]
         public async Task<IActionResult> ReloadSubjects()
         {
-            var result = await _SubjectService.GetAllSubjects(500, GetBaseService().GetAppRootPath());
+            var result = await _SubjectService.GetAllSubjects(500);
             var TempModel = new AppGridModel<SubjectBM>();
             TempModel.Rows = result;
             return PartialView("_HTMLTable", TempModel);

@@ -21,7 +21,8 @@ namespace AppBAL.BusinessConfig
             CreateMap<Tblmteacher, Teacher>();
             CreateMap<Tblmstandard, StandardMaster>();
             CreateMap<Tblmsubject, SubjectBM>();
-            
+            CreateMap<Tblmclassroom, Classroom>();
+            CreateMap<Classroom, Tblmclassroom>();
         }
     }
 }

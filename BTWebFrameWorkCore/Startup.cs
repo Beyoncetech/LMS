@@ -33,6 +33,7 @@ using AppBAL.Sevices.AppCore;
 using AppUtility.AppMessage;
 using AppBAL.Sevices;
 using AppBAL.CoreJobService;
+using AppBAL.Sevices.Transaction;
 
 namespace BTWebAppFrameWorkCore
 {
@@ -173,6 +174,7 @@ namespace BTWebAppFrameWorkCore
             services.AddScoped<ITeacherService, TeacherService>();
             services.AddScoped<ISubjectService, SubjectService>();
             services.AddScoped<IClassroomService, ClassroomService>();
+            services.AddScoped<IStudentClassroomService, StudentClassroomService>();
             #endregion
 
 
@@ -187,6 +189,7 @@ namespace BTWebAppFrameWorkCore
             services.AddScoped<ITeacherRepository, TeacherRepository>();
             services.AddScoped<ISubjectRepository, SubjectRepository>();
             services.AddScoped<IClassroomRepository, ClassroomRepository>();
+            services.AddScoped<IStudentClassroomRepository, StudentClassroomRepository>();
             #endregion
 
             #region Other Services

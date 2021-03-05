@@ -13,7 +13,7 @@ namespace AppBAL.Sevices
 {
     public interface IStandardMasterService
     {
-        Task<List<StandardMasterBM>> GetAllStandards(int RowCount, String AppRootPath);
+        Task<List<StandardMasterBM>> GetAllStandards(int RowCount);
         Task<CommonResponce> GetStandardByStandardId(int StandardID);
         Task<CommonResponce> GetStandardByStandardName(string StandardName);
         Task<CommonResponce> InsertStandard(StandardMasterVM StandanrdToInsert);
@@ -34,7 +34,7 @@ namespace AppBAL.Sevices
             _commonRepository = CommonRepository;
         }
 
-        public async Task<List<StandardMasterBM>> GetAllStandards(int RowCount, String AppRootPath)
+        public async Task<List<StandardMasterBM>> GetAllStandards(int RowCount)
         {
             List<StandardMasterBM> result = new List<StandardMasterBM>();
             var oStandards = await _DBStandardMasterRepository.GetAllStandards(RowCount).ConfigureAwait(false);

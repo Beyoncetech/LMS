@@ -14,7 +14,7 @@ namespace AppModel.ViewModel
 
     public class ClassRoomDetailsVM : BaseViewModel
     {
-        public long Id { get; set; }
+        public int Id { get; set; }
         [Required(ErrorMessage = "Class reference Id is required")]
         public string RefId { get; set; }
         [Required]
@@ -40,6 +40,7 @@ namespace AppModel.ViewModel
         public string AutoCompleteSearchText { get; set; }
         public string TempClassRefId { get; set; }
 
+        public string ApprootPath { get; set; }
         // custom properties
         public List<ClassMemberInfo> AsignStudentInfo
         {

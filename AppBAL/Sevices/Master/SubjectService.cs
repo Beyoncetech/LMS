@@ -12,7 +12,7 @@ namespace AppBAL.Sevices
 {
     public interface ISubjectService
     {
-        Task<List<SubjectBM>> GetAllSubjects(int RowCount, string AppRootPath);
+        Task<List<SubjectBM>> GetAllSubjects(int RowCount);
         Task<SubjectBM> GetSubjectBySubjectId(int SubjectID);
         Task<CommonResponce> GetSubjectBySubjectName(string SubjectName);
         Task<CommonResponce> InsertSubject(SubjectMasterVM SubjectToInsert);
@@ -33,7 +33,7 @@ namespace AppBAL.Sevices
             _commonRepository = CommonRepository;
         }
 
-        public async Task<List<SubjectBM>> GetAllSubjects(int RowCount,string AppRootPath)
+        public async Task<List<SubjectBM>> GetAllSubjects(int RowCount)
         {
             List<SubjectBM> result = new List<SubjectBM>();
             var oSubject = await _DBSubjectRepository.GetAllSubjects(RowCount).ConfigureAwait(false);

@@ -1,23 +1,37 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
+﻿using AppBAL.Sevices;
 using AppBAL.Sevices.Master;
+using AppBAL.Sevices.Transaction;
 using AppModel;
 using AppModel.BusinessModel.Master;
 using AppModel.ViewModel;
+using AppUtility.Extension;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
+using System;
+using System.Collections.Generic;
+using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 
 namespace BTWebAppFrameWorkCore.Controllers
 {
     public class ClassroomController : BaseController
     {
         private readonly IClassroomService _ClassroomService;
-        public ClassroomController(IClassroomService ClassrommService)
+        private readonly ISubjectService _SubjectService;
+        public readonly IStandardMasterService _StandardMasterService;
+        public readonly ITeacherService _TeacherService;
+        public readonly IStudentService _StudentService;
+        public readonly IStudentClassroomService _StudentClassroomService;
+
+
+        public ClassroomController(IClassroomService ClassrommService,ISubjectService SubjectService,IStandardMasterService StandardMasterService,
+                                    ITeacherService TeacherService,IStudentService StudentService,IStudentClassroomService StudentClassroomService)
         {
             _ClassroomService = ClassrommService;
+            _SubjectService = SubjectService;
+            _StandardMasterService = StandardMasterService;
+            _TeacherService = TeacherService;
+            _StudentService = StudentService;
+            _StudentClassroomService = StudentClassroomService;
         }
         #region LIST
         public async Task<IActionResult> Classrooms()
@@ -48,6 +62,8 @@ namespace BTWebAppFrameWorkCore.Controllers
             BaseViewModel VModel = null;
 
             var TempVModel = new ClassRoomDetailsVM();
+            TempVModel.Id = id;
+            TempVModel.ApprootPath = GetBaseService().GetAppRootPath();
             //set class ref id and remove tempdata if exist
             var tempLoginUser = GetLoginUserInfo();
             if (tempLoginUser != null)            
@@ -59,42 +75,43 @@ namespace BTWebAppFrameWorkCore.Controllers
             
             TempTeacherKey = string.Format("{0}_{1}", TempVModel.TempClassRefId, "ClassStudent");
             if (TempData.ContainsKey(TempTeacherKey))            
-                TempData.Remove(TempTeacherKey);            
+                TempData.Remove(TempTeacherKey);
             //end of class ref id and remove tempdata if exist
-            // get value from service layer            
-            TempVModel.Subjects = new List<AppSelectListItem>
-            {
-                new AppSelectListItem { Value = "1", Text = "Math" },
-                new AppSelectListItem { Value = "2", Text = "Hindi" },
-                new AppSelectListItem { Value = "3", Text = "Biology"  },
-            };
-
-            TempVModel.Standards = new List<AppSelectListItem>
-            {
-                new AppSelectListItem { Value = "1", Text = "Class V" },
-                new AppSelectListItem { Value = "2", Text = "Class VI" },
-                new AppSelectListItem { Value = "3", Text = "XII"  },
-            };
-            TempVModel.Scheduler = new ClassSchedule();
-            TempVModel.AllTeachers = new List<ClassMemberInfo>
-            {
-                new ClassMemberInfo {Id = 1, RegNo = "111222", Name = "Rohit Sign", Description = "M. Sc (CS)", Avatar = string.Format("~/AppFileRepo/UserAvatar/{0}.{1}?r={2}", "dd", "jpg", DateTime.Now.Ticks.ToString())},
-                new ClassMemberInfo {Id = 2, RegNo = "44445555", Name = "Kunal Sarma", Description = "B. Sc (CS)", Avatar = string.Format("~/AppFileRepo/UserAvatar/{0}.{1}?r={2}", "dd", "jpg", DateTime.Now.Ticks.ToString())},
-                new ClassMemberInfo {Id = 3, RegNo = "777888", Name = "Kamal Das", Description = "B com", Avatar = string.Format("~/AppFileRepo/UserAvatar/{0}.{1}?r={2}", "dd", "jpg", DateTime.Now.Ticks.ToString())},
-                new ClassMemberInfo {Id = 4, RegNo = "6666555", Name = "Molani Saw", Description = "Math", Avatar = string.Format("~/AppFileRepo/UserAvatar/{0}.{1}?r={2}", "dd", "jpg", DateTime.Now.Ticks.ToString())},
-                new ClassMemberInfo {Id = 5, RegNo = "454545", Name = "Kanchan Paul", Description = "English graduate", Avatar = string.Format("~/AppFileRepo/UserAvatar/{0}.{1}?r={2}", "dd", "jpg", DateTime.Now.Ticks.ToString())}
-            };
-            TempVModel.AsignTeacher = new string[1] { "44445555" };
-            TempVModel.AllStudents = new List<ClassMemberInfo>
-            {
-                new ClassMemberInfo {Id = 1, RegNo = "1144", Name = "Ripan paul", Description = "M. Sc (V Sem)", Avatar = string.Format("~/AppFileRepo/UserAvatar/{0}.{1}?r={2}", "dd", "jpg", DateTime.Now.Ticks.ToString())},
-                new ClassMemberInfo {Id = 2, RegNo = "6655", Name = "Sunil saw", Description = "B. Sc (1st sem)", Avatar = string.Format("~/AppFileRepo/UserAvatar/{0}.{1}?r={2}", "dd", "jpg", DateTime.Now.Ticks.ToString())},
-                new ClassMemberInfo {Id = 3, RegNo = "8899", Name = "Mani Das", Description = "B com Pass", Avatar = string.Format("~/AppFileRepo/UserAvatar/{0}.{1}?r={2}", "dd", "jpg", DateTime.Now.Ticks.ToString())},
-                new ClassMemberInfo {Id = 4, RegNo = "7744", Name = "Prasanta saha", Description = "Math pass", Avatar = string.Format("~/AppFileRepo/UserAvatar/{0}.{1}?r={2}", "dd", "jpg", DateTime.Now.Ticks.ToString())},
-                new ClassMemberInfo {Id = 5, RegNo = "5656", Name = "Pallav Paul", Description = "English graduate", Avatar = string.Format("~/AppFileRepo/UserAvatar/{0}.{1}?r={2}", "dd", "jpg", DateTime.Now.Ticks.ToString())}
-            };
-            TempVModel.AsignStudent = new string[2] { "6655", "7744" };
+            // get value from service layer  
+            //var AllSubjects = await _SubjectService.GetAllSubjects(500, GetBaseService().GetAppRootPath());
+            //TempVModel.Subjects = new List<AppSelectListItem>();
+            //foreach (SubjectBM subject in AllSubjects)
+            //{
+            //    AppSelectListItem AppSItem = new AppSelectListItem { Value = subject.Id.ToString(), Text = subject.Name };
+            //    TempVModel.Subjects.Add(AppSItem);
+            //}
+            //var AllStandards= await _StandardMasterService.GetAllStandards(500, GetBaseService().GetAppRootPath());
+            //TempVModel.Standards = new List<AppSelectListItem>();
+            //foreach (StandardMasterBM standard in AllStandards)
+            //{
+            //    AppSelectListItem AppSItem = new AppSelectListItem { Value = standard.Id.ToString(), Text = standard.Name };
+            //    TempVModel.Standards.Add(AppSItem);
+            //}
+            // TempVModel.Scheduler = new ClassSchedule();
+            //var AllTeachers = await _TeacherService.GetAllTeachers(500, GetBaseService().GetAppRootPath());
+            //TempVModel.AllTeachers = new List<ClassMemberInfo>();
+            //foreach (TeacherBM teacher in AllTeachers)
+            //{
+            //    ClassMemberInfo CMI = new ClassMemberInfo { Id = teacher.Id, RegNo = teacher.RegNo, Name = teacher.Name, Description = teacher.EducationalQualification, Avatar = string.Format("~/AppFileRepo/UserAvatar/{0}.{1}?r={2}", teacher.RegNo, "jpg", DateTime.Now.Ticks.ToString()) };
+            //    TempVModel.AllTeachers.Add(CMI);
+            //}
+            //TempVModel.AsignTeacher = new string[1] { "44445555" };
+            //var AllStudents = await _StudentService.GetAllStudents(500, GetBaseService().GetAppRootPath());
+            //TempVModel.AllStudents = new List<ClassMemberInfo>();
+            //foreach(StudentBM student in AllStudents)
+            //{
+            //    ClassMemberInfo CMI = new ClassMemberInfo { Id = (int)student.Id, RegNo = student.RegNo, Name = student.Name, Description = student.StandardId.ToString(), Avatar = string.Format("~/AppFileRepo/UserAvatar/{0}.{1}?r={2}", student.RegNo, "jpg", DateTime.Now.Ticks.ToString()) };
+            //    TempVModel.AllStudents.Add(CMI);
+            //};
+            //TempVModel.AsignStudent = new string[2] { "6655", "7744" };
+           await _ClassroomService.GetClassroomVM(TempVModel);
             // end of service lyer
+
             VModel = await GetViewModel(TempVModel);
             
             return View(VModel);
@@ -106,6 +123,7 @@ namespace BTWebAppFrameWorkCore.Controllers
             if (ModelState.IsValid)
             {
                 string TempMemberAsignList = string.Empty;
+                CommonResponce result = null;
                 string TempAsignKey = string.Format("{0}_{1}", model.TempClassRefId, "ClassTeacher");
                 if (TempData.ContainsKey(TempAsignKey))
                 {
@@ -121,14 +139,24 @@ namespace BTWebAppFrameWorkCore.Controllers
 
                 // write the class save service
                 await Task.Delay(5).ConfigureAwait(false);
+                Classroom CR = new Classroom();
+                CR.RefId = model.RefId;
+                CR.Name = model.Name;
+                CR.Scheduler =  model.Scheduler.ToJSONString();
+                CR.StandardId = model.StandardId;
+                CR.SubjectId = model.SubjectId;
+                CR.Description = model.Description;
                 if (model.Id > 0)
                 {
                     // write update logic
+                    result = _ClassroomService.Update(CR);
                     return Json(new { stat = true, msg = "Successfully updated Classroom" });
                 }
                 else
                 {
                     // write save logic
+                    result =await _ClassroomService.Insert(CR);
+                    //result = await _StudentClassroomService.Insert();
                     return Json(new { stat = true, msg = "Successfully save Classroom" });
                 }                                
             }

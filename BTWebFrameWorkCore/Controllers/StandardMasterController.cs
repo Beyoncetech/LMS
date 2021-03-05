@@ -25,7 +25,7 @@ namespace BTWebAppFrameWorkCore.Controllers
 
             BaseViewModel VModel = null;
 
-            var result = await _StandardMasterService.GetAllStandards(500, GetBaseService().GetAppRootPath());
+            var result = await _StandardMasterService.GetAllStandards(500);
 
             var TempVModel = new StandardVM();
             TempVModel.StandardMasterInfo= new AppGridModel<StandardMasterBM>();
@@ -165,7 +165,7 @@ namespace BTWebAppFrameWorkCore.Controllers
         [HttpPost]
         public async Task<IActionResult> ReloadStandards()
         {
-            var result = await _StandardMasterService.GetAllStandards(500, GetBaseService().GetAppRootPath());
+            var result = await _StandardMasterService.GetAllStandards(500);
             var TempModel = new AppGridModel<StandardMasterBM>();
             TempModel.Rows = result;
             return PartialView("_HTMLTable", TempModel);

@@ -12,7 +12,7 @@ namespace AppBAL.Sevices.Master
 {
     public interface ITeacherService
     {
-        Task<List<TeacherBM>> GetAllTeachers(int RowCount,string AppRootPath);
+        Task<List<TeacherBM>> GetAllTeachers(int RowCount, string AppRootPath);
         Task<CommonResponce> GetTeacherByTeacherId(int TeacherID);        
         Task<CommonResponce> GetTeacherByEmailID(string EmailID);
         Task<CommonResponce> CheckDataValidation(TeacherProfileVM TeacherToInsert, bool IsAdd);
@@ -34,7 +34,7 @@ namespace AppBAL.Sevices.Master
             _AppDirectoryFileService = AppDirectoryFileService;
         }
 
-        public async Task<List<TeacherBM>> GetAllTeachers(int RowCount,string AppRootPath)
+        public async Task<List<TeacherBM>> GetAllTeachers(int RowCount, string AppRootPath)
         {
             List<TeacherBM> result = new List<TeacherBM>();
             var oTeachers = await _DBTeacherRepository.GetAllTeachers(RowCount).ConfigureAwait(false);

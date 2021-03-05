@@ -122,7 +122,8 @@ namespace AppUtility.Extension
             }
             catch (Exception)
             {
-                throw new Exception("Wrong JSON String");
+                // throw new Exception("Wrong JSON String");
+                return (T)Activator.CreateInstance(typeof(T));
             }
 
         }
