@@ -7,85 +7,80 @@
 
 <div class="row">
     <!-- left column -->
-    <div class="col-md-8">
+    <div class="col-md-12">
         <!-- jquery validation -->
-        <div class="card card-primary">
+        <div class="card card-outline card-success">
             <!-- /.card-header -->
-            <!-- form start -->
-            <form id="frmUserProfile" asp-area="" asp-action="UserProfile" asp-controller="Account" data-ajax="true" data-ajax-method="post" data-ajax-begin="onBeforeSubmit" data-ajax-success="onSuccess">
-                @Html.HiddenFor(model => model.AttachUserImage.FileName)
-                @Html.HiddenFor(model => model.AttachUserImage.FileSize)
-                @Html.HiddenFor(model => model.AttachUserImage.FileType)
-                @Html.HiddenFor(model => model.AttachUserImage.FileContentsBase64)
-                @Html.HiddenFor(model => model.Id)
-                @Html.HiddenFor(model => model.UserID)
-                <div class="card-body">
-                    <div class="form-group">
-                        <label>User Name</label>
-                        <input type="text" name="UserName" asp-for="UserName" class="form-control" placeholder="User Name" />
-                        <span asp-validation-for="UserName" class="text-danger" style="font-size:small"></span>
-                    </div>
-                    <div class="form-group">
-                        <label>User Email</label>
-                        <input type="email" name="Email" asp-for="Email" class="form-control" placeholder="User Email" />
-                        <span asp-validation-for="Email" class="text-danger" style="font-size:small"></span>
-                    </div>
-                    <div class="form-group">
-                        <label>User Mobile</label>
-                        <input type="text" name="Mobile" asp-for="Mobile" class="form-control" placeholder="User Mobile" />
-                        <span asp-validation-for="Mobile" class="text-danger" style="font-size:small"></span>
-                    </div>
-                    <div class="form-group">
-                        <label>Date of Birth</label>
-                        <div class="input-group date" id="dobdate" data-target-input="nearest">
-                            <input type="text" name="Dob" asp-for="Dob" class="form-control datetimepicker-input" data-target="#dobdate" />
-                            <div class="input-group-append" data-target="#dobdate" data-toggle="datetimepicker">
-                                <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-8">
+                        <!-- form start -->
+                        <form id="frmUserProfile" asp-area="" asp-action="UserProfile" asp-controller="Account" data-ajax="true" data-ajax-method="post" data-ajax-begin="onBeforeSubmit" data-ajax-success="onSuccess">
+                            @Html.HiddenFor(model => model.AttachUserImage.FileName)
+                            @Html.HiddenFor(model => model.AttachUserImage.FileSize)
+                            @Html.HiddenFor(model => model.AttachUserImage.FileType)
+                            @Html.HiddenFor(model => model.AttachUserImage.FileContentsBase64)
+                            @Html.HiddenFor(model => model.Id)
+                            @Html.HiddenFor(model => model.UserID)
+
+                            <div class="form-group">
+                                <label>User Name</label>
+                                <input type="text" name="UserName" asp-for="UserName" class="form-control" placeholder="User Name" />
+                                <span asp-validation-for="UserName" class="text-danger" style="font-size:small"></span>
                             </div>
+                            <div class="form-group">
+                                <label>User Email</label>
+                                <input type="email" name="Email" asp-for="Email" class="form-control" placeholder="User Email" />
+                                <span asp-validation-for="Email" class="text-danger" style="font-size:small"></span>
+                            </div>
+                            <div class="form-group">
+                                <label>User Mobile</label>
+                                <input type="text" name="Mobile" asp-for="Mobile" class="form-control" placeholder="User Mobile" />
+                                <span asp-validation-for="Mobile" class="text-danger" style="font-size:small"></span>
+                            </div>
+                            <div class="form-group">
+                                <label>Date of Birth</label>
+                                <div class="input-group date" id="dobdate" data-target-input="nearest">
+                                    <input type="text" name="Dob" asp-for="Dob" class="form-control datetimepicker-input" data-target="#dobdate" />
+                                    <div class="input-group-append" data-target="#dobdate" data-toggle="datetimepicker">
+                                        <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <table>
+                                <tr>
+                                    <td>
+                                        @*@Html.HiddenFor(model => model.UserImgPath)*@
+                                        <img id="EmpImg" alt="No Image Found" src="@Url.Content(Model.UserImgPath)" style="border:groove;" width="150" height="150" />
+                                    </td>
+                                    <td style="padding-left:10px;">
+                                        <div style="position:relative;">
+                                            <a class='btn btn-primary' href='javascript:;'>
+                                                Browse ...
+                                                <input type="file" name="UpldUserImg" style='position:absolute;z-index:2;top:0;left:0;filter: alpha(opacity=0);-ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";opacity:0;background-color:transparent;color:transparent;' size="40" onchange='OnImageSelect(this);'>
+                                            </a>
+                                            &nbsp;
+                                            <span class='label label-success' id="upload-file-info"></span>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </table>
                         </div>
                     </div>
                 </div>
-                <!-- /.card-body -->
-                <div class="card-footer">
-                    <input type="submit" class="btn btn-primary" value="Save" />
-                </div>
-            </form>
-        </div>
-        <!-- /.card -->
-    </div>
-    <!--/.col (left) -->
-    <!-- right column -->
-    <div class="col-md-4">
-        <!-- jquery validation -->
-        <div class="card card-primary">
-            <!-- /.card-header -->
-            <!-- contain start -->
-            <div class="card-body">
-                <div class="form-group">
-                    <table>
-                        <tr>
-                            <td>
-                                @*@Html.HiddenFor(model => model.UserImgPath)*@
-                                <img id="EmpImg" alt="No Image Found" src="@Url.Content(Model.UserImgPath)" style="border:groove;" width="150" height="150" />
-                            </td>
-                            <td style="padding-left:10px;">
-                                <div style="position:relative;">
-                                    <a class='btn btn-primary' href='javascript:;'>
-                                        Browse ...
-                                        <input type="file" name="UpldUserImg" style='position:absolute;z-index:2;top:0;left:0;filter: alpha(opacity=0);-ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";opacity:0;background-color:transparent;color:transparent;' size="40" onchange='OnImageSelect(this);'>
-                                    </a>
-                                    &nbsp;
-                                    <span class='label label-success' id="upload-file-info"></span>
-                                </div>
-                            </td>
-                        </tr>
-                    </table>
-                </div>
+
+            </div>
+            <!-- /.card-body -->
+            <div class="card-footer">
+                <input type="submit" class="btn btn-primary" value="Save" id="btnUserSave" />
             </div>
         </div>
         <!-- /.card -->
     </div>
-    <!--/.col (right) -->
 </div>
 
 @section Scripts {
@@ -93,19 +88,27 @@
     <script type="text/javascript">
 
         $(function () {
-            //Date range picker  
+            //Date range picker
             //$('#dobdate').datepicker({
             //    dateFormat: 'dd/mm/yy'
             //});
             $('#dobdate').datetimepicker({
                 format: 'DD/MM/YYYY'
             });
+
+            $('#btnUserSave').click(function (e) {
+                e.preventDefault();
+                var isFormValid = $('#frmUserProfile').valid();
+                if (isFormValid) {
+                    $('#frmUserProfile').submit();
+                }
+            });
         });
 
 
         function onBeforeSubmit() {
             debugger;
-            ShowAppLoader();            
+            ShowAppLoader();
         }
 
         function onSuccess(result, textStatus, jqXHR) {
@@ -134,7 +137,7 @@
                     //    messageText: "The selected User image is lerger than 1MB. Please select Image less than 1MB.",
                     //    alertType: "danger",
                     //    topMargin: '300px'
-                    //});                    
+                    //});
                     input.value = '';
                     return;
                 }
